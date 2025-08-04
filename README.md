@@ -62,23 +62,23 @@ boodongsan/
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     API Gateway Layer                     │
+│                     API Gateway Layer                       │
 ├─────────────────────────────────────────────────────────────┤
-│           AWS API Gateway + CloudFront CDN            │
-│              (Rate Limiting, CORS, SSL)               │
+│           AWS API Gateway + CloudFront CDN                  │
+│              (Rate Limiting, CORS, SSL)                     │
 └─────────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   Application Layer                   │
+│                   Application Layer                         │
 ├─────────────────────────────────────────────────────────────┤
-│  Lambda Function (Python 3.11)  │    FastAPI + EC2/ECS    │
-│          (Serverless)           │       (Container)       │
+│  Lambda Function (Python 3.11)  │    FastAPI + EC2/ECS      │
+│          (Serverless)           │       (Container)         │
 └─────────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                       AI/ML Layer                       │
+│                       AI/ML Layer                           │
 ├─────────────────────────────────────────────────────────────┤
 │     AWS Bedrock (Claude/GPT)    │    LangChain Framework    │
 │     Custom Embedding Models     │ Vector Database (Pinecone)│
@@ -86,20 +86,20 @@ boodongsan/
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                        Data Layer                         │
+│                        Data Layer                           │
 ├─────────────────────────────────────────────────────────────┤
-│ RDS (PostgreSQL) │  DynamoDB  │  S3 Bucket  │ ElastiCache │
-│   (Structured)   │  (NoSQL)   │(Files/Docs) │   (Cache)   │
+│ RDS (PostgreSQL) │  DynamoDB  │  S3 Bucket  │ ElastiCache   │
+│   (Structured)   │  (NoSQL)   │(Files/Docs) │   (Cache)     │
 └─────────────────────────────────────────────────────────────┘
 
 핵심 데이터 플로우
 
 사용자 질문 → API Gateway → Lambda/FastAPI
-     ↓
+                 ↓
 사용자 프로파일링 → 정부 정책 매칭 → 부동산 데이터 검색
-     ↓
+                 ↓
 AWS Bedrock + LangChain → 맞춤형 추천 생성
-     ↓
+                 ↓
 응답 반환 → 사용자 인터페이스
 ```
 
