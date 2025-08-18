@@ -1,2 +1,5 @@
 .DS_Store
 .env
+.cursor
+.claude
+testing_files

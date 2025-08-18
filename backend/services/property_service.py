@@ -1,25 +1,29 @@
 """
-부동산 매물 서비스 (스텁)
-부동산 검색 및 추천 로직
+Property Service for Korean Real Estate RAG AI Chatbot
+Handles property-related business logic
 """
 
 import logging
-from typing import Dict, List, Optional, Any
-import asyncio
+from typing import List, Dict, Any, Optional
+from datetime import datetime
 
-from sqlalchemy.orm import Session
-from ..database.models import Property
-from ..database.connection import get_db_session
+from ..models.property import Property, PropertyFilter, PropertyResponse, PropertySearchResult, PropertyStats
+from ..core.database import get_database_session
 
 logger = logging.getLogger(__name__)
 
 class PropertyService:
-    """부동산 매물 서비스"""
+    """Service for property-related operations"""
     
     def __init__(self):
         pass
     
-    async def search_properties(self, query: str) -> List[Dict[str, Any]]:
+    async def search_properties(
+        self,
+        filter: PropertyFilter,
+        limit: int = 10,
+        offset: int = 0
+    ) -> List[PropertyResponse]:
         """부동산 검색 (간단한 텍스트 쿼리)"""
         try:
             # 임시 더미 데이터 반환

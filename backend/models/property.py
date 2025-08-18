@@ -1,0 +1,256 @@
+"""
+Property models for Korean Real Estate data
+"""
+
+from datetime import datetime
+from typing import Optional, List, Dict, Any
+from enum import Enum
+import uuid
+
+from sqlalchemy import Column, String, Integer, Float, Text, DateTime, Boolean, Index, JSON
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
+from pydantic import BaseModel, Field, validator
+
+from .base import Base, BaseSchema, TimestampMixin
+
+
+class PropertyType(str, Enum):
+    """Property types"""
+    APARTMENT = "아파트"
+    VILLA = "빌라"
+    OFFICETEL = "오피스텔"
+    SINGLE_HOUSE = "단독주택"
+    TOWNHOUSE = "연립주택"
+    STUDIO = "원룸"
+
+
+class TransactionType(str, Enum):
+    """Transaction types"""
+    SALE = "매매"
+    JEONSE = "전세"
+    MONTHLY_RENT = "월세"
+
+
+class Property(Base):
+    """Property database model"""
+    __tablename__ = "properties"
+    
+    # Basic property information
+    address = Column(String(500), nullable=False, index=True)
+    detailed_address = Column(String(500))
+    postal_code = Column(String(10))
+    
+    # Location information
+    sido = Column(String(50), nullable=False, index=True)  # 시도
+    sigungu = Column(String(50), nullable=False, index=True)  # 시군구
+    dong = Column(String(50), nullable=False, index=True)  # 동
+    jibun = Column(String(100))  # 지번
+    
+    # Property details
+    property_type = Column(String(20), nullable=False, index=True)
+    building_name = Column(String(200))
+    room_count = Column(Integer)  # 방 개수
+    bathroom_count = Column(Integer)  # 화장실 개수
+    area_m2 = Column(Float, nullable=False)  # 면적 (제곱미터)
+    area_pyeong = Column(Float)  # 면적 (평)
+    
+    # Building information
+    building_year = Column(Integer)  # 건축년도
+    floor = Column(Integer)  # 층수
+    total_floors = Column(Integer)  # 총 층수
+    
+    # Transaction information
+    transaction_type = Column(String(10), nullable=False, index=True)
+    price = Column(Integer, nullable=False, index=True)  # 가격 (원)
+    deposit = Column(Integer)  # 보증금 (전세/월세)
+    monthly_rent = Column(Integer)  # 월세
+    maintenance_fee = Column(Integer)  # 관리비
+    
+    # Transaction date
+    transaction_date = Column(DateTime, index=True)
+    registration_date = Column(DateTime, default=datetime.utcnow)
+    
+    # Additional information
+    parking_available = Column(Boolean, default=False)
+    elevator_available = Column(Boolean, default=False)
+    
+    # Coordinate information
+    latitude = Column(Float)
+    longitude = Column(Float)
+    
+    # Infrastructure data (JSON)
+    transportation = Column(JSON)  # 교통 정보
+    education = Column(JSON)  # 교육 시설
+    convenience = Column(JSON)  # 편의 시설
+    
+    # Data source
+    data_source = Column(String(100))  # 데이터 출처
+    source_id = Column(String(100))  # 원본 ID
+    
+    # Additional metadata
+    description = Column(Text)
+    features = Column(ARRAY(String))  # 특징 리스트
+    images = Column(ARRAY(String))  # 이미지 URL 리스트
+    
+    # Search optimization
+    search_vector = Column(Text)  # 검색용 벡터 임베딩 ID
+    
+    # Indexes
+    __table_args__ = (
+        Index('idx_location', 'sido', 'sigungu', 'dong'),
+        Index('idx_property_type_transaction', 'property_type', 'transaction_type'),
+        Index('idx_price_range', 'transaction_type', 'price'),
+        Index('idx_area_range', 'area_m2'),
+        Index('idx_building_year', 'building_year'),
+        Index('idx_coordinates', 'latitude', 'longitude'),
+    )
+
+
+class PropertyFilter(BaseModel):
+    """Property search filter"""
+    
+    # Location filters
+    sido: Optional[str] = None
+    sigungu: Optional[str] = None
+    dong: Optional[str] = None
+    
+    # Property type filter
+    property_types: Optional[List[PropertyType]] = None
+    transaction_types: Optional[List[TransactionType]] = None
+    
+    # Price filters
+    min_price: Optional[int] = None
+    max_price: Optional[int] = None
+    min_deposit: Optional[int] = None
+    max_deposit: Optional[int] = None
+    max_monthly_rent: Optional[int] = None
+    
+    # Area filters
+    min_area_m2: Optional[float] = None
+    max_area_m2: Optional[float] = None
+    min_area_pyeong: Optional[float] = None
+    max_area_pyeong: Optional[float] = None
+    
+    # Room filters
+    min_room_count: Optional[int] = None
+    max_room_count: Optional[int] = None
+    
+    # Building filters
+    min_building_year: Optional[int] = None
+    max_building_year: Optional[int] = None
+    min_floor: Optional[int] = None
+    max_floor: Optional[int] = None
+    
+    # Feature filters
+    parking_required: Optional[bool] = None
+    elevator_required: Optional[bool] = None
+    
+    # Location filters (coordinates)
+    center_lat: Optional[float] = None
+    center_lng: Optional[float] = None
+    radius_km: Optional[float] = None
+    
+    # Date filters
+    transaction_date_from: Optional[datetime] = None
+    transaction_date_to: Optional[datetime] = None
+
+
+class PropertyBase(BaseSchema):
+    """Base property schema"""
+    address: str = Field(..., description="Property address")
+    detailed_address: Optional[str] = None
+    sido: str = Field(..., description="시도")
+    sigungu: str = Field(..., description="시군구") 
+    dong: str = Field(..., description="동")
+    property_type: PropertyType = Field(..., description="Property type")
+    transaction_type: TransactionType = Field(..., description="Transaction type")
+    area_m2: float = Field(..., gt=0, description="Area in square meters")
+    price: int = Field(..., ge=0, description="Price in KRW")
+
+
+class PropertyCreate(PropertyBase):
+    """Property creation schema"""
+    building_name: Optional[str] = None
+    room_count: Optional[int] = Field(None, ge=0)
+    bathroom_count: Optional[int] = Field(None, ge=0)
+    area_pyeong: Optional[float] = Field(None, gt=0)
+    building_year: Optional[int] = Field(None, ge=1900, le=2030)
+    floor: Optional[int] = Field(None, ge=-10, le=200)
+    total_floors: Optional[int] = Field(None, ge=1, le=200)
+    deposit: Optional[int] = Field(None, ge=0)
+    monthly_rent: Optional[int] = Field(None, ge=0)
+    maintenance_fee: Optional[int] = Field(None, ge=0)
+    transaction_date: Optional[datetime] = None
+    parking_available: Optional[bool] = False
+    elevator_available: Optional[bool] = False
+    latitude: Optional[float] = Field(None, ge=-90, le=90)
+    longitude: Optional[float] = Field(None, ge=-180, le=180)
+    description: Optional[str] = None
+    features: Optional[List[str]] = []
+    data_source: Optional[str] = None
+    source_id: Optional[str] = None
+
+
+class PropertyUpdate(BaseModel):
+    """Property update schema"""
+    price: Optional[int] = Field(None, ge=0)
+    deposit: Optional[int] = Field(None, ge=0)
+    monthly_rent: Optional[int] = Field(None, ge=0)
+    maintenance_fee: Optional[int] = Field(None, ge=0)
+    description: Optional[str] = None
+    features: Optional[List[str]] = None
+    is_active: Optional[bool] = None
+
+
+class PropertyResponse(PropertyBase, TimestampMixin):
+    """Property response schema"""
+    id: uuid.UUID
+    building_name: Optional[str] = None
+    room_count: Optional[int] = None
+    bathroom_count: Optional[int] = None
+    area_pyeong: Optional[float] = None
+    building_year: Optional[int] = None
+    floor: Optional[int] = None
+    total_floors: Optional[int] = None
+    deposit: Optional[int] = None
+    monthly_rent: Optional[int] = None
+    maintenance_fee: Optional[int] = None
+    transaction_date: Optional[datetime] = None
+    parking_available: bool = False
+    elevator_available: bool = False
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    description: Optional[str] = None
+    features: Optional[List[str]] = []
+    is_active: bool = True
+    
+    @validator('area_pyeong', pre=True, always=True)
+    def calculate_area_pyeong(cls, v, values):
+        if v is not None:
+            return v
+        area_m2 = values.get('area_m2')
+        if area_m2:
+            return round(area_m2 / 3.3058, 2)  # Convert m² to 평
+        return None
+
+
+class PropertySearchResult(BaseModel):
+    """Property search result with relevance score"""
+    property: PropertyResponse
+    relevance_score: float = Field(..., ge=0, le=1, description="Relevance score from vector search")
+    distance_km: Optional[float] = Field(None, description="Distance from search center in km")
+    matching_criteria: List[str] = Field(default=[], description="List of matching search criteria")
+
+
+class PropertyStats(BaseModel):
+    """Property statistics"""
+    total_count: int
+    average_price: float
+    median_price: float
+    min_price: int
+    max_price: int
+    price_per_m2: float
+    price_per_pyeong: float
+    area_distribution: Dict[str, int]
+    transaction_type_distribution: Dict[str, int]
+    property_type_distribution: Dict[str, int]
