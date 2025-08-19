@@ -38,7 +38,6 @@ graph TB
         AI1 -.-> |빠른 응답| API
         AI2 -.-> |복잡한 추론| API
     end
-end
 ```
 
 ### 데이터 플로우
