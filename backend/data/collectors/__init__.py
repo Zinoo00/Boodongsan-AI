@@ -2,8 +2,8 @@
 Data collectors for Korean Real Estate data sources
 """
 
-from .real_estate_collector import RealEstateCollector
 from .policy_collector import PolicyCollector
+from .real_estate_collector import RealEstateCollector
 
 __all__ = [
     "RealEstateCollector",

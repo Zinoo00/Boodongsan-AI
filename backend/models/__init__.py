@@ -2,10 +2,10 @@
 Data models for Korean Real Estate RAG AI Chatbot
 """
 
-from .property import Property, PropertyFilter, PropertySearchResult
-from .user import User, UserProfile, ConversationHistory
-from .policy import GovernmentPolicy, PolicyMatch
 from .base import Base
+from .policy import GovernmentPolicy, PolicyMatch
+from .property import Property, PropertyFilter, PropertySearchResult
+from .user import ConversationHistory, User, UserProfile
 
 __all__ = [
     "Base",

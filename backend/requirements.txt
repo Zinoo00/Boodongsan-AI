@@ -1,122 +1,130 @@
+# ⚠️  DEPRECATED: This file is maintained for compatibility only
+# 🎯 Use `uv sync` instead of `pip install -r requirements.txt`
+# 📦 Dependencies are now managed in pyproject.toml with dependency groups
+# 
+# Migration: 
+# - Core: `uv sync`
+# - Development: `uv sync --group dev`
+# - ML features: `uv sync --group ml`
+# - See README.md for full dependency group options
+#
+# This file is auto-generated and may become outdated.
+# Always prefer pyproject.toml as the source of truth.
+
 # FastAPI 및 웹 프레임워크
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-granian==1.1.0           # High-performance ASGI server
-pydantic==2.5.0
-pydantic-settings==2.1.0
+fastapi==0.116.1
+uvicorn[standard]>=0.24,<0.31
+granian==2.5.0           # High-performance Rust-based ASGI server
+pydantic==2.11.7
+pydantic-settings==2.10.1
 
 # AWS SDK 및 서비스
-boto3==1.34.72
-botocore==1.34.72
+boto3==1.40.11
+botocore==1.40.11
 
-# LangChain 및 AI/ML
-langchain==0.1.0
-langchain-aws==0.1.0
-langchain-community==0.0.10
-openai==1.6.1
+# LangChain 및 AI/ML (Compatible with NumPy 1.x)
+langchain==0.3.27
+langchain-aws==0.2.30
+langchain-community==0.3.27
+langchain-core==0.3.74
+openai==1.91.0
 
 # 데이터베이스
-asyncpg==0.29.0          # PostgreSQL 비동기 드라이버
-redis==5.0.1             # Redis 캐시
-aioredis==2.0.1          # Redis 비동기 드라이버
+asyncpg==0.30.0          # PostgreSQL 비동기 드라이버
+redis>=5,<6              # Redis 캐시 (includes async support, replaces aioredis)
 
-# 벡터 데이터베이스
-qdrant-client==1.7.0     # Qdrant 벡터 DB
-numpy==1.26.2            # For vector operations
+# 벡터 데이터베이스 (NumPy 1.x compatible)
+qdrant-client==1.15.1    # Qdrant 벡터 DB (security fixes included)
+numpy==1.26.4            # Latest NumPy 1.x for Python 3.11 compatibility
 
 # ORM 및 데이터베이스 마이그레이션
-sqlalchemy==2.0.23
-alembic==1.13.1
+sqlalchemy==2.0.39
+alembic==1.16.4
 
 # 사용자 인증 및 보안
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
-cryptography==42.0.8
+python-jose[cryptography]==3.5.0
+passlib[bcrypt]==1.7.4    # Consider migrating to pwdlib for new projects
+python-multipart==0.0.20
+cryptography==45.0.6
 
-# 데이터 처리 및 분석
-pandas==2.1.4
-numpy==1.26.2
-scikit-learn==1.3.2
+# 데이터 처리 및 분석 (NumPy 1.x compatible)
+pandas==2.2.3            # Compatible with NumPy 1.x
+scikit-learn==1.5.2      # Compatible with NumPy 1.x
 
 # HTTP 클라이언트 및 네트워킹
-httpx==0.25.2
-aiohttp==3.9.1
-requests==2.31.0
+httpx==0.28.1
+aiohttp==3.12.15
+requests==2.32.4
 
 # Retry and resilience
 tenacity==8.2.3           # Retry logic with exponential backoff
 
 # 로깅 및 모니터링
-structlog==23.2.0
+structlog>=24.0.0,<26.0.0
 python-json-logger==2.0.7
-prometheus-client==0.19.0
+prometheus-client>=0.19,<0.22
 
 # 환경설정 및 유틸리티
-python-dotenv==1.0.0
-click==8.1.7
-typer==0.9.0
+python-dotenv==1.0.1
+click==8.1.8
+typer==0.15.2
 
 # 테스트
-pytest==7.4.3
-pytest-asyncio==0.21.1
-pytest-mock==3.12.0
-httpx==0.25.2
+pytest==8.4.1
+pytest-asyncio==1.1.0
+pytest-mock==3.14.1
 
-# 코드 품질 및 포매팅
-black==23.12.0
-isort==5.13.2
-flake8==6.1.0
-mypy==1.8.0
+# 코드 품질 및 포매팅 (Modern Ruff-based approach)
+ruff>=0.5,<0.7           # Replaces black, isort, flake8 with fast linter/formatter
+mypy==1.17.1
 
 # 개발 도구
-watchdog==3.0.0
-python-multipart==0.0.6
+watchdog==6.0.0
 
 # API 문서화
 slowapi==0.1.9          # FastAPI와 SlowAPI 통합
 
 # 데이터 검증 및 직렬화
-marshmallow==3.20.2
+marshmallow==3.23.2
 cerberus==1.3.5
 
 # 지리적 데이터 처리 (부동산 위치 정보)
 geopy==2.4.1
-folium==0.15.1          # 지도 시각화
-geopandas==0.14.1       # 지리 데이터 분석
+folium==0.16.0          # 지도 시각화
+geopandas==1.0.1        # Compatible with NumPy 1.x
 
 # 한국어 자연어 처리
-konlpy==0.6.0           # 한국어 형태소 분석
-soynlp==0.0.493         # 비지도 한국어 토크나이저
-kiwipiepy==0.16.1       # Kiwi 형태소 분석기
+konlpy==0.6.0           # 한국어 형태소 분석 (Java 의존성 필요)
+soynlp==0.0.27          # 비지도 한국어 토크나이저
+kiwipiepy==0.21.0       # 현대 한국어 형태소 분석기 (권장)
 
 # 웹 스크래핑 (부동산 데이터 수집)
-beautifulsoup4==4.12.2
-selenium==4.16.0
-scrapy==2.11.0
+beautifulsoup4>=4.12,<4.13
+selenium==4.29.0        # WebDriver BiDi support
+scrapy==2.13.3          # Enhanced politeness settings
 
 # 스케줄링
-apscheduler==3.10.4     # 데이터 업데이트 스케줄링
+apscheduler==3.11.0     # 데이터 업데이트 스케줄링
 
 # 이미지 처리 (부동산 사진)
-Pillow==10.1.0
-opencv-python==4.8.1.78
+Pillow==11.3.0          # libavif and GIF support
+opencv-python==4.10.0.84  # Compatible with NumPy 1.x
 
-# 통계 및 수학
-scipy==1.11.4
-statsmodels==0.14.1
+# 통계 및 수학 (NumPy 1.x compatible)
+scipy==1.13.1          # Compatible with NumPy 1.x
+statsmodels==0.14.5
 
 # 캐싱
-cachetools==5.3.2
+cachetools==6.1.0
 diskcache==5.6.3
 
 # 비동기 처리
-celery==5.3.4           # 분산 작업 큐
+celery==5.5.3           # 분산 작업 큐 (Google Cloud Pub/Sub support)
 flower==2.0.1           # Celery 모니터링
 
 # XML/JSON 처리
 xmltodict==0.13.0
-orjson==3.9.10          # 빠른 JSON 처리
+orjson==3.11.2          # 10x faster JSON processing
 
 # 환경 및 설정
-dynaconf==3.2.4         # 동적 설정 관리
+dynaconf==3.2.11        # 동적 설정 관리

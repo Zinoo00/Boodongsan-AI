@@ -5,12 +5,10 @@
 
 import asyncio
 import logging
-from datetime import datetime, date
-from typing import List, Dict, Any
+from datetime import datetime
 
-from sqlalchemy.orm import Session
-from .models import GovernmentPolicy, PolicyCondition
 from .connection import get_db_session
+from .models import GovernmentPolicy, PolicyCondition
 
 logger = logging.getLogger(__name__)
 

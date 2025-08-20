@@ -2,15 +2,15 @@
 User models for Korean Real Estate RAG AI Chatbot
 """
 
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-from enum import Enum
 import uuid
+from datetime import datetime
+from enum import Enum
+from typing import Any
 
-from sqlalchemy import Column, String, Integer, Float, Text, DateTime, Boolean, ForeignKey, JSON
+from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from pydantic import BaseModel, Field, validator, EmailStr
 
 from .base import Base, BaseSchema, TimestampMixin
 
@@ -179,28 +179,28 @@ class ConversationHistory(Base):
 class UserBase(BaseSchema):
     """Base user schema"""
     email: EmailStr = Field(..., description="User email address")
-    username: Optional[str] = Field(None, min_length=3, max_length=100, description="Username")
-    phone_number: Optional[str] = Field(None, regex=r"^01[0-9]-[0-9]{4}-[0-9]{4}$", description="Phone number")
-    full_name: Optional[str] = Field(None, max_length=200, description="Full name")
+    username: str | None = Field(None, min_length=3, max_length=100, description="Username")
+    phone_number: str | None = Field(None, regex=r"^01[0-9]-[0-9]{4}-[0-9]{4}$", description="Phone number")
+    full_name: str | None = Field(None, max_length=200, description="Full name")
     preferred_language: str = Field("ko", description="Preferred language")
 
 
 class UserCreate(UserBase):
     """User creation schema"""
     password: str = Field(..., min_length=8, max_length=100, description="Password")
-    birth_date: Optional[datetime] = None
-    gender: Optional[str] = Field(None, regex=r"^(male|female|other)$")
+    birth_date: datetime | None = None
+    gender: str | None = Field(None, regex=r"^(male|female|other)$")
     marketing_consent: bool = False
 
 
 class UserUpdate(BaseModel):
     """User update schema"""
-    username: Optional[str] = Field(None, min_length=3, max_length=100)
-    phone_number: Optional[str] = Field(None, regex=r"^01[0-9]-[0-9]{4}-[0-9]{4}$")
-    full_name: Optional[str] = Field(None, max_length=200)
-    preferred_language: Optional[str] = None
-    notification_enabled: Optional[bool] = None
-    marketing_consent: Optional[bool] = None
+    username: str | None = Field(None, min_length=3, max_length=100)
+    phone_number: str | None = Field(None, regex=r"^01[0-9]-[0-9]{4}-[0-9]{4}$")
+    full_name: str | None = Field(None, max_length=200)
+    preferred_language: str | None = None
+    notification_enabled: bool | None = None
+    marketing_consent: bool | None = None
 
 
 class UserResponse(UserBase, TimestampMixin):
@@ -208,40 +208,40 @@ class UserResponse(UserBase, TimestampMixin):
     id: uuid.UUID
     status: UserStatus
     is_verified: bool
-    last_login: Optional[datetime] = None
+    last_login: datetime | None = None
     login_count: int
 
 
 class UserProfileBase(BaseSchema):
     """Base user profile schema"""
     profile_name: str = Field("기본 프로필", max_length=100)
-    age: Optional[int] = Field(None, ge=18, le=100)
-    annual_income: Optional[int] = Field(None, ge=0)
-    household_size: Optional[int] = Field(None, ge=1, le=20)
-    max_budget: Optional[int] = Field(None, ge=0)
+    age: int | None = Field(None, ge=18, le=100)
+    annual_income: int | None = Field(None, ge=0)
+    household_size: int | None = Field(None, ge=1, le=20)
+    max_budget: int | None = Field(None, ge=0)
 
 
 class UserProfileCreate(UserProfileBase):
     """User profile creation schema"""
-    marital_status: Optional[str] = None
-    employment_status: Optional[str] = None
-    current_residence_type: Optional[str] = None
-    current_residence_area: Optional[str] = None
+    marital_status: str | None = None
+    employment_status: str | None = None
+    current_residence_type: str | None = None
+    current_residence_area: str | None = None
     is_first_time_buyer: bool = True
-    available_budget: Optional[int] = Field(None, ge=0)
-    preferred_locations: Optional[List[str]] = []
-    preferred_property_types: Optional[List[str]] = []
-    preferred_transaction_types: Optional[List[str]] = []
+    available_budget: int | None = Field(None, ge=0)
+    preferred_locations: list[str] | None = []
+    preferred_property_types: list[str] | None = []
+    preferred_transaction_types: list[str] | None = []
 
 
 class UserProfileUpdate(BaseModel):
     """User profile update schema"""
-    profile_name: Optional[str] = Field(None, max_length=100)
-    age: Optional[int] = Field(None, ge=18, le=100)
-    annual_income: Optional[int] = Field(None, ge=0)
-    max_budget: Optional[int] = Field(None, ge=0)
-    preferred_locations: Optional[List[str]] = None
-    preferred_property_types: Optional[List[str]] = None
+    profile_name: str | None = Field(None, max_length=100)
+    age: int | None = Field(None, ge=18, le=100)
+    annual_income: int | None = Field(None, ge=0)
+    max_budget: int | None = Field(None, ge=0)
+    preferred_locations: list[str] | None = None
+    preferred_property_types: list[str] | None = None
 
 
 class UserProfileResponse(UserProfileBase, TimestampMixin):
@@ -249,12 +249,12 @@ class UserProfileResponse(UserProfileBase, TimestampMixin):
     id: uuid.UUID
     user_id: uuid.UUID
     is_primary: bool
-    marital_status: Optional[str] = None
-    employment_status: Optional[str] = None
+    marital_status: str | None = None
+    employment_status: str | None = None
     is_first_time_buyer: bool
-    preferred_locations: Optional[List[str]] = []
-    preferred_property_types: Optional[List[str]] = []
-    eligible_policies: Optional[List[str]] = []
+    preferred_locations: list[str] | None = []
+    preferred_property_types: list[str] | None = []
+    eligible_policies: list[str] | None = []
 
 
 class ConversationCreate(BaseModel):
@@ -262,8 +262,8 @@ class ConversationCreate(BaseModel):
     conversation_id: str = Field(..., max_length=100)
     role: str = Field(..., regex=r"^(user|assistant|system)$")
     content: str = Field(..., min_length=1)
-    intent: Optional[str] = None
-    entities: Optional[Dict[str, Any]] = None
+    intent: str | None = None
+    entities: dict[str, Any] | None = None
 
 
 class ConversationResponse(BaseSchema, TimestampMixin):
@@ -273,10 +273,10 @@ class ConversationResponse(BaseSchema, TimestampMixin):
     message_index: int
     role: str
     content: str
-    intent: Optional[str] = None
-    confidence_score: Optional[float] = None
-    user_rating: Optional[int] = None
-    was_helpful: Optional[bool] = None
+    intent: str | None = None
+    confidence_score: float | None = None
+    user_rating: int | None = None
+    was_helpful: bool | None = None
 
 
 class UserStats(BaseModel):
@@ -284,6 +284,6 @@ class UserStats(BaseModel):
     total_conversations: int
     total_messages: int
     average_session_duration: float
-    favorite_property_types: List[str]
-    most_searched_locations: List[str]
-    interaction_frequency: Dict[str, int]
+    favorite_property_types: list[str]
+    most_searched_locations: list[str]
+    interaction_frequency: dict[str, int]

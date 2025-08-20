@@ -5,13 +5,13 @@
 
 import logging
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from ...database.connection import health_check as db_health_check
 from ...ai.bedrock_client import get_bedrock_client
+from ...database.connection import health_check as db_health_check
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class HealthResponse(BaseModel):
     """헬스체크 응답 모델"""
     status: str
     timestamp: str
-    services: Dict[str, Any]
+    services: dict[str, Any]
     version: str = "1.0.0"
 
 class ServiceStatus(BaseModel):
@@ -109,7 +109,7 @@ async def health_check():
             detail="헬스체크 실행 중 오류가 발생했습니다."
         )
 
-@router.get("/database", response_model=Dict[str, Any])
+@router.get("/database", response_model=dict[str, Any])
 async def database_health():
     """데이터베이스 상태 확인"""
     try:
@@ -132,7 +132,7 @@ async def database_health():
             detail="데이터베이스 헬스체크 실행 중 오류가 발생했습니다."
         )
 
-@router.get("/ai", response_model=Dict[str, Any])
+@router.get("/ai", response_model=dict[str, Any])
 async def ai_service_health():
     """AI 서비스 상태 확인"""
     try:
@@ -156,12 +156,13 @@ async def ai_service_health():
             detail="AI 서비스 헬스체크 실행 중 오류가 발생했습니다."
         )
 
-@router.get("/metrics", response_model=Dict[str, Any])
+@router.get("/metrics", response_model=dict[str, Any])
 async def system_metrics():
     """시스템 메트릭스"""
     try:
-        import psutil
         import os
+
+        import psutil
         
         # CPU 사용률
         cpu_percent = psutil.cpu_percent(interval=1)
@@ -214,7 +215,7 @@ async def system_metrics():
             detail="시스템 메트릭스 조회 중 오류가 발생했습니다."
         )
 
-@router.get("/version", response_model=Dict[str, str])
+@router.get("/version", response_model=dict[str, str])
 async def get_version():
     """API 버전 정보"""
     return {

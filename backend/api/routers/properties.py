@@ -4,7 +4,7 @@
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -16,20 +16,20 @@ router = APIRouter()
 # Pydantic 모델들
 class PropertySearchRequest(BaseModel):
     """부동산 검색 요청 모델"""
-    region: Optional[str] = Field(None, description="지역")
-    property_type: Optional[str] = Field(None, description="부동산 유형")
-    transaction_type: Optional[str] = Field(None, description="거래 유형")
-    price_min: Optional[int] = Field(None, description="최소 가격")
-    price_max: Optional[int] = Field(None, description="최대 가격")
-    area_min: Optional[int] = Field(None, description="최소 면적")
-    area_max: Optional[int] = Field(None, description="최대 면적")
-    room_count: Optional[int] = Field(None, description="방 개수")
+    region: str | None = Field(None, description="지역")
+    property_type: str | None = Field(None, description="부동산 유형")
+    transaction_type: str | None = Field(None, description="거래 유형")
+    price_min: int | None = Field(None, description="최소 가격")
+    price_max: int | None = Field(None, description="최대 가격")
+    area_min: int | None = Field(None, description="최소 면적")
+    area_max: int | None = Field(None, description="최대 면적")
+    room_count: int | None = Field(None, description="방 개수")
 
 class PropertyListResponse(BaseModel):
     """부동산 목록 응답 모델"""
-    properties: List[Dict[str, Any]] = Field(..., description="부동산 목록")
+    properties: list[dict[str, Any]] = Field(..., description="부동산 목록")
     total_count: int = Field(..., description="전체 매물 수")
-    search_criteria: Dict[str, Any] = Field(..., description="검색 조건")
+    search_criteria: dict[str, Any] = Field(..., description="검색 조건")
 
 @router.post("/search", response_model=PropertyListResponse)
 async def search_properties(request: PropertySearchRequest):
@@ -157,9 +157,9 @@ async def search_properties(request: PropertySearchRequest):
 
 @router.get("/", response_model=PropertyListResponse)
 async def list_properties(
-    region: Optional[str] = Query(None, description="지역 필터"),
-    property_type: Optional[str] = Query(None, description="부동산 유형 필터"),
-    transaction_type: Optional[str] = Query(None, description="거래 유형 필터"),
+    region: str | None = Query(None, description="지역 필터"),
+    property_type: str | None = Query(None, description="부동산 유형 필터"),
+    transaction_type: str | None = Query(None, description="거래 유형 필터"),
     limit: int = Query(20, description="조회 개수", le=100),
     offset: int = Query(0, description="오프셋")
 ):

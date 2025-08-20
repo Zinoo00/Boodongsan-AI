@@ -2,15 +2,15 @@
 Base model and common utilities
 """
 
+import uuid
 from datetime import datetime
 from typing import Any
-import uuid
 
-from sqlalchemy import Column, DateTime, String, Boolean
+from pydantic import BaseModel, Field
+from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
-from pydantic import BaseModel, Field
 
 
 class BaseDB:

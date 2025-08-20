@@ -2,14 +2,14 @@
 Government policy models for Korean Real Estate support
 """
 
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-from enum import Enum
 import uuid
+from datetime import datetime
+from enum import Enum
+from typing import Any
 
-from sqlalchemy import Column, String, Integer, Float, Text, DateTime, Boolean, JSON
+from pydantic import BaseModel, Field
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
-from pydantic import BaseModel, Field, validator
 
 from .base import Base, BaseSchema, TimestampMixin
 
@@ -157,51 +157,51 @@ class PolicyBase(BaseSchema):
 
 class PolicyCreate(PolicyBase):
     """Policy creation schema"""
-    policy_category: Optional[str] = None
-    summary: Optional[str] = None
-    benefits: Optional[Dict[str, Any]] = None
-    eligibility_requirements: Dict[str, Any] = Field(..., description="Eligibility requirements")
-    income_criteria: Optional[Dict[str, Any]] = None
-    age_criteria: Optional[Dict[str, Any]] = None
-    area_restrictions: Optional[List[str]] = None
-    loan_limit: Optional[int] = Field(None, ge=0)
-    interest_rate: Optional[float] = Field(None, ge=0, le=100)
+    policy_category: str | None = None
+    summary: str | None = None
+    benefits: dict[str, Any] | None = None
+    eligibility_requirements: dict[str, Any] = Field(..., description="Eligibility requirements")
+    income_criteria: dict[str, Any] | None = None
+    age_criteria: dict[str, Any] | None = None
+    area_restrictions: list[str] | None = None
+    loan_limit: int | None = Field(None, ge=0)
+    interest_rate: float | None = Field(None, ge=0, le=100)
     effective_date: datetime = Field(..., description="Effective date")
-    expiry_date: Optional[datetime] = None
-    target_group: Optional[str] = None
-    application_method: Optional[str] = None
-    website_url: Optional[str] = None
+    expiry_date: datetime | None = None
+    target_group: str | None = None
+    application_method: str | None = None
+    website_url: str | None = None
 
 
 class PolicyUpdate(BaseModel):
     """Policy update schema"""
-    policy_name: Optional[str] = Field(None, max_length=200)
-    description: Optional[str] = None
-    status: Optional[PolicyStatus] = None
-    loan_limit: Optional[int] = Field(None, ge=0)
-    interest_rate: Optional[float] = Field(None, ge=0, le=100)
-    expiry_date: Optional[datetime] = None
-    eligibility_requirements: Optional[Dict[str, Any]] = None
+    policy_name: str | None = Field(None, max_length=200)
+    description: str | None = None
+    status: PolicyStatus | None = None
+    loan_limit: int | None = Field(None, ge=0)
+    interest_rate: float | None = Field(None, ge=0, le=100)
+    expiry_date: datetime | None = None
+    eligibility_requirements: dict[str, Any] | None = None
 
 
 class PolicyResponse(PolicyBase, TimestampMixin):
     """Policy response schema"""
     id: uuid.UUID
-    policy_category: Optional[str] = None
-    summary: Optional[str] = None
-    benefits: Optional[Dict[str, Any]] = None
-    eligibility_requirements: Dict[str, Any]
-    income_criteria: Optional[Dict[str, Any]] = None
-    age_criteria: Optional[Dict[str, Any]] = None
-    area_restrictions: Optional[List[str]] = None
-    loan_limit: Optional[int] = None
-    interest_rate: Optional[float] = None
+    policy_category: str | None = None
+    summary: str | None = None
+    benefits: dict[str, Any] | None = None
+    eligibility_requirements: dict[str, Any]
+    income_criteria: dict[str, Any] | None = None
+    age_criteria: dict[str, Any] | None = None
+    area_restrictions: list[str] | None = None
+    loan_limit: int | None = None
+    interest_rate: float | None = None
     status: PolicyStatus
     effective_date: datetime
-    expiry_date: Optional[datetime] = None
-    target_group: Optional[str] = None
-    website_url: Optional[str] = None
-    approval_rate: Optional[float] = None
+    expiry_date: datetime | None = None
+    target_group: str | None = None
+    website_url: str | None = None
+    approval_rate: float | None = None
 
 
 class PolicyMatchBase(BaseSchema):
@@ -214,12 +214,12 @@ class PolicyMatchBase(BaseSchema):
 class PolicyMatchCreate(PolicyMatchBase):
     """Policy match creation schema"""
     user_id: uuid.UUID = Field(..., description="User ID")
-    met_requirements: Optional[List[str]] = []
-    unmet_requirements: Optional[List[str]] = []
-    required_actions: Optional[List[str]] = []
-    estimated_loan_amount: Optional[int] = Field(None, ge=0)
-    estimated_interest_rate: Optional[float] = Field(None, ge=0)
-    application_deadline: Optional[datetime] = None
+    met_requirements: list[str] | None = []
+    unmet_requirements: list[str] | None = []
+    required_actions: list[str] | None = []
+    estimated_loan_amount: int | None = Field(None, ge=0)
+    estimated_interest_rate: float | None = Field(None, ge=0)
+    application_deadline: datetime | None = None
     application_priority: int = Field(3, ge=1, le=5)
 
 
@@ -228,31 +228,31 @@ class PolicyMatchResponse(PolicyMatchBase, TimestampMixin):
     id: uuid.UUID
     user_id: uuid.UUID
     policy: PolicyResponse
-    met_requirements: Optional[List[str]] = []
-    unmet_requirements: Optional[List[str]] = []
-    required_actions: Optional[List[str]] = []
-    estimated_loan_amount: Optional[int] = None
-    estimated_interest_rate: Optional[float] = None
-    estimated_monthly_payment: Optional[int] = None
-    application_deadline: Optional[datetime] = None
+    met_requirements: list[str] | None = []
+    unmet_requirements: list[str] | None = []
+    required_actions: list[str] | None = []
+    estimated_loan_amount: int | None = None
+    estimated_interest_rate: float | None = None
+    estimated_monthly_payment: int | None = None
+    application_deadline: datetime | None = None
     application_priority: int
-    user_interest_level: Optional[int] = None
+    user_interest_level: int | None = None
     is_bookmarked: bool = False
     matched_at: datetime
 
 
 class PolicyFilter(BaseModel):
     """Policy search filter"""
-    policy_types: Optional[List[PolicyType]] = None
-    organizing_institutions: Optional[List[str]] = None
-    status: Optional[List[PolicyStatus]] = None
-    target_groups: Optional[List[str]] = None
-    min_loan_limit: Optional[int] = None
-    max_interest_rate: Optional[float] = None
-    area_restrictions: Optional[List[str]] = None
-    effective_date_from: Optional[datetime] = None
-    effective_date_to: Optional[datetime] = None
-    search_keyword: Optional[str] = None
+    policy_types: list[PolicyType] | None = None
+    organizing_institutions: list[str] | None = None
+    status: list[PolicyStatus] | None = None
+    target_groups: list[str] | None = None
+    min_loan_limit: int | None = None
+    max_interest_rate: float | None = None
+    area_restrictions: list[str] | None = None
+    effective_date_from: datetime | None = None
+    effective_date_to: datetime | None = None
+    search_keyword: str | None = None
 
 
 class PolicyRecommendation(BaseModel):
@@ -261,15 +261,15 @@ class PolicyRecommendation(BaseModel):
     match_score: float = Field(..., ge=0, le=1)
     eligibility_status: str
     recommendation_reason: str
-    estimated_benefits: Dict[str, Any]
-    next_steps: List[str]
+    estimated_benefits: dict[str, Any]
+    next_steps: list[str]
 
 
 class PolicyStats(BaseModel):
     """Policy statistics"""
     total_policies: int
     active_policies: int
-    policy_type_distribution: Dict[str, int]
+    policy_type_distribution: dict[str, int]
     average_approval_rate: float
-    most_popular_policies: List[str]
-    recent_policy_updates: List[str]
+    most_popular_policies: list[str]
+    recent_policy_updates: list[str]

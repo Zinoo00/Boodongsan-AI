@@ -3,28 +3,32 @@ Vector Service for Korean Real Estate RAG AI Chatbot
 Handles Qdrant vector database operations and embeddings with enterprise-grade reliability
 """
 
-import logging
-import time
 import asyncio
 import hashlib
-from typing import List, Dict, Any, Optional, Union, Tuple
+import json
+import logging
+import time
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
-import uuid
-import json
-from functools import wraps
+from typing import Any
 
 import numpy as np
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-from qdrant_client.http.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, Range
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from qdrant_client.http.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    PointStruct,
+    Range,
+    VectorParams,
+)
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from ..core.config import settings
-from ..core.exceptions import (
-    VectorServiceError, ErrorCode, safe_execute
-)
 from ..core.database import cache_manager
+from ..core.exceptions import ErrorCode, VectorServiceError
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +88,7 @@ class VectorMetrics:
     def record_retry(self):
         self.connection_retries += 1
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         total_ops = self.embedding_operations + self.search_operations
         return {
             "embedding_operations": self.embedding_operations,
@@ -106,15 +110,15 @@ class SearchResult:
     """Vector search result"""
     id: str
     score: float
-    payload: Dict[str, Any]
-    vector: Optional[List[float]] = None
+    payload: dict[str, Any]
+    vector: list[float] | None = None
 
 
 @dataclass
 class EmbeddingResult:
     """Embedding generation result"""
     text: str
-    embedding: List[float]
+    embedding: list[float]
     model: str
     timestamp: datetime
 
@@ -355,8 +359,8 @@ class VectorService:
         self, 
         text: str, 
         model: str = "default",
-        correlation_id: Optional[str] = None
-    ) -> List[float]:
+        correlation_id: str | None = None
+    ) -> list[float]:
         """
         Generate embedding for text with caching and error handling
         
@@ -437,8 +441,7 @@ class VectorService:
             )
             
             # Reset circuit breaker on success
-            if self._circuit_breaker_failures > 0:
-                self._circuit_breaker_failures = 0
+            self._circuit_breaker_failures = min(self._circuit_breaker_failures, 0)
             
             return embedding
             
@@ -485,7 +488,7 @@ class VectorService:
         text: str, 
         model: str,
         correlation_id: str
-    ) -> List[float]:
+    ) -> list[float]:
         """
         Internal embedding generation implementation
         TODO: Replace with actual embedding service (OpenAI, Bedrock, etc.)
@@ -524,7 +527,7 @@ class VectorService:
     
     async def add_documents(
         self, 
-        documents: List[Dict[str, Any]], 
+        documents: list[dict[str, Any]], 
         batch_size: int = 100
     ) -> bool:
         """
@@ -594,12 +597,12 @@ class VectorService:
     )
     async def search(
         self,
-        query_vector: List[float],
+        query_vector: list[float],
         limit: int = 10,
         score_threshold: float = 0.0,
-        filter_conditions: Optional[Filter] = None,
-        correlation_id: Optional[str] = None
-    ) -> List[SearchResult]:
+        filter_conditions: Filter | None = None,
+        correlation_id: str | None = None
+    ) -> list[SearchResult]:
         """
         Perform vector similarity search with caching and error handling
         
@@ -724,8 +727,7 @@ class VectorService:
             )
             
             # Reset circuit breaker on success
-            if self._circuit_breaker_failures > 0:
-                self._circuit_breaker_failures = 0
+            self._circuit_breaker_failures = min(self._circuit_breaker_failures, 0)
             
             return results
             
@@ -769,13 +771,13 @@ class VectorService:
     
     async def hybrid_search(
         self,
-        query_embedding: List[float],
+        query_embedding: list[float],
         query_text: str,
         limit: int = 10,
         threshold: float = 0.0,
-        filters: Optional[Dict[str, Any]] = None,
-        correlation_id: Optional[str] = None
-    ) -> List[SearchResult]:
+        filters: dict[str, Any] | None = None,
+        correlation_id: str | None = None
+    ) -> list[SearchResult]:
         """
         Perform hybrid search combining vector similarity and keyword matching
         
@@ -908,9 +910,9 @@ class VectorService:
         query_text: str,
         limit: int = 10,
         threshold: float = 0.0,
-        filters: Optional[Dict[str, Any]] = None,
-        correlation_id: Optional[str] = None
-    ) -> List[SearchResult]:
+        filters: dict[str, Any] | None = None,
+        correlation_id: str | None = None
+    ) -> list[SearchResult]:
         """
         Search by text query with automatic embedding generation and comprehensive error handling
         
@@ -1017,7 +1019,7 @@ class VectorService:
                 correlation_id=correlation_id
             )
     
-    def _build_filter_conditions(self, filters: Optional[Dict[str, Any]]) -> Optional[Filter]:
+    def _build_filter_conditions(self, filters: dict[str, Any] | None) -> Filter | None:
         """Build Qdrant filter conditions from filter dictionary"""
         if not filters:
             return None
@@ -1081,7 +1083,7 @@ class VectorService:
         
         return None
     
-    async def get_document(self, document_id: str) -> Optional[SearchResult]:
+    async def get_document(self, document_id: str) -> SearchResult | None:
         """Get specific document by ID"""
         if not self._initialized:
             await self.initialize()
@@ -1108,7 +1110,7 @@ class VectorService:
             logger.error(f"Failed to get document {document_id}: {str(e)}")
             return None
     
-    async def delete_documents(self, document_ids: List[str]) -> bool:
+    async def delete_documents(self, document_ids: list[str]) -> bool:
         """Delete documents by IDs"""
         if not self._initialized:
             await self.initialize()
@@ -1129,7 +1131,7 @@ class VectorService:
             logger.error(f"Failed to delete documents: {str(e)}")
             return False
     
-    async def get_collection_info(self) -> Dict[str, Any]:
+    async def get_collection_info(self) -> dict[str, Any]:
         """Get collection information and statistics"""
         if not self._initialized:
             await self.initialize()
@@ -1153,7 +1155,7 @@ class VectorService:
             logger.error(f"Failed to get collection info: {str(e)}")
             return {}
     
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive vector service health check with metrics"""
         health_status = {
             "service_name": "Vector Service",
@@ -1282,7 +1284,7 @@ class VectorService:
         
         return health_status
     
-    async def get_service_metrics(self) -> Dict[str, Any]:
+    async def get_service_metrics(self) -> dict[str, Any]:
         """Get comprehensive service metrics"""
         return {
             "service_name": "Vector Service",

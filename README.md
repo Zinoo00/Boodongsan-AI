@@ -76,40 +76,47 @@ graph TB
 ## 📋 최적화된 프로젝트 구조
 
 ```
-korean-real-estate-rag/
-├── backend/
-│   ├── api/                 # FastAPI 애플리케이션
-│   │   ├── main.py         # FastAPI 메인 앱
-│   │   ├── routers/        # API 라우터
-│   │   └── middleware/     # 미들웨어
-│   ├── core/               # 핵심 설정 (최적화됨)
-│   │   ├── config.py       # 환경 설정 (Pydantic 검증)
-│   │   ├── database.py     # DB 연결 (연결 풀링, retry)
-│   │   └── exceptions.py   # 구조화된 예외 처리
-│   ├── models/             # 데이터 모델
-│   │   ├── property.py     # 부동산 모델
-│   │   └── user.py         # 사용자 모델
-│   ├── services/           # 비즈니스 로직 (엔터프라이즈급)
-│   │   ├── rag_service.py  # RAG 처리 (캐싱, 재시도)
+boodongsan/
+├── backend/                # 모든 백엔드 관련 파일
+│   ├── api/               # FastAPI 애플리케이션
+│   │   ├── main.py        # FastAPI 메인 앱
+│   │   ├── routers/       # API 라우터
+│   │   └── middleware/    # 미들웨어
+│   ├── core/              # 핵심 설정 (최적화됨)
+│   │   ├── config.py      # 환경 설정 (Pydantic 검증)
+│   │   ├── database.py    # DB 연결 (연결 풀링, retry)
+│   │   └── exceptions.py  # 구조화된 예외 처리
+│   ├── models/            # 데이터 모델
+│   │   ├── property.py    # 부동산 모델
+│   │   └── user.py        # 사용자 모델
+│   ├── services/          # 비즈니스 로직 (엔터프라이즈급)
+│   │   ├── rag_service.py # RAG 처리 (캐싱, 재시도)
 │   │   ├── vector_service.py # 벡터 검색 (하이브리드)
-│   │   └── ai_service.py   # AI 서비스 (failover, circuit breaker)
-│   ├── data/               # 데이터 처리
-│   │   ├── collectors/     # 데이터 수집기
-│   │   ├── processors/     # 데이터 전처리
-│   │   └── embeddings/     # 임베딩 생성
-│   └── utils/              # 유틸리티
-├── data/                   # 부동산 데이터
-│   ├── raw/               # 원본 데이터
-│   ├── processed/         # 전처리된 데이터
-│   └── embeddings/        # 벡터 임베딩
-├── scripts/               # 스크립트
-│   ├── data_collection.py # 데이터 수집
-│   ├── setup_vector_db.py # 벡터 DB 설정
-│   └── populate_data.py   # 데이터 초기화
-├── tests/                 # 테스트
-├── requirements.txt       # Python 의존성
-├── docker-compose.yml     # 로컬 개발 환경
-└── README.md
+│   │   └── ai_service.py  # AI 서비스 (failover, circuit breaker)
+│   ├── data/              # 데이터 처리
+│   │   └── collectors/    # 데이터 수집기
+│   ├── database/          # 데이터베이스 관련
+│   │   ├── connection.py  # DB 연결 관리
+│   │   ├── models.py      # SQLAlchemy 모델
+│   │   └── policy_seed_data.py # 시드 데이터
+│   ├── ai/                # AI 관련 모듈
+│   │   ├── bedrock_client.py    # AWS Bedrock 클라이언트
+│   │   └── langchain_pipeline.py # LangChain 파이프라인
+│   ├── scripts/           # 설정 및 유틸리티 스크립트
+│   │   └── setup.sh       # 프로젝트 설정 스크립트
+│   ├── tests/             # 테스트 파일
+│   ├── docs/              # 백엔드 문서
+│   ├── .env.example       # 환경 변수 예제
+│   ├── docker-compose.yml # Docker 컨테이너 설정
+│   ├── Dockerfile         # Docker 이미지 빌드
+│   ├── pyproject.toml     # uv 패키지 관리
+│   ├── requirements.txt   # Python 의존성 (호환성)
+│   └── uv.lock           # uv 잠금 파일
+├── .gitignore            # Git 무시 파일
+├── LICENSE               # 프로젝트 라이선스
+├── README.md             # 프로젝트 개요
+├── DEPLOYMENT.md         # 배포 가이드
+└── PROJECT_COMPLETION_ROADMAP.md # 프로젝트 로드맵
 ```
 
 ## 🚀 설치 및 실행
@@ -125,12 +132,18 @@ korean-real-estate-rag/
 
 ### 1. 프로젝트 클론
 ```bash
-git clone https://github.com/yourusername/korean-real-estate-rag.git
-cd korean-real-estate-rag
+git clone https://github.com/yourusername/boodongsan.git
+cd boodongsan
 ```
 
-### 2. 가상환경 설정
+### 2. 백엔드 의존성 설치
 ```bash
+cd backend
+
+# uv를 사용하는 경우 (권장)
+uv sync
+
+# 또는 기존 pip 사용
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -138,7 +151,7 @@ pip install -r requirements.txt
 
 ### 3. 환경변수 설정
 ```bash
-cp .env.example .env
+cd backend && cp .env.example .env
 # .env 파일을 편집하여 API 키들을 입력
 ```
 
@@ -177,11 +190,11 @@ python scripts/setup_vector_db.py
 
 ### 5. 데이터 수집 및 처리
 ```bash
-# 부동산 데이터 수집
-python scripts/data_collection.py
+# 부동산 데이터 수집 (backend 폴더에서)
+cd backend && python data/collectors/real_estate_collector.py
 
 # 데이터 전처리 및 임베딩 생성
-python scripts/process_data.py
+python data/processors/data_processor.py
 
 # 벡터 DB에 데이터 삽입
 python scripts/populate_vector_db.py
@@ -189,11 +202,11 @@ python scripts/populate_vector_db.py
 
 ### 6. 서버 실행
 ```bash
-# 개발 서버 (Granian 사용)
-granian --interface asgi backend.api.main:app --host 0.0.0.0 --port 8000 --reload
+# 개발 서버 (backend 폴더에서 uv 사용)
+cd backend && uv run granian --interface asgi api.main:app --host 0.0.0.0 --port 8000 --reload
 
-# 또는 Docker Compose로 전체 스택 실행
-docker-compose up -d
+# 또는 Docker Compose로 전체 스택 실행 (backend 폴더에서)
+cd backend && docker-compose up -d
 ```
 
 ## 🔧 API 사용법

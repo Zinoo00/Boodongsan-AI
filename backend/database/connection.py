@@ -5,15 +5,13 @@ PostgreSQL 및 Redis 연결 관리
 
 import logging
 import os
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Optional
 
-import asyncpg
-import aioredis
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.pool import StaticPool
+import redis.asyncio as aioredis
+from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 from .models import Base
 
@@ -117,7 +115,7 @@ async def initialize_database():
         )
         
         # Redis 클라이언트 초기화
-        redis_client = await aioredis.from_url(
+        redis_client = aioredis.from_url(
             db_config.redis_url,
             encoding="utf-8",
             decode_responses=True,
@@ -209,7 +207,7 @@ class CacheManager:
     def __init__(self):
         self.default_ttl = 3600  # 1시간
     
-    async def get(self, key: str) -> Optional[str]:
+    async def get(self, key: str) -> str | None:
         """캐시 값 조회"""
         try:
             return await redis_client.get(key)
@@ -256,7 +254,7 @@ class CacheManager:
             logger.error(f"패턴 캐시 삭제 실패 {pattern}: {str(e)}")
             return 0
     
-    async def get_json(self, key: str) -> Optional[dict]:
+    async def get_json(self, key: str) -> dict | None:
         """JSON 형태 캐시 값 조회"""
         try:
             import json

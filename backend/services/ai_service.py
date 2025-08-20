@@ -3,12 +3,12 @@ AI Service for Korean Real Estate RAG AI Chatbot
 Supports dual AI providers: AWS Bedrock and Cloudflare Workers AI
 """
 
-import logging
-from typing import List, Dict, Any, Optional, Union
-from enum import Enum
-from datetime import datetime
-import json
 import asyncio
+import json
+import logging
+from enum import Enum
+from typing import Any
+
 import aiohttp
 import boto3
 from botocore.exceptions import ClientError
@@ -149,10 +149,10 @@ class AIService:
     
     async def generate_rag_response(
         self,
-        context: Dict[str, Any],
-        max_tokens: Optional[int] = None,
+        context: dict[str, Any],
+        max_tokens: int | None = None,
         provider: AIProvider = AIProvider.AUTO
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate RAG response using context
         
@@ -224,7 +224,7 @@ class AIService:
         self,
         text: str,
         provider: AIProvider = AIProvider.AUTO
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Extract entities from user text
         
@@ -346,9 +346,9 @@ class AIService:
     
     async def generate_embeddings(
         self,
-        texts: List[str],
+        texts: list[str],
         provider: AIProvider = AIProvider.AUTO
-    ) -> List[List[float]]:
+    ) -> list[list[float]]:
         """
         Generate embeddings for texts
         
@@ -389,7 +389,7 @@ class AIService:
     
     async def _generate_response(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         provider: AIProvider,
         max_tokens: int = 1000
     ) -> str:
@@ -421,7 +421,7 @@ class AIService:
     
     async def _call_bedrock(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         max_tokens: int = 1000
     ) -> str:
         """Call AWS Bedrock Claude model"""
@@ -473,7 +473,7 @@ class AIService:
     
     async def _call_cloudflare(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         max_tokens: int = 1000
     ) -> str:
         """Call Cloudflare Workers AI"""
@@ -539,7 +539,7 @@ class AIService:
 4. 시장 동향 및 지역 정보
 """
     
-    def _build_rag_user_message(self, context: Dict[str, Any]) -> str:
+    def _build_rag_user_message(self, context: dict[str, Any]) -> str:
         """Build user message with RAG context"""
         
         message_parts = []
@@ -600,7 +600,7 @@ class AIService:
                 property_info.append(prop_str)
             
             if property_info:
-                message_parts.append(f"추천 매물:\n" + "\n".join(property_info))
+                message_parts.append("추천 매물:\n" + "\n".join(property_info))
         
         # Policies
         if context.get("policies"):
@@ -612,7 +612,7 @@ class AIService:
                 policy_info.append(policy_str)
             
             if policy_info:
-                message_parts.append(f"적용 가능한 정부 정책:\n" + "\n".join(policy_info))
+                message_parts.append("적용 가능한 정부 정책:\n" + "\n".join(policy_info))
         
         # Market context
         if context.get("market_context"):
@@ -629,7 +629,7 @@ class AIService:
         
         return "\n\n".join(message_parts)
     
-    def _clean_entities(self, entities: Dict[str, Any]) -> Dict[str, Any]:
+    def _clean_entities(self, entities: dict[str, Any]) -> dict[str, Any]:
         """Clean and validate extracted entities"""
         cleaned = {}
         
@@ -673,7 +673,7 @@ class AIService:
         content = ":".join([request_type.value] + [str(arg) for arg in args])
         return f"ai_{hashlib.md5(content.encode()).hexdigest()[:16]}"
     
-    async def _get_cached_response(self, cache_key: str) -> Optional[Any]:
+    async def _get_cached_response(self, cache_key: str) -> Any | None:
         """Get cached response if available"""
         if not self._cache_enabled:
             return None
@@ -700,7 +700,7 @@ class AIService:
         except Exception as e:
             logger.warning(f"Cache set failed: {str(e)}")
     
-    async def _build_rag_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+    async def _build_rag_messages(self, context: dict[str, Any]) -> list[dict[str, str]]:
         """Build and validate RAG messages"""
         # Build system prompt
         system_prompt = self._build_rag_system_prompt()
@@ -737,7 +737,7 @@ class AIService:
         error_message: str, 
         correlation_id: str, 
         request_start: float
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create standardized error response"""
         return {
             "text": f"죄송합니다. {error_message}가 발생했습니다. 잠시 후 다시 시도해 주세요.",
@@ -750,7 +750,7 @@ class AIService:
     
     def _calculate_confidence_score(
         self,
-        context: Dict[str, Any],
+        context: dict[str, Any],
         response_text: str
     ) -> float:
         """Calculate confidence score based on available context"""
@@ -806,7 +806,7 @@ class AIService:
         except Exception as e:
             logger.error(f"Error closing AI service: {str(e)}")
     
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive health check of AI service"""
         health_start = time.time()
         
@@ -915,7 +915,7 @@ class AIService:
         except Exception as e:
             raise e
     
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get detailed AI service metrics"""
         return {
             "providers": {

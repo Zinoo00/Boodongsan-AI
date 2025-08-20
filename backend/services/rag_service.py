@@ -5,29 +5,21 @@ Orchestrates vector search, AI response generation, and context management
 
 import logging
 import time
-import asyncio
-from typing import List, Dict, Any, Optional, Tuple, Union
 from datetime import datetime
-import json
-from functools import wraps
+from typing import Any
 
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from pydantic import BaseModel, Field, validator
 
 from ..core.config import settings
-from ..core.exceptions import (
-    RAGServiceError, AIServiceError, VectorServiceError, ValidationError, 
-    ErrorCode, safe_execute
-)
 from ..core.database import cache_manager
-from ..models.property import PropertyFilter, PropertySearchResult
-from ..models.user import UserProfile, ConversationHistory
 from ..models.policy import PolicyRecommendation
-from .vector_service import VectorService
+from ..models.property import PropertyFilter, PropertySearchResult
+from ..models.user import ConversationHistory, UserProfile
 from .ai_service import AIService
-from .property_service import PropertyService
 from .policy_service import PolicyService
+from .property_service import PropertyService
 from .user_service import UserService
+from .vector_service import VectorService
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +59,7 @@ class RAGMetrics:
         else:
             self.cache_misses += 1
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         return {
             "total_queries": self.total_queries,
             "success_rate": self.successful_queries / max(self.total_queries, 1),
@@ -84,7 +76,7 @@ class QueryValidation(BaseModel):
     user_query: str = Field(..., min_length=1, max_length=2000, description="User query text")
     user_id: str = Field(..., min_length=1, max_length=100, description="User identifier")
     conversation_id: str = Field(..., min_length=1, max_length=100, description="Conversation identifier")
-    session_context: Optional[Dict[str, Any]] = Field(default=None, description="Session context")
+    session_context: dict[str, Any] | None = Field(default=None, description="Session context")
     
     @validator('user_query')
     def validate_query(cls, v):
@@ -103,19 +95,19 @@ class RAGContext:
     
     def __init__(self):
         self.user_query: str = ""
-        self.user_id: Optional[str] = None
-        self.conversation_id: Optional[str] = None
-        self.user_profile: Optional[UserProfile] = None
-        self.conversation_history: List[ConversationHistory] = []
-        self.extracted_entities: Dict[str, Any] = {}
+        self.user_id: str | None = None
+        self.conversation_id: str | None = None
+        self.user_profile: UserProfile | None = None
+        self.conversation_history: list[ConversationHistory] = []
+        self.extracted_entities: dict[str, Any] = {}
         self.intent: str = "GENERAL_CHAT"
-        self.relevant_properties: List[PropertySearchResult] = []
-        self.relevant_policies: List[PolicyRecommendation] = []
-        self.market_context: Dict[str, Any] = {}
-        self.search_metadata: Dict[str, Any] = {}
-        self.processing_metrics: Dict[str, float] = {}
-        self.cache_keys: List[str] = []
-        self.correlation_id: Optional[str] = None
+        self.relevant_properties: list[PropertySearchResult] = []
+        self.relevant_policies: list[PolicyRecommendation] = []
+        self.market_context: dict[str, Any] = {}
+        self.search_metadata: dict[str, Any] = {}
+        self.processing_metrics: dict[str, float] = {}
+        self.cache_keys: list[str] = []
+        self.correlation_id: str | None = None
     
     def add_timing(self, stage: str, duration_ms: float):
         """Add timing information for a processing stage"""
@@ -157,8 +149,8 @@ class RAGService:
         user_query: str,
         user_id: str,
         conversation_id: str,
-        session_context: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        session_context: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """
         Process user query through RAG pipeline
         
@@ -414,7 +406,7 @@ class RAGService:
             logger.error(f"Market context gathering failed: {str(e)}")
             context.market_context = {}
     
-    async def _generate_ai_response(self, context: RAGContext) -> Dict[str, Any]:
+    async def _generate_ai_response(self, context: RAGContext) -> dict[str, Any]:
         """Generate AI response using all gathered context"""
         try:
             # Prepare context for AI model
@@ -452,7 +444,7 @@ class RAGService:
         context: RAGContext,
         user_id: str,
         conversation_id: str,
-        ai_response: Dict[str, Any]
+        ai_response: dict[str, Any]
     ):
         """Save conversation history"""
         try:
@@ -481,7 +473,7 @@ class RAGService:
         except Exception as e:
             logger.error(f"Failed to save conversation history: {str(e)}")
     
-    def _build_search_filters(self, context: RAGContext) -> Dict[str, Any]:
+    def _build_search_filters(self, context: RAGContext) -> dict[str, Any]:
         """Build search filters from extracted entities"""
         filters = {}
         
@@ -611,7 +603,7 @@ class RAGService:
         self, 
         property_obj: Any, 
         context: RAGContext
-    ) -> List[str]:
+    ) -> list[str]:
         """Identify which criteria the property matches"""
         criteria = []
         entities = context.extracted_entities
@@ -636,7 +628,7 @@ class RAGService:
     async def _cache_response(
         self, 
         validated_input: QueryValidation, 
-        response: Dict[str, Any], 
+        response: dict[str, Any], 
         correlation_id: str
     ):
         """Cache successful response for future use"""
@@ -659,9 +651,9 @@ class RAGService:
     def _compile_response(
         self, 
         context: RAGContext, 
-        ai_response: Dict[str, Any], 
+        ai_response: dict[str, Any], 
         pipeline_start: float
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Compile final response with all gathered information"""
         processing_time = (time.time() - pipeline_start) * 1000
         
@@ -705,7 +697,7 @@ class RAGService:
             "cache_hit": False
         }
     
-    def _create_timeout_response(self, start_time: float) -> Dict[str, Any]:
+    def _create_timeout_response(self, start_time: float) -> dict[str, Any]:
         """Create response for timeout errors"""
         return {
             "response": "죄송합니다. 요청 처리 시간이 초과되었습니다. 질문을 더 간단히 하여 다시 시도해 주세요.",
@@ -720,7 +712,7 @@ class RAGService:
             "error_type": "TIMEOUT"
         }
     
-    def _create_validation_error_response(self, start_time: float, error_msg: str) -> Dict[str, Any]:
+    def _create_validation_error_response(self, start_time: float, error_msg: str) -> dict[str, Any]:
         """Create response for validation errors"""
         return {
             "response": "입력값에 오류가 있습니다. 올바른 형식으로 다시 시도해 주세요.",
@@ -735,7 +727,7 @@ class RAGService:
             "error_type": "VALIDATION_ERROR"
         }
     
-    def _create_service_error_response(self, start_time: float, error_msg: str) -> Dict[str, Any]:
+    def _create_service_error_response(self, start_time: float, error_msg: str) -> dict[str, Any]:
         """Create response for service errors"""
         return {
             "response": "죄송합니다. 일시적인 서비스 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
@@ -750,7 +742,7 @@ class RAGService:
             "error_type": "SERVICE_ERROR"
         }
     
-    def _create_general_error_response(self, start_time: float, error_msg: str) -> Dict[str, Any]:
+    def _create_general_error_response(self, start_time: float, error_msg: str) -> dict[str, Any]:
         """Create response for general errors"""
         return {
             "response": "죄송합니다. 요청을 처리하는 중 오류가 발생했습니다. 다시 시도해 주세요.",
@@ -765,7 +757,7 @@ class RAGService:
             "error_type": "GENERAL_ERROR"
         }
     
-    async def get_service_health(self) -> Dict[str, Any]:
+    async def get_service_health(self) -> dict[str, Any]:
         """Get RAG service health and metrics"""
         return {
             "service_name": "RAG Service",

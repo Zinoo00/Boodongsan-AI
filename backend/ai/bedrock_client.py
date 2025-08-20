@@ -3,17 +3,17 @@ AWS Bedrock 클라이언트 구현
 Claude-3 모델을 사용한 자연어 처리 및 대화 관리
 """
 
+import asyncio
 import json
 import logging
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
+from typing import Any
+
 import boto3
 from botocore.exceptions import ClientError
-import asyncio
-import aiohttp
-from langchain.llms.bedrock import Bedrock
 from langchain.embeddings import BedrockEmbeddings
-from langchain.schema import HumanMessage, SystemMessage, AIMessage
+from langchain.llms.bedrock import Bedrock
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +78,7 @@ class BedrockClient:
     
     async def generate_response(
         self, 
-        messages: List[Dict[str, str]], 
+        messages: list[dict[str, str]], 
         system_prompt: str = None
     ) -> str:
         """대화 기반 응답 생성"""
@@ -106,7 +106,7 @@ class BedrockClient:
             logger.error(f"응답 생성 실패: {str(e)}")
             raise
     
-    def _invoke_claude(self, messages: List) -> str:
+    def _invoke_claude(self, messages: list) -> str:
         """Claude-3 모델 직접 호출"""
         try:
             # Anthropic Claude-3 API 포맷으로 변환
@@ -158,7 +158,7 @@ class BedrockClient:
             logger.error(f"Claude 호출 중 오류: {str(e)}")
             raise
     
-    async def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
+    async def generate_embeddings(self, texts: list[str]) -> list[list[float]]:
         """텍스트 임베딩 생성"""
         try:
             embeddings = await asyncio.to_thread(
@@ -170,7 +170,7 @@ class BedrockClient:
             logger.error(f"임베딩 생성 실패: {str(e)}")
             raise
     
-    async def extract_entities(self, text: str) -> Dict[str, Any]:
+    async def extract_entities(self, text: str) -> dict[str, Any]:
         """사용자 메시지에서 개체 추출"""
         try:
             system_prompt = """
@@ -244,9 +244,9 @@ class BedrockClient:
     
     async def generate_recommendation_text(
         self, 
-        user_profile: Dict[str, Any],
-        matched_policies: List[Dict[str, Any]],
-        recommended_properties: List[Dict[str, Any]]
+        user_profile: dict[str, Any],
+        matched_policies: list[dict[str, Any]],
+        recommended_properties: list[dict[str, Any]]
     ) -> str:
         """개인맞춤형 추천 텍스트 생성"""
         try:

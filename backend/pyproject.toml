@@ -1,0 +1,191 @@
+[project]
+name = "boodongsan-backend"
+version = "0.1.0"
+description = "Korean Real Estate RAG backend"
+requires-python = ">=3.11,<3.12"
+readme = "README.md"
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+# Default (prod) dependencies
+default = [
+  # Core web framework
+  "fastapi==0.116.1",
+  "uvicorn[standard]>=0.24,<0.31",
+  "pydantic==2.11.7",
+  "pydantic-settings==2.10.1",
+  
+  # AWS and AI services
+  "boto3==1.40.11",
+  "botocore==1.40.11",
+  "langchain==0.3.27",
+  "langchain-aws==0.2.30",
+  "langchain-community==0.3.27",
+  "langchain-core==0.3.74",
+  "openai==1.91.0",
+  
+  # Database
+  "asyncpg==0.30.0",
+  "redis>=5,<6",
+  "qdrant-client==1.15.1",
+  "numpy==1.26.4",
+  "sqlalchemy==2.0.39",
+  "alembic==1.16.4",
+  
+  # Security
+  "python-jose[cryptography]==3.5.0",
+  "passlib[bcrypt]==1.7.4",
+  "python-multipart==0.0.20",
+  "cryptography==45.0.6",
+  
+  # Data processing (core only)
+  "pandas==2.2.3",
+  "httpx==0.28.1",
+  "aiohttp==3.12.15",
+  "requests==2.32.4",
+  "tenacity==8.2.3",
+  
+  # Logging and monitoring
+  "structlog>=24.0.0,<26.0.0",
+  "python-json-logger==2.0.7",
+  "prometheus-client>=0.19,<0.22",
+  
+  # Configuration
+  "python-dotenv==1.0.1",
+  "click==8.1.8",
+  "typer==0.15.2",
+  
+  # JSON processing
+  "orjson==3.11.2",
+]
+
+# Optional feature groups
+ml = [
+  "scikit-learn==1.5.2",
+  "scipy==1.13.1",
+  "statsmodels==0.14.5",
+]
+
+data-collection = [
+  "beautifulsoup4>=4.12,<4.13",
+  "selenium==4.29.0",
+  "scrapy==2.13.3",
+  "geopy==2.4.1",
+  "geopandas==1.0.1",
+]
+
+nlp = [
+  "konlpy==0.6.0",
+  "soynlp==0.0.27",
+  "kiwipiepy==0.21.0",
+]
+
+image-processing = [
+  "Pillow==11.3.0",
+  "opencv-python==4.10.0.84",
+]
+
+async-tasks = [
+  "celery==5.5.3",
+  "flower==2.0.1",
+  "apscheduler==3.11.0",
+]
+
+validation = [
+  "marshmallow==3.23.2",
+  "cerberus==1.3.5",
+]
+
+visualization = [
+  "folium>=0.16.0,<0.17.0",
+]
+
+caching = [
+  "cachetools==6.1.0",
+  "diskcache==5.6.3",
+]
+
+config = [
+  "dynaconf==3.2.11",
+]
+
+xml = [
+  "xmltodict==0.13.0",
+]
+
+# Development only dependencies
+dev = [
+  "pytest==8.4.1",
+  "pytest-asyncio==1.1.0",
+  "pytest-mock==3.14.1",
+  "pytest-cov>=6.0.0",
+  "ruff>=0.5,<0.7",
+  "mypy==1.17.1",
+  "types-redis>=4.6.0",
+  "types-aiofiles>=24.1.0",
+  "watchdog==6.0.0",
+  "granian==2.5.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "I", "UP", "B", "SIM", "PL", "N",
+  "S", "RUF", "ERA", "PT", "TID", "C4", "FA",
+  "PIE", "T20", "RSE", "TCH"
+]
+ignore = [
+  "E203", "E501", "S101", "S608", "PLR0913", 
+  "PLR0911", "PLR0912", "PLR0915", "PLR2004",
+  "F841", "RUF010"  # Allow unused variables and str() calls
+]
+unfixable = ["T20"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "PLR2004", "PLR0913"]
+"**/models.py" = ["A003"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["backend"]
+split-on-trailing-comma = true
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["backend"]
+omit = ["*/tests/*", "*/venv/*", "*/.venv/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

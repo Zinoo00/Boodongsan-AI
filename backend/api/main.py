@@ -4,36 +4,35 @@ Korean Real Estate RAG AI Chatbot API
 """
 
 import logging
-import uvicorn
 from contextlib import asynccontextmanager
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any
 
-from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
+import uvicorn
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
 
 # Core imports
-from ..core.config import settings, get_environment_config
-from ..core.database import initialize_database, cleanup_database, database_health_check
+from ..core.config import get_environment_config, settings
+from ..core.database import cleanup_database, initialize_database
 
 # Service imports
 from ..services.ai_service import AIService
-from ..services.vector_service import VectorService
-from ..services.rag_service import RAGService
-from ..services.property_service import PropertyService
 from ..services.policy_service import PolicyService
+from ..services.property_service import PropertyService
+from ..services.rag_service import RAGService
 from ..services.user_service import UserService
-
-# Router imports
-from .routers import chat, health, policies, properties, users
+from ..services.vector_service import VectorService
+from .middleware.auth import AuthMiddleware
 
 # Middleware imports
 from .middleware.caching import CacheMiddleware
-from .middleware.auth import AuthMiddleware
+
+# Router imports
+from .routers import chat, health, policies, properties, users
 
 # Configure logging
 logging.basicConfig(
@@ -156,7 +155,7 @@ app.include_router(policies.router, prefix=settings.API_V1_STR + "/policies", ta
 app.include_router(properties.router, prefix=settings.API_V1_STR + "/properties", tags=["Properties"])
 app.include_router(users.router, prefix=settings.API_V1_STR + "/users", tags=["Users"])
 
-@app.get("/", response_model=Dict[str, Any])
+@app.get("/", response_model=dict[str, Any])
 async def root():
     """API root endpoint"""
     return {
@@ -168,7 +167,7 @@ async def root():
         "environment": settings.ENVIRONMENT.value
     }
 
-@app.get(f"{settings.API_V1_STR}/info", response_model=Dict[str, Any])
+@app.get(f"{settings.API_V1_STR}/info", response_model=dict[str, Any])
 async def api_info():
     """API information"""
     return {

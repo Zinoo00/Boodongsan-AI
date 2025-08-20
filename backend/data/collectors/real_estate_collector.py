@@ -3,14 +3,16 @@ Real Estate Data Collector for Korean Government APIs
 Collects data from MOLIT (Ministry of Land, Infrastructure and Transport) APIs
 """
 
-import logging
 import asyncio
-from typing import List, Dict, Any, Optional, AsyncGenerator
-from datetime import datetime, timedelta
-import aiohttp
-import xml.etree.ElementTree as ET
-from urllib.parse import urlencode
+import logging
 import time
+import xml.etree.ElementTree as ET
+from collections.abc import AsyncGenerator
+from datetime import datetime
+from typing import Any
+from urllib.parse import urlencode
+
+import aiohttp
 
 from ...core.config import settings
 
@@ -80,9 +82,9 @@ class RealEstateCollector:
     async def collect_all_data(
         self,
         year_month: str = None,
-        districts: List[str] = None,
-        property_types: List[str] = None
-    ) -> AsyncGenerator[Dict[str, Any], None]:
+        districts: list[str] = None,
+        property_types: list[str] = None
+    ) -> AsyncGenerator[dict[str, Any], None]:
         """
         Collect all real estate data
         
@@ -143,7 +145,7 @@ class RealEstateCollector:
         district_code: str,
         property_type: str,
         year_month: str
-    ) -> AsyncGenerator[Dict[str, Any], None]:
+    ) -> AsyncGenerator[dict[str, Any], None]:
         """
         Collect data for specific district and property type
         
@@ -203,7 +205,7 @@ class RealEstateCollector:
         xml_content: str,
         property_type: str,
         district: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Parse XML response from MOLIT API"""
         
         records = []
@@ -245,7 +247,7 @@ class RealEstateCollector:
         item: ET.Element,
         property_type: str,
         district: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Parse individual item from XML"""
         
         try:
@@ -383,7 +385,7 @@ class RealEstateCollector:
         """Parse float value"""
         return float(value.replace(",", "").strip())
     
-    def _generate_source_id(self, record: Dict[str, Any]) -> str:
+    def _generate_source_id(self, record: dict[str, Any]) -> str:
         """Generate unique source ID for record"""
         import hashlib
         
@@ -445,10 +447,10 @@ class RealEstateCollector:
         finally:
             await self.close()
     
-    def get_available_districts(self) -> List[str]:
+    def get_available_districts(self) -> list[str]:
         """Get list of available districts"""
         return list(self.district_codes.keys())
     
-    def get_available_property_types(self) -> List[str]:
+    def get_available_property_types(self) -> list[str]:
         """Get list of available property types"""
         return list(self.base_urls.keys())

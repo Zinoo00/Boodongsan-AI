@@ -4,11 +4,12 @@ Handles property-related business logic
 """
 
 import logging
-from typing import List, Dict, Any, Optional
-from datetime import datetime
+from typing import Any
 
-from ..models.property import Property, PropertyFilter, PropertyResponse, PropertySearchResult, PropertyStats
-from ..core.database import get_database_session
+from ..models.property import (
+    PropertyFilter,
+    PropertyResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class PropertyService:
         filter: PropertyFilter,
         limit: int = 10,
         offset: int = 0
-    ) -> List[PropertyResponse]:
+    ) -> list[PropertyResponse]:
         """부동산 검색 (간단한 텍스트 쿼리)"""
         try:
             # 임시 더미 데이터 반환
@@ -54,8 +55,8 @@ class PropertyService:
     
     async def search_properties_by_criteria(
         self, 
-        criteria: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        criteria: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """조건 기반 부동산 검색"""
         try:
             # 실제로는 데이터베이스 쿼리 실행

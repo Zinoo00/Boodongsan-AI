@@ -3,27 +3,24 @@ Database connection and management for Korean Real Estate RAG AI Chatbot
 Supabase PostgreSQL and Redis integration
 """
 
-import logging
 import asyncio
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Optional, Dict, Any, Callable, TypeVar, Union
 import json
+import logging
 import time
-from functools import wraps
+from collections.abc import AsyncGenerator, Callable
+from contextlib import asynccontextmanager
+from typing import Any, TypeVar
 
-import aioredis
-from sqlalchemy import create_engine, MetaData, text, event
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.pool import StaticPool, QueuePool
-from sqlalchemy.exc import SQLAlchemyError, DisconnectionError, OperationalError
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+import redis.asyncio as aioredis
+from sqlalchemy import create_engine, event, text
+from sqlalchemy.exc import DisconnectionError, OperationalError
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import QueuePool
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from .config import settings
-from .exceptions import (
-    DatabaseError, CacheError, ErrorCode,
-    handle_database_error, safe_execute
-)
+from .exceptions import CacheError, DatabaseError
 
 logger = logging.getLogger(__name__)
 
@@ -401,7 +398,7 @@ class DatabaseManager:
             operation="execute_with_retry"
         )
     
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive database health check with metrics"""
         from datetime import datetime
         
@@ -483,7 +480,7 @@ class CacheManager:
         stop=stop_after_attempt(CACHE_RETRY_ATTEMPTS),
         wait=wait_exponential(multiplier=1, min=CACHE_RETRY_WAIT, max=2)
     )
-    async def get(self, key: str) -> Optional[str]:
+    async def get(self, key: str) -> str | None:
         """Get value from cache with retry logic"""
         self._cache_stats["total_operations"] += 1
         
@@ -518,7 +515,7 @@ class CacheManager:
         stop=stop_after_attempt(CACHE_RETRY_ATTEMPTS),
         wait=wait_exponential(multiplier=1, min=CACHE_RETRY_WAIT, max=2)
     )
-    async def set(self, key: str, value: str, ttl: Optional[int] = None) -> bool:
+    async def set(self, key: str, value: str, ttl: int | None = None) -> bool:
         """Set value in cache with retry logic"""
         self._cache_stats["total_operations"] += 1
         
@@ -560,7 +557,7 @@ class CacheManager:
             logger.error(f"Cache exists check failed for key {key}: {str(e)}")
             return False
     
-    async def get_json(self, key: str) -> Optional[Dict[str, Any]]:
+    async def get_json(self, key: str) -> dict[str, Any] | None:
         """Get JSON value from cache with proper error handling"""
         try:
             value = await self.get(key)
@@ -584,7 +581,7 @@ class CacheManager:
             )
             return None
     
-    async def set_json(self, key: str, value: Dict[str, Any], ttl: Optional[int] = None) -> bool:
+    async def set_json(self, key: str, value: dict[str, Any], ttl: int | None = None) -> bool:
         """Set JSON value in cache with validation"""
         try:
             # Validate that the value can be serialized
@@ -605,7 +602,7 @@ class CacheManager:
             )
             return False
     
-    def get_cache_stats(self) -> Dict[str, Any]:
+    def get_cache_stats(self) -> dict[str, Any]:
         """Get cache performance statistics"""
         total_ops = self._cache_stats["total_operations"]
         if total_ops > 0:
@@ -642,7 +639,7 @@ class CacheManager:
             logger.error(f"Cache clear_pattern failed for pattern {pattern}: {str(e)}")
             return 0
     
-    async def increment(self, key: str, amount: int = 1) -> Optional[int]:
+    async def increment(self, key: str, amount: int = 1) -> int | None:
         """Increment counter"""
         try:
             redis_client = await self.db_manager.get_redis()

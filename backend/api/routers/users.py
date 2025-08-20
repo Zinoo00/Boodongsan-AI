@@ -4,7 +4,7 @@
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -18,11 +18,11 @@ router = APIRouter()
 # Pydantic 모델들
 class UserProfileResponse(BaseModel):
     """사용자 프로필 응답 모델"""
-    user_profile: Dict[str, Any] = Field(..., description="사용자 프로필")
+    user_profile: dict[str, Any] = Field(..., description="사용자 프로필")
 
 class UserAnalysisResponse(BaseModel):
     """사용자 분석 응답 모델"""
-    analysis: Dict[str, Any] = Field(..., description="사용자 분석 결과")
+    analysis: dict[str, Any] = Field(..., description="사용자 분석 결과")
 
 @router.get("/{user_id}/profile", response_model=UserProfileResponse)
 async def get_user_profile(user_id: str):

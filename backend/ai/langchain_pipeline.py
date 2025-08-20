@@ -3,25 +3,19 @@ LangChain 기반 AI 파이프라인 구현
 부동산 추천을 위한 체인 및 에이전트 관리
 """
 
-import logging
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass
 import asyncio
+import logging
+from dataclasses import dataclass
+from typing import Any
 
 from langchain.chains import ConversationChain, LLMChain
 from langchain.memory import ConversationBufferWindowMemory
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
-from langchain.schema import BaseRetriever, Document
-from langchain.agents import Tool, AgentExecutor, create_react_agent
+from langchain.prompts import PromptTemplate
 from langchain.tools import BaseTool
-from langchain_community.vectorstores import Pinecone
-from langchain.chains.retrieval_qa import RetrievalQA
-from langchain.chains.summarize import load_summarize_chain
 
-from .bedrock_client import BedrockClient, get_bedrock_client
-from ..database.models import Property, GovernmentPolicy, User
 from ..services.policy_service import PolicyService
 from ..services.property_service import PropertyService
+from .bedrock_client import get_bedrock_client
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +24,9 @@ class ConversationContext:
     """대화 컨텍스트 관리"""
     user_id: str
     session_id: str
-    user_profile: Optional[Dict[str, Any]] = None
-    conversation_history: List[Dict[str, str]] = None
-    extracted_entities: Dict[str, Any] = None
+    user_profile: dict[str, Any] | None = None
+    conversation_history: list[dict[str, str]] = None
+    extracted_entities: dict[str, Any] = None
     current_intent: str = "GENERAL_CHAT"
 
 class PropertySearchTool(BaseTool):
@@ -191,7 +185,7 @@ class RealEstateAgent:
         self, 
         message: str, 
         context: ConversationContext
-    ) -> Tuple[str, ConversationContext]:
+    ) -> tuple[str, ConversationContext]:
         """메시지 처리 메인 함수"""
         try:
             # 1. 의도 분류

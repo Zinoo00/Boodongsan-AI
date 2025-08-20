@@ -4,16 +4,13 @@
 """
 
 import logging
-from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime
-import asyncio
-import json
+from typing import Any
 
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
 
-from ..database.models import User, UserPreference, ConversationHistory
 from ..database.connection import get_db_session
+from ..database.models import ConversationHistory, User, UserPreference
 from .policy_service import PolicyService
 
 logger = logging.getLogger(__name__)
@@ -27,9 +24,9 @@ class UserProfilingService:
     async def create_or_update_profile(
         self, 
         user_id: str,
-        extracted_entities: Dict[str, Any],
+        extracted_entities: dict[str, Any],
         session_id: str = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """사용자 프로필 생성 또는 업데이트"""
         try:
             async with get_db_session() as db:
@@ -81,7 +78,7 @@ class UserProfilingService:
         self, 
         db: Session, 
         user_id: str,
-        extracted_entities: Dict[str, Any]
+        extracted_entities: dict[str, Any]
     ) -> User:
         """사용자 조회 또는 생성"""
         try:
@@ -125,38 +122,38 @@ class UserProfilingService:
         self, 
         db: Session, 
         user: User,
-        extracted_entities: Dict[str, Any]
+        extracted_entities: dict[str, Any]
     ) -> User:
         """사용자 기본 정보 업데이트"""
         try:
             # 추출된 엔티티로 사용자 정보 업데이트
-            if "age" in extracted_entities and extracted_entities["age"]:
+            if extracted_entities.get("age"):
                 user.age = extracted_entities["age"]
             
-            if "income" in extracted_entities and extracted_entities["income"]:
+            if extracted_entities.get("income"):
                 user.annual_income = extracted_entities["income"]
             
-            if "job_type" in extracted_entities and extracted_entities["job_type"]:
+            if extracted_entities.get("job_type"):
                 user.job_type = extracted_entities["job_type"]
             
-            if "marital_status" in extracted_entities and extracted_entities["marital_status"]:
+            if extracted_entities.get("marital_status"):
                 user.marital_status = extracted_entities["marital_status"]
             
             if "dependents" in extracted_entities and extracted_entities["dependents"] is not None:
                 user.dependents = extracted_entities["dependents"]
             
-            if "region" in extracted_entities and extracted_entities["region"]:
+            if extracted_entities.get("region"):
                 user.region_preference = extracted_entities["region"]
             
             # 예산 정보 업데이트
-            if "budget_min" in extracted_entities and extracted_entities["budget_min"]:
+            if extracted_entities.get("budget_min"):
                 user.budget_min = extracted_entities["budget_min"]
             
-            if "budget_max" in extracted_entities and extracted_entities["budget_max"]:
+            if extracted_entities.get("budget_max"):
                 user.budget_max = extracted_entities["budget_max"]
             
             # 단일 예산이 주어진 경우 범위로 변환
-            if "budget" in extracted_entities and extracted_entities["budget"]:
+            if extracted_entities.get("budget"):
                 budget = extracted_entities["budget"]
                 if not user.budget_min and not user.budget_max:
                     # 예산의 ±20% 범위로 설정
@@ -195,8 +192,8 @@ class UserProfilingService:
         self, 
         db: Session, 
         user: User,
-        extracted_entities: Dict[str, Any]
-    ) -> Optional[UserPreference]:
+        extracted_entities: dict[str, Any]
+    ) -> UserPreference | None:
         """사용자 선호도 업데이트"""
         try:
             # 기존 선호도 조회
@@ -209,22 +206,22 @@ class UserProfilingService:
                 db.add(preference)
             
             # 부동산 유형 업데이트
-            if "property_type" in extracted_entities and extracted_entities["property_type"]:
+            if extracted_entities.get("property_type"):
                 preference.property_type = extracted_entities["property_type"]
             
             # 방 개수 업데이트
-            if "room_count" in extracted_entities and extracted_entities["room_count"]:
+            if extracted_entities.get("room_count"):
                 preference.room_count = extracted_entities["room_count"]
             
             # 면적 정보 업데이트
-            if "area_min" in extracted_entities and extracted_entities["area_min"]:
+            if extracted_entities.get("area_min"):
                 preference.area_min = extracted_entities["area_min"]
             
-            if "area_max" in extracted_entities and extracted_entities["area_max"]:
+            if extracted_entities.get("area_max"):
                 preference.area_max = extracted_entities["area_max"]
             
             # 단일 면적이 주어진 경우 범위로 변환
-            if "area" in extracted_entities and extracted_entities["area"]:
+            if extracted_entities.get("area"):
                 area = extracted_entities["area"]
                 if not preference.area_min and not preference.area_max:
                     # 면적의 ±5평 범위로 설정
@@ -263,7 +260,7 @@ class UserProfilingService:
     def _calculate_profile_completeness(
         self, 
         user: User, 
-        preference: Optional[UserPreference]
+        preference: UserPreference | None
     ) -> float:
         """프로필 완성도 계산 (0.0 ~ 1.0)"""
         try:
@@ -311,7 +308,7 @@ class UserProfilingService:
             logger.error(f"프로필 완성도 계산 실패: {str(e)}")
             return 0.0
     
-    def _user_to_dict(self, user: User) -> Dict[str, Any]:
+    def _user_to_dict(self, user: User) -> dict[str, Any]:
         """User 모델을 딕셔너리로 변환"""
         return {
             "id": str(user.id),
@@ -331,7 +328,7 @@ class UserProfilingService:
             "updated_at": user.updated_at.isoformat() if user.updated_at else None
         }
     
-    def _preference_to_dict(self, preference: UserPreference) -> Dict[str, Any]:
+    def _preference_to_dict(self, preference: UserPreference) -> dict[str, Any]:
         """UserPreference 모델을 딕셔너리로 변환"""
         return {
             "property_type": preference.property_type,
@@ -345,7 +342,7 @@ class UserProfilingService:
             "parking_importance": preference.parking_importance
         }
     
-    async def get_user_profile(self, user_id: str) -> Optional[Dict[str, Any]]:
+    async def get_user_profile(self, user_id: str) -> dict[str, Any] | None:
         """사용자 프로필 조회"""
         try:
             async with get_db_session() as db:
@@ -390,7 +387,7 @@ class UserProfilingService:
         self, 
         user_id: str, 
         limit: int = 10
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """사용자 대화 패턴 분석"""
         try:
             async with get_db_session() as db:
@@ -444,7 +441,7 @@ class UserProfilingService:
             logger.error(f"대화 패턴 분석 실패: {str(e)}")
             return {"error": "분석 중 오류가 발생했습니다."}
     
-    async def suggest_missing_info(self, user_id: str) -> List[str]:
+    async def suggest_missing_info(self, user_id: str) -> list[str]:
         """부족한 정보 제안"""
         try:
             profile = await self.get_user_profile(user_id)

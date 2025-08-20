@@ -4,15 +4,12 @@
 """
 
 import logging
-from typing import Dict, List, Optional, Any, Tuple
-from datetime import datetime
-import asyncio
+from typing import Any
 
-from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, desc
+from sqlalchemy import and_, or_
 
-from ..database.models import GovernmentPolicy, PolicyCondition, User
 from ..database.connection import get_db_session
+from ..database.models import GovernmentPolicy, PolicyCondition
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +21,8 @@ class PolicyService:
     
     async def find_applicable_policies(
         self, 
-        user_profile: Dict[str, Any]
-    ) -> List[GovernmentPolicy]:
+        user_profile: dict[str, Any]
+    ) -> list[GovernmentPolicy]:
         """사용자 프로필에 적용 가능한 정책 찾기"""
         try:
             async with get_db_session() as db:
@@ -91,7 +88,7 @@ class PolicyService:
     async def _check_detailed_conditions(
         self, 
         policy: GovernmentPolicy, 
-        user_profile: Dict[str, Any]
+        user_profile: dict[str, Any]
     ) -> bool:
         """정책별 세부 조건 검사"""
         try:
@@ -121,7 +118,7 @@ class PolicyService:
     def _get_policy_priority(
         self, 
         policy: GovernmentPolicy, 
-        user_profile: Dict[str, Any]
+        user_profile: dict[str, Any]
     ) -> int:
         """정책 우선순위 계산 (낮을수록 높은 우선순위)"""
         priority_score = 0
@@ -158,7 +155,7 @@ class PolicyService:
         
         return priority_score
     
-    async def get_policy_details(self, policy_id: str) -> Optional[Dict[str, Any]]:
+    async def get_policy_details(self, policy_id: str) -> dict[str, Any] | None:
         """정책 상세 정보 조회"""
         try:
             async with get_db_session() as db:
@@ -243,8 +240,8 @@ class PolicyService:
     async def calculate_policy_benefit(
         self, 
         policy_id: str, 
-        user_profile: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        user_profile: dict[str, Any]
+    ) -> dict[str, Any]:
         """사용자 기준 정책 혜택 계산"""
         try:
             policy_details = await self.get_policy_details(policy_id)
@@ -311,9 +308,9 @@ class PolicyService:
     
     async def _check_eligibility(
         self, 
-        policy_details: Dict[str, Any], 
-        user_profile: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        policy_details: dict[str, Any], 
+        user_profile: dict[str, Any]
+    ) -> dict[str, Any]:
         """자격 조건 체크"""
         try:
             eligibility = policy_details["eligibility"]
@@ -389,7 +386,7 @@ class PolicyService:
         self, 
         keyword: str, 
         limit: int = 10
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """키워드로 정책 검색"""
         try:
             async with get_db_session() as db:
@@ -423,7 +420,7 @@ class PolicyService:
             logger.error(f"키워드 정책 검색 실패: {str(e)}")
             return []
     
-    async def get_popular_policies(self, limit: int = 5) -> List[Dict[str, Any]]:
+    async def get_popular_policies(self, limit: int = 5) -> list[dict[str, Any]]:
         """인기 정책 조회 (예시 구현)"""
         try:
             # 실제로는 신청 통계, 조회수 등을 기반으로 인기도 계산

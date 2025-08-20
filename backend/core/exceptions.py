@@ -4,8 +4,8 @@ Provides structured error handling with proper context and logging
 """
 
 import logging
-from typing import Any, Dict, Optional, Union
 from enum import Enum
+from typing import Any
 
 
 class ErrorCode(str, Enum):
@@ -74,9 +74,9 @@ class BaseAppException(Exception):
         self,
         message: str,
         error_code: ErrorCode,
-        details: Optional[Dict[str, Any]] = None,
-        cause: Optional[Exception] = None,
-        correlation_id: Optional[str] = None
+        details: dict[str, Any] | None = None,
+        cause: Exception | None = None,
+        correlation_id: str | None = None
     ):
         self.message = message
         self.error_code = error_code
@@ -110,7 +110,7 @@ class BaseAppException(Exception):
         else:
             logger.error("Unhandled application error: %s", log_data, exc_info=True)
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert exception to dictionary for API responses"""
         return {
             "error_code": self.error_code.value,
@@ -123,7 +123,7 @@ class BaseAppException(Exception):
 class ConfigurationError(BaseAppException):
     """Configuration-related errors"""
     
-    def __init__(self, message: str, field_name: Optional[str] = None, **kwargs):
+    def __init__(self, message: str, field_name: str | None = None, **kwargs):
         details = kwargs.pop("details", {})
         if field_name:
             details["field_name"] = field_name
@@ -139,7 +139,7 @@ class ConfigurationError(BaseAppException):
 class DatabaseError(BaseAppException):
     """Database operation errors"""
     
-    def __init__(self, message: str, operation: Optional[str] = None, **kwargs):
+    def __init__(self, message: str, operation: str | None = None, **kwargs):
         details = kwargs.pop("details", {})
         if operation:
             details["operation"] = operation
@@ -155,7 +155,7 @@ class DatabaseError(BaseAppException):
 class CacheError(BaseAppException):
     """Cache operation errors"""
     
-    def __init__(self, message: str, operation: Optional[str] = None, **kwargs):
+    def __init__(self, message: str, operation: str | None = None, **kwargs):
         details = kwargs.pop("details", {})
         if operation:
             details["operation"] = operation
@@ -174,8 +174,8 @@ class AIServiceError(BaseAppException):
     def __init__(
         self, 
         message: str, 
-        provider: Optional[str] = None,
-        model: Optional[str] = None,
+        provider: str | None = None,
+        model: str | None = None,
         **kwargs
     ):
         details = kwargs.pop("details", {})
@@ -198,8 +198,8 @@ class VectorServiceError(BaseAppException):
     def __init__(
         self, 
         message: str, 
-        collection: Optional[str] = None,
-        operation: Optional[str] = None,
+        collection: str | None = None,
+        operation: str | None = None,
         **kwargs
     ):
         details = kwargs.pop("details", {})
@@ -222,8 +222,8 @@ class RAGServiceError(BaseAppException):
     def __init__(
         self, 
         message: str, 
-        stage: Optional[str] = None,
-        user_id: Optional[str] = None,
+        stage: str | None = None,
+        user_id: str | None = None,
         **kwargs
     ):
         details = kwargs.pop("details", {})
@@ -246,8 +246,8 @@ class ExternalServiceError(BaseAppException):
     def __init__(
         self, 
         message: str, 
-        service_name: Optional[str] = None,
-        status_code: Optional[int] = None,
+        service_name: str | None = None,
+        status_code: int | None = None,
         **kwargs
     ):
         details = kwargs.pop("details", {})
@@ -270,8 +270,8 @@ class ValidationError(BaseAppException):
     def __init__(
         self, 
         message: str, 
-        field_name: Optional[str] = None,
-        field_value: Optional[Any] = None,
+        field_name: str | None = None,
+        field_value: Any | None = None,
         **kwargs
     ):
         details = kwargs.pop("details", {})
@@ -291,7 +291,7 @@ class ValidationError(BaseAppException):
 class BusinessLogicError(BaseAppException):
     """Business rule violation errors"""
     
-    def __init__(self, message: str, rule: Optional[str] = None, **kwargs):
+    def __init__(self, message: str, rule: str | None = None, **kwargs):
         details = kwargs.pop("details", {})
         if rule:
             details["business_rule"] = rule
@@ -310,7 +310,7 @@ class UserError(BaseAppException):
     def __init__(
         self, 
         message: str, 
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
         **kwargs
     ):
         details = kwargs.pop("details", {})
@@ -331,7 +331,7 @@ class PropertyError(BaseAppException):
     def __init__(
         self, 
         message: str, 
-        property_id: Optional[str] = None,
+        property_id: str | None = None,
         **kwargs
     ):
         details = kwargs.pop("details", {})
@@ -352,7 +352,7 @@ class PolicyError(BaseAppException):
     def __init__(
         self, 
         message: str, 
-        policy_id: Optional[str] = None,
+        policy_id: str | None = None,
         **kwargs
     ):
         details = kwargs.pop("details", {})
@@ -401,7 +401,7 @@ def handle_external_api_error(service_name: str):
     return decorator
 
 
-def validate_required_fields(data: Dict[str, Any], required_fields: list):
+def validate_required_fields(data: dict[str, Any], required_fields: list):
     """Validate required fields in data"""
     missing_fields = []
     for field in required_fields:

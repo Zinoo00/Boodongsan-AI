@@ -3,13 +3,12 @@ Core configuration module for Korean Real Estate RAG AI Chatbot
 Environment variables and application settings management
 """
 
-import os
 import secrets
-from typing import List, Optional, Any, Dict, Union
-from pydantic import BaseSettings, validator, AnyHttpUrl, Field, SecretStr, HttpUrl
-from pydantic.env_settings import SettingsSourceCallable
 from enum import Enum
-import logging
+from typing import Any
+
+from pydantic import AnyHttpUrl, Field, HttpUrl, SecretStr, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Environment(str, Enum):
@@ -74,10 +73,11 @@ class Settings(BaseSettings):
     JWT_REFRESH_SECRET_KEY: str = secrets.token_urlsafe(32)
     
     # CORS
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
     
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
-    def assemble_cors_origins(cls, v: Any) -> List[str]:
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Any) -> list[str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
         elif isinstance(v, (list, str)):
@@ -99,13 +99,15 @@ class Settings(BaseSettings):
         min_length=20,
         description="Supabase service role key"
     )
-    DATABASE_URL: Optional[str] = Field(
+    DATABASE_URL: str | None = Field(
         default=None,
         description="Direct PostgreSQL connection URL"
     )
     
-    @validator("DATABASE_URL", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> str:
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod 
+    def assemble_db_connection(cls, v: str | None, info) -> str:
+        values = info.data if hasattr(info, 'data') else {}
         if isinstance(v, str) and v:
             return v
         
@@ -130,7 +132,7 @@ class Settings(BaseSettings):
     
     # Redis Cache
     REDIS_URL: str = "redis://localhost:6379/0"
-    REDIS_PASSWORD: Optional[str] = None
+    REDIS_PASSWORD: str | None = None
     CACHE_TTL: int = 3600  # 1 hour
     
     # Vector Database - Qdrant
@@ -200,8 +202,8 @@ class Settings(BaseSettings):
     
     # Korean Real Estate APIs
     MOLIT_API_KEY: str  # 국토교통부 API
-    HUG_API_KEY: Optional[str] = None  # 주택도시보증공사 API
-    HF_API_KEY: Optional[str] = None  # 주택금융공사 API
+    HUG_API_KEY: str | None = None  # 주택도시보증공사 API
+    HF_API_KEY: str | None = None  # 주택금융공사 API
     
     # Data Collection
     DATA_UPDATE_INTERVAL_HOURS: int = 24
@@ -243,13 +245,14 @@ class Settings(BaseSettings):
     # Monitoring
     ENABLE_METRICS: bool = True
     METRICS_PORT: int = 9090
-    LOG_FILE_PATH: Optional[str] = None
+    LOG_FILE_PATH: str | None = None
     
     # File Storage
     UPLOAD_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
-    ALLOWED_FILE_TYPES: List[str] = ["csv", "xlsx", "json"]
+    ALLOWED_FILE_TYPES: list[str] = ["csv", "xlsx", "json"]
     
-    @validator("DEBUG", pre=True)
+    @field_validator("DEBUG", mode="before")
+    @classmethod
     def parse_debug(cls, v: Any) -> bool:
         """Parse debug flag from various input types"""
         if isinstance(v, bool):
@@ -258,8 +261,11 @@ class Settings(BaseSettings):
             return v.lower() in ("true", "1", "yes", "on")
         return bool(v)
     
-    @validator("*", pre=True)
-    def validate_required_in_production(cls, v: Any, field: Any, values: Dict[str, Any]) -> Any:
+    @field_validator("*", mode="before") 
+    @classmethod
+    def validate_required_in_production(cls, v: Any, info) -> Any:
+        field = info.field_name if hasattr(info, 'field_name') else None
+        values = info.data if hasattr(info, 'data') else {}
         """Ensure required fields are set in production"""
         env = values.get("ENVIRONMENT", Environment.DEVELOPMENT)
         
@@ -272,32 +278,19 @@ class Settings(BaseSettings):
         }
         
         if (env == Environment.PRODUCTION and 
-            field.name in production_required and 
+            field in production_required and 
             (v is None or v == "")):
-            raise ValueError(f"{field.name} is required in production environment")
+            raise ValueError(f"{field} is required in production environment")
         
         return v
     
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = True
-        allow_population_by_field_name = True
-        validate_assignment = True
-        
-        # Custom source for better error messages
-        @classmethod
-        def customise_sources(
-            cls,
-            init_settings: SettingsSourceCallable,
-            env_settings: SettingsSourceCallable,
-            file_secret_settings: SettingsSourceCallable,
-        ) -> tuple[SettingsSourceCallable, ...]:
-            return (
-                init_settings,
-                env_settings,
-                file_secret_settings,
-            )
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        validate_assignment=True,
+        extra="forbid"
+    )
     
     def get_secret_value(self, field_name: str) -> str:
         """Safely get secret value from SecretStr fields"""
@@ -344,7 +337,7 @@ ENVIRONMENT_CONFIGS = {
 }
 
 
-def get_environment_config() -> Dict[str, Any]:
+def get_environment_config() -> dict[str, Any]:
     """Get environment-specific configuration"""
     return ENVIRONMENT_CONFIGS.get(settings.ENVIRONMENT, ENVIRONMENT_CONFIGS[Environment.DEVELOPMENT])
 

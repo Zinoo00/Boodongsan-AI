@@ -6,15 +6,15 @@
 import logging
 import uuid
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Any
 
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel, Field
 
-from ...ai.langchain_pipeline import get_real_estate_agent, ConversationContext
-from ...services.user_profiling_service import UserProfilingService
+from ...ai.langchain_pipeline import ConversationContext, get_real_estate_agent
+from ...database.connection import cache_manager, get_db_session
 from ...database.models import ConversationHistory
-from ...database.connection import get_db_session, cache_manager
+from ...services.user_profiling_service import UserProfilingService
 
 logger = logging.getLogger(__name__)
 
@@ -24,32 +24,32 @@ router = APIRouter()
 class ChatMessage(BaseModel):
     """채팅 메시지 모델"""
     message: str = Field(..., description="사용자 메시지", min_length=1, max_length=1000)
-    user_id: Optional[str] = Field(None, description="사용자 ID")
-    session_id: Optional[str] = Field(None, description="세션 ID")
+    user_id: str | None = Field(None, description="사용자 ID")
+    session_id: str | None = Field(None, description="세션 ID")
 
 class ChatResponse(BaseModel):
     """채팅 응답 모델"""
     response: str = Field(..., description="AI 응답")
     session_id: str = Field(..., description="세션 ID")
-    user_id: Optional[str] = Field(None, description="사용자 ID")
-    extracted_entities: Optional[Dict[str, Any]] = Field(None, description="추출된 개체 정보")
-    detected_intent: Optional[str] = Field(None, description="감지된 의도")
-    recommended_policies: Optional[List[str]] = Field(None, description="추천 정책 ID 목록")
-    recommended_properties: Optional[List[str]] = Field(None, description="추천 매물 ID 목록")
-    conversation_context: Optional[Dict[str, Any]] = Field(None, description="대화 컨텍스트")
-    processing_time_ms: Optional[int] = Field(None, description="처리 시간(밀리초)")
+    user_id: str | None = Field(None, description="사용자 ID")
+    extracted_entities: dict[str, Any] | None = Field(None, description="추출된 개체 정보")
+    detected_intent: str | None = Field(None, description="감지된 의도")
+    recommended_policies: list[str] | None = Field(None, description="추천 정책 ID 목록")
+    recommended_properties: list[str] | None = Field(None, description="추천 매물 ID 목록")
+    conversation_context: dict[str, Any] | None = Field(None, description="대화 컨텍스트")
+    processing_time_ms: int | None = Field(None, description="처리 시간(밀리초)")
 
 class ConversationHistoryResponse(BaseModel):
     """대화 이력 응답 모델"""
-    conversations: List[Dict[str, Any]] = Field(..., description="대화 이력 목록")
+    conversations: list[dict[str, Any]] = Field(..., description="대화 이력 목록")
     total_count: int = Field(..., description="전체 대화 수")
     session_id: str = Field(..., description="세션 ID")
 
 class UserContextResponse(BaseModel):
     """사용자 컨텍스트 응답 모델"""
-    user_profile: Optional[Dict[str, Any]] = Field(None, description="사용자 프로필")
-    conversation_patterns: Optional[Dict[str, Any]] = Field(None, description="대화 패턴 분석")
-    missing_info_suggestions: Optional[List[str]] = Field(None, description="부족한 정보 제안")
+    user_profile: dict[str, Any] | None = Field(None, description="사용자 프로필")
+    conversation_patterns: dict[str, Any] | None = Field(None, description="대화 패턴 분석")
+    missing_info_suggestions: list[str] | None = Field(None, description="부족한 정보 제안")
 
 @router.post("/send", response_model=ChatResponse)
 async def send_message(
@@ -128,7 +128,7 @@ async def send_message(
 @router.get("/history/{session_id}", response_model=ConversationHistoryResponse)
 async def get_conversation_history(
     session_id: str,
-    user_id: Optional[str] = None,
+    user_id: str | None = None,
     limit: int = 50,
     offset: int = 0
 ):
@@ -207,7 +207,7 @@ async def get_user_context(user_id: str):
         )
 
 @router.delete("/session/{session_id}")
-async def clear_session(session_id: str, user_id: Optional[str] = None):
+async def clear_session(session_id: str, user_id: str | None = None):
     """세션 클리어"""
     try:
         # 캐시에서 컨텍스트 삭제
@@ -238,7 +238,7 @@ async def clear_session(session_id: str, user_id: Optional[str] = None):
 
 @router.post("/feedback")
 async def submit_feedback(
-    feedback_data: Dict[str, Any]
+    feedback_data: dict[str, Any]
 ):
     """사용자 피드백 제출"""
     try:
@@ -336,7 +336,7 @@ async def _save_conversation_context(
 
 async def _update_user_profile_async(
     user_id: str,
-    extracted_entities: Dict[str, Any],
+    extracted_entities: dict[str, Any],
     session_id: str
 ):
     """사용자 프로필 비동기 업데이트"""

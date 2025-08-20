@@ -2,12 +2,25 @@
 SQLAlchemy 데이터베이스 모델 정의
 """
 
-from sqlalchemy import Column, String, Integer, BigInteger, Boolean, DateTime, Text, DECIMAL, ARRAY, ForeignKey, Index
+import uuid
+from datetime import datetime
+
+from sqlalchemy import (
+    ARRAY,
+    DECIMAL,
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+)
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID, JSONB
-from datetime import datetime
-import uuid
 
 Base = declarative_base()
 

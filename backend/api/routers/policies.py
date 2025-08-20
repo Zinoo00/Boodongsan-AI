@@ -4,7 +4,7 @@
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -18,21 +18,21 @@ router = APIRouter()
 # Pydantic 모델들
 class PolicySearchRequest(BaseModel):
     """정책 검색 요청 모델"""
-    user_profile: Dict[str, Any] = Field(..., description="사용자 프로필 정보")
+    user_profile: dict[str, Any] = Field(..., description="사용자 프로필 정보")
 
 class PolicyListResponse(BaseModel):
     """정책 목록 응답 모델"""
-    policies: List[Dict[str, Any]] = Field(..., description="정책 목록")
+    policies: list[dict[str, Any]] = Field(..., description="정책 목록")
     total_count: int = Field(..., description="전체 정책 수")
-    filters_applied: Dict[str, Any] = Field(..., description="적용된 필터")
+    filters_applied: dict[str, Any] = Field(..., description="적용된 필터")
 
 class PolicyDetailResponse(BaseModel):
     """정책 상세 응답 모델"""
-    policy: Dict[str, Any] = Field(..., description="정책 상세 정보")
+    policy: dict[str, Any] = Field(..., description="정책 상세 정보")
 
 class PolicyBenefitResponse(BaseModel):
     """정책 혜택 계산 응답 모델"""
-    benefit_calculation: Dict[str, Any] = Field(..., description="혜택 계산 결과")
+    benefit_calculation: dict[str, Any] = Field(..., description="혜택 계산 결과")
 
 @router.post("/search", response_model=PolicyListResponse)
 async def search_applicable_policies(request: PolicySearchRequest):
@@ -89,8 +89,8 @@ async def search_applicable_policies(request: PolicySearchRequest):
 
 @router.get("/", response_model=PolicyListResponse)
 async def list_policies(
-    policy_type: Optional[str] = Query(None, description="정책 유형 필터"),
-    policy_category: Optional[str] = Query(None, description="정책 카테고리 필터"),
+    policy_type: str | None = Query(None, description="정책 유형 필터"),
+    policy_category: str | None = Query(None, description="정책 카테고리 필터"),
     active_only: bool = Query(True, description="활성 정책만 조회"),
     limit: int = Query(20, description="조회 개수", le=100),
     offset: int = Query(0, description="오프셋")
@@ -156,7 +156,7 @@ async def get_policy_detail(policy_id: str):
 @router.post("/{policy_id}/calculate-benefit", response_model=PolicyBenefitResponse)
 async def calculate_policy_benefit(
     policy_id: str,
-    user_profile: Dict[str, Any]
+    user_profile: dict[str, Any]
 ):
     """사용자 기준 정책 혜택 계산"""
     try:

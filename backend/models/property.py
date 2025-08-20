@@ -2,14 +2,13 @@
 Property models for Korean Real Estate data
 """
 
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-from enum import Enum
 import uuid
+from datetime import datetime
+from enum import Enum
 
-from sqlalchemy import Column, String, Integer, Float, Text, DateTime, Boolean, Index, JSON
-from sqlalchemy.dialects.postgresql import UUID, ARRAY
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Index, Integer, String, Text
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from .base import Base, BaseSchema, TimestampMixin
 
@@ -110,55 +109,55 @@ class PropertyFilter(BaseModel):
     """Property search filter"""
     
     # Location filters
-    sido: Optional[str] = None
-    sigungu: Optional[str] = None
-    dong: Optional[str] = None
+    sido: str | None = None
+    sigungu: str | None = None
+    dong: str | None = None
     
     # Property type filter
-    property_types: Optional[List[PropertyType]] = None
-    transaction_types: Optional[List[TransactionType]] = None
+    property_types: list[PropertyType] | None = None
+    transaction_types: list[TransactionType] | None = None
     
     # Price filters
-    min_price: Optional[int] = None
-    max_price: Optional[int] = None
-    min_deposit: Optional[int] = None
-    max_deposit: Optional[int] = None
-    max_monthly_rent: Optional[int] = None
+    min_price: int | None = None
+    max_price: int | None = None
+    min_deposit: int | None = None
+    max_deposit: int | None = None
+    max_monthly_rent: int | None = None
     
     # Area filters
-    min_area_m2: Optional[float] = None
-    max_area_m2: Optional[float] = None
-    min_area_pyeong: Optional[float] = None
-    max_area_pyeong: Optional[float] = None
+    min_area_m2: float | None = None
+    max_area_m2: float | None = None
+    min_area_pyeong: float | None = None
+    max_area_pyeong: float | None = None
     
     # Room filters
-    min_room_count: Optional[int] = None
-    max_room_count: Optional[int] = None
+    min_room_count: int | None = None
+    max_room_count: int | None = None
     
     # Building filters
-    min_building_year: Optional[int] = None
-    max_building_year: Optional[int] = None
-    min_floor: Optional[int] = None
-    max_floor: Optional[int] = None
+    min_building_year: int | None = None
+    max_building_year: int | None = None
+    min_floor: int | None = None
+    max_floor: int | None = None
     
     # Feature filters
-    parking_required: Optional[bool] = None
-    elevator_required: Optional[bool] = None
+    parking_required: bool | None = None
+    elevator_required: bool | None = None
     
     # Location filters (coordinates)
-    center_lat: Optional[float] = None
-    center_lng: Optional[float] = None
-    radius_km: Optional[float] = None
+    center_lat: float | None = None
+    center_lng: float | None = None
+    radius_km: float | None = None
     
     # Date filters
-    transaction_date_from: Optional[datetime] = None
-    transaction_date_to: Optional[datetime] = None
+    transaction_date_from: datetime | None = None
+    transaction_date_to: datetime | None = None
 
 
 class PropertyBase(BaseSchema):
     """Base property schema"""
     address: str = Field(..., description="Property address")
-    detailed_address: Optional[str] = None
+    detailed_address: str | None = None
     sido: str = Field(..., description="시도")
     sigungu: str = Field(..., description="시군구") 
     dong: str = Field(..., description="동")
@@ -170,58 +169,58 @@ class PropertyBase(BaseSchema):
 
 class PropertyCreate(PropertyBase):
     """Property creation schema"""
-    building_name: Optional[str] = None
-    room_count: Optional[int] = Field(None, ge=0)
-    bathroom_count: Optional[int] = Field(None, ge=0)
-    area_pyeong: Optional[float] = Field(None, gt=0)
-    building_year: Optional[int] = Field(None, ge=1900, le=2030)
-    floor: Optional[int] = Field(None, ge=-10, le=200)
-    total_floors: Optional[int] = Field(None, ge=1, le=200)
-    deposit: Optional[int] = Field(None, ge=0)
-    monthly_rent: Optional[int] = Field(None, ge=0)
-    maintenance_fee: Optional[int] = Field(None, ge=0)
-    transaction_date: Optional[datetime] = None
-    parking_available: Optional[bool] = False
-    elevator_available: Optional[bool] = False
-    latitude: Optional[float] = Field(None, ge=-90, le=90)
-    longitude: Optional[float] = Field(None, ge=-180, le=180)
-    description: Optional[str] = None
-    features: Optional[List[str]] = []
-    data_source: Optional[str] = None
-    source_id: Optional[str] = None
+    building_name: str | None = None
+    room_count: int | None = Field(None, ge=0)
+    bathroom_count: int | None = Field(None, ge=0)
+    area_pyeong: float | None = Field(None, gt=0)
+    building_year: int | None = Field(None, ge=1900, le=2030)
+    floor: int | None = Field(None, ge=-10, le=200)
+    total_floors: int | None = Field(None, ge=1, le=200)
+    deposit: int | None = Field(None, ge=0)
+    monthly_rent: int | None = Field(None, ge=0)
+    maintenance_fee: int | None = Field(None, ge=0)
+    transaction_date: datetime | None = None
+    parking_available: bool | None = False
+    elevator_available: bool | None = False
+    latitude: float | None = Field(None, ge=-90, le=90)
+    longitude: float | None = Field(None, ge=-180, le=180)
+    description: str | None = None
+    features: list[str] | None = []
+    data_source: str | None = None
+    source_id: str | None = None
 
 
 class PropertyUpdate(BaseModel):
     """Property update schema"""
-    price: Optional[int] = Field(None, ge=0)
-    deposit: Optional[int] = Field(None, ge=0)
-    monthly_rent: Optional[int] = Field(None, ge=0)
-    maintenance_fee: Optional[int] = Field(None, ge=0)
-    description: Optional[str] = None
-    features: Optional[List[str]] = None
-    is_active: Optional[bool] = None
+    price: int | None = Field(None, ge=0)
+    deposit: int | None = Field(None, ge=0)
+    monthly_rent: int | None = Field(None, ge=0)
+    maintenance_fee: int | None = Field(None, ge=0)
+    description: str | None = None
+    features: list[str] | None = None
+    is_active: bool | None = None
 
 
 class PropertyResponse(PropertyBase, TimestampMixin):
     """Property response schema"""
     id: uuid.UUID
-    building_name: Optional[str] = None
-    room_count: Optional[int] = None
-    bathroom_count: Optional[int] = None
-    area_pyeong: Optional[float] = None
-    building_year: Optional[int] = None
-    floor: Optional[int] = None
-    total_floors: Optional[int] = None
-    deposit: Optional[int] = None
-    monthly_rent: Optional[int] = None
-    maintenance_fee: Optional[int] = None
-    transaction_date: Optional[datetime] = None
+    building_name: str | None = None
+    room_count: int | None = None
+    bathroom_count: int | None = None
+    area_pyeong: float | None = None
+    building_year: int | None = None
+    floor: int | None = None
+    total_floors: int | None = None
+    deposit: int | None = None
+    monthly_rent: int | None = None
+    maintenance_fee: int | None = None
+    transaction_date: datetime | None = None
     parking_available: bool = False
     elevator_available: bool = False
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    description: Optional[str] = None
-    features: Optional[List[str]] = []
+    latitude: float | None = None
+    longitude: float | None = None
+    description: str | None = None
+    features: list[str] | None = []
     is_active: bool = True
     
     @validator('area_pyeong', pre=True, always=True)
@@ -238,8 +237,8 @@ class PropertySearchResult(BaseModel):
     """Property search result with relevance score"""
     property: PropertyResponse
     relevance_score: float = Field(..., ge=0, le=1, description="Relevance score from vector search")
-    distance_km: Optional[float] = Field(None, description="Distance from search center in km")
-    matching_criteria: List[str] = Field(default=[], description="List of matching search criteria")
+    distance_km: float | None = Field(None, description="Distance from search center in km")
+    matching_criteria: list[str] = Field(default=[], description="List of matching search criteria")
 
 
 class PropertyStats(BaseModel):
@@ -251,6 +250,6 @@ class PropertyStats(BaseModel):
     max_price: int
     price_per_m2: float
     price_per_pyeong: float
-    area_distribution: Dict[str, int]
-    transaction_type_distribution: Dict[str, int]
-    property_type_distribution: Dict[str, int]
+    area_distribution: dict[str, int]
+    transaction_type_distribution: dict[str, int]
+    property_type_distribution: dict[str, int]

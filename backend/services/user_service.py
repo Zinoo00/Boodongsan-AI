@@ -4,10 +4,9 @@ Handles user-related business logic
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Any
 
-from ..models.user import User, UserProfile, ConversationHistory
-from ..core.database import get_database_session
+from ..models.user import ConversationHistory, UserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ class UserService:
     def __init__(self):
         pass
     
-    async def get_primary_profile(self, user_id: str) -> Optional[UserProfile]:
+    async def get_primary_profile(self, user_id: str) -> UserProfile | None:
         """Get user's primary profile"""
         try:
             # TODO: Implement user profile lookup
@@ -34,7 +33,7 @@ class UserService:
         user_id: str,
         conversation_id: str,
         limit: int = 10
-    ) -> List[ConversationHistory]:
+    ) -> list[ConversationHistory]:
         """Get conversation history"""
         try:
             # TODO: Implement conversation history lookup
@@ -51,12 +50,12 @@ class UserService:
         conversation_id: str,
         role: str,
         content: str,
-        intent: Optional[str] = None,
-        entities: Optional[Dict[str, Any]] = None,
-        search_results: Optional[List[str]] = None,
-        recommended_policies: Optional[List[str]] = None,
-        confidence_score: Optional[float] = None,
-        model_used: Optional[str] = None
+        intent: str | None = None,
+        entities: dict[str, Any] | None = None,
+        search_results: list[str] | None = None,
+        recommended_policies: list[str] | None = None,
+        confidence_score: float | None = None,
+        model_used: str | None = None
     ) -> bool:
         """Save conversation message"""
         try:
