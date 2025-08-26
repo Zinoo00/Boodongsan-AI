@@ -16,28 +16,28 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 
 # Core imports
-from ..core.config import get_environment_config, settings
-from ..core.database import cleanup_database, initialize_database
+from core.config import get_environment_config, settings
+from core.database import cleanup_database, initialize_database
 
 # Service imports
-from ..services.ai_service import AIService
-from ..services.policy_service import PolicyService
-from ..services.property_service import PropertyService
-from ..services.rag_service import RAGService
-from ..services.user_service import UserService
-from ..services.vector_service import VectorService
-from .middleware.auth import AuthMiddleware
+from services.ai_service import AIService
+from services.policy_service import PolicyService
+from services.property_service import PropertyService
+from services.rag_service import RAGService
+from services.user_service import UserService
+from services.hybrid_vector_service import HybridVectorService
 
 # Middleware imports
-from .middleware.caching import CacheMiddleware
+from api.middleware.auth import AuthMiddleware
+from api.middleware.caching import CacheMiddleware
 
 # Router imports
-from .routers import chat, health, policies, properties, users
+from api.routers import chat, health, policies, properties, users
 
 # Configure logging
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL.value),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -54,38 +54,38 @@ user_service = None
 async def lifespan(app: FastAPI):
     """Application lifespan management"""
     global ai_service, vector_service, rag_service, property_service, policy_service, user_service
-    
+
     # Startup
     logger.info("Starting Korean Real Estate RAG AI Chatbot")
-    
+
     try:
         # Initialize database
         logger.info("Initializing database connections...")
         await initialize_database()
-        
+
         # Initialize services
         logger.info("Initializing AI services...")
         ai_service = AIService()
         await ai_service.initialize()
-        
-        logger.info("Initializing vector service...")
-        vector_service = VectorService()
+
+        logger.info("Initializing hybrid vector service...")
+        vector_service = HybridVectorService()
         await vector_service.initialize()
-        
+
         logger.info("Initializing business services...")
         property_service = PropertyService()
         policy_service = PolicyService()
         user_service = UserService()
-        
+
         logger.info("Initializing RAG service...")
         rag_service = RAGService(
             vector_service=vector_service,
             ai_service=ai_service,
             property_service=property_service,
             policy_service=policy_service,
-            user_service=user_service
+            user_service=user_service,
         )
-        
+
         # Store services in app state for dependency injection
         app.state.ai_service = ai_service
         app.state.vector_service = vector_service
@@ -93,28 +93,29 @@ async def lifespan(app: FastAPI):
         app.state.property_service = property_service
         app.state.policy_service = policy_service
         app.state.user_service = user_service
-        
+
         logger.info("All services initialized successfully")
-        
+
     except Exception as e:
         logger.error(f"Service initialization failed: {str(e)}")
         raise
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down application...")
-    
+
     try:
         if ai_service:
             await ai_service.close()
-        
+
         await cleanup_database()
-        
+
         logger.info("Application shutdown completed")
-        
+
     except Exception as e:
         logger.error(f"Error during shutdown: {str(e)}")
+
 
 # Create FastAPI application
 app = FastAPI(
@@ -124,7 +125,7 @@ app = FastAPI(
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
     openapi_url="/openapi.json" if settings.DEBUG else None,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Add middleware
@@ -137,12 +138,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Trusted host middleware  
+# Trusted host middleware
 if settings.ENVIRONMENT.value == "production":
-    app.add_middleware(
-        TrustedHostMiddleware,
-        allowed_hosts=["yourdomain.com", "*.yourdomain.com"]
-    )
+    allowed_hosts = settings.ALLOWED_HOSTS if settings.ALLOWED_HOSTS else ["*"]
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
 
 # Custom middleware
 app.add_middleware(CacheMiddleware)
@@ -152,8 +151,11 @@ app.add_middleware(AuthMiddleware)
 app.include_router(chat.router, prefix=settings.API_V1_STR + "/chat", tags=["Chat"])
 app.include_router(health.router, prefix=settings.API_V1_STR + "/health", tags=["Health"])
 app.include_router(policies.router, prefix=settings.API_V1_STR + "/policies", tags=["Policies"])
-app.include_router(properties.router, prefix=settings.API_V1_STR + "/properties", tags=["Properties"])
+app.include_router(
+    properties.router, prefix=settings.API_V1_STR + "/properties", tags=["Properties"]
+)
 app.include_router(users.router, prefix=settings.API_V1_STR + "/users", tags=["Users"])
+
 
 @app.get("/", response_model=dict[str, Any])
 async def root():
@@ -164,8 +166,9 @@ async def root():
         "version": settings.APP_VERSION,
         "docs": "/docs" if settings.DEBUG else None,
         "health": f"{settings.API_V1_STR}/health",
-        "environment": settings.ENVIRONMENT.value
+        "environment": settings.ENVIRONMENT.value,
     }
+
 
 @app.get(f"{settings.API_V1_STR}/info", response_model=dict[str, Any])
 async def api_info():
@@ -181,23 +184,25 @@ async def api_info():
             "Real-time market information",
             "Conversation history management",
             "Vector-based similarity search",
-            "Dual AI provider support (AWS Bedrock + Cloudflare)"
+            "Dual AI provider support (AWS Bedrock + Cloudflare)",
         ],
         "endpoints": {
             "chat": f"{settings.API_V1_STR}/chat",
-            "policies": f"{settings.API_V1_STR}/policies", 
+            "policies": f"{settings.API_V1_STR}/policies",
             "properties": f"{settings.API_V1_STR}/properties",
             "users": f"{settings.API_V1_STR}/users",
-            "health": f"{settings.API_V1_STR}/health"
+            "health": f"{settings.API_V1_STR}/health",
         },
         "architecture": {
             "framework": "FastAPI",
+            "asgi_server": "Uvicorn",
             "database": "Supabase PostgreSQL",
-            "vector_db": "Qdrant",
+            "vector_db": "Chromadb",
             "cache": "Redis",
-            "ai_providers": ["AWS Bedrock", "Cloudflare Workers AI"]
-        }
+            "ai_providers": ["AWS Bedrock", "Cloudflare Workers AI"],
+        },
     }
+
 
 # Global exception handlers
 @app.exception_handler(Exception)
@@ -210,9 +215,10 @@ async def global_exception_handler(request, exc):
             "error": "Internal Server Error",
             "message": "An unexpected error occurred on the server.",
             "detail": str(exc) if settings.DEBUG else None,
-            "timestamp": datetime.utcnow().isoformat()
-        }
+            "timestamp": datetime.utcnow().isoformat(),
+        },
     )
+
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
@@ -222,38 +228,32 @@ async def http_exception_handler(request, exc):
         content={
             "error": exc.detail,
             "status_code": exc.status_code,
-            "timestamp": datetime.utcnow().isoformat()
-        }
+            "timestamp": datetime.utcnow().isoformat(),
+        },
     )
+
 
 # Custom OpenAPI schema
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
-    
+
     openapi_schema = get_openapi(
         title=settings.APP_NAME,
         version=settings.APP_VERSION,
         description="Korean Real Estate RAG AI Chatbot - AI-powered personalized real estate recommendations",
         routes=app.routes,
     )
-    
+
     # Add security schemes
     openapi_schema["components"]["securitySchemes"] = {
-        "BearerAuth": {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "JWT"
-        },
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "in": "header",
-            "name": "X-API-Key"
-        }
+        "BearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"},
+        "ApiKeyAuth": {"type": "apiKey", "in": "header", "name": "X-API-Key"},
     }
-    
+
     app.openapi_schema = openapi_schema
     return app.openapi_schema
+
 
 app.openapi = custom_openapi
 
@@ -263,35 +263,63 @@ async def get_rag_service() -> RAGService:
     """Dependency to get RAG service"""
     return app.state.rag_service
 
+
 async def get_ai_service() -> AIService:
     """Dependency to get AI service"""
     return app.state.ai_service
 
-async def get_vector_service() -> VectorService:
+
+async def get_vector_service() -> HybridVectorService:
     """Dependency to get vector service"""
     return app.state.vector_service
+
 
 async def get_property_service() -> PropertyService:
     """Dependency to get property service"""
     return app.state.property_service
 
+
 async def get_policy_service() -> PolicyService:
     """Dependency to get policy service"""
     return app.state.policy_service
+
 
 async def get_user_service() -> UserService:
     """Dependency to get user service"""
     return app.state.user_service
 
-
 if __name__ == "__main__":
-    # Development server
+    # Development server using Uvicorn (per README architecture)
     env_config = get_environment_config()
     
-    uvicorn.run(
-        "backend.api.main:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=env_config["reload"],
-        log_level=env_config["log_level"]
-    )
+    if settings.ASGI_SERVER == "granian":
+        # Granian server support (if requested)
+        try:
+            import granian
+
+            granian.run(
+                "backend.api.main:app",
+                interface="asgi",
+                host=settings.HOST,
+                port=settings.PORT,
+                workers=settings.WORKERS,
+                reload=env_config["reload"],
+            )
+        except ImportError:
+            logger.warning("Granian not installed, falling back to Uvicorn")
+            uvicorn.run(
+                "backend.api.main:app",
+                host=settings.HOST,
+                port=settings.PORT,
+                reload=env_config["reload"],
+                log_level=env_config["log_level"],
+            )
+    else:
+        # Default Uvicorn server (recommended per architecture)
+        uvicorn.run(
+            "backend.api.main:app",
+            host=settings.HOST,
+            port=settings.PORT,
+            reload=env_config["reload"],
+            log_level=env_config["log_level"],
+        )
