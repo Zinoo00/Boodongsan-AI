@@ -16,9 +16,9 @@ from typing import Any
 import numpy as np
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from ..core.config import settings
-from ..core.database import cache_manager
-from ..core.exceptions import ErrorCode, VectorServiceError
+from core.config import settings
+from core.database import cache_manager
+from core.exceptions import ErrorCode, VectorServiceError
 
 logger = logging.getLogger(__name__)
 

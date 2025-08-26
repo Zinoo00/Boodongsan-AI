@@ -11,10 +11,10 @@ from typing import Any
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel, Field
 
-from ...ai.langchain_pipeline import ConversationContext, get_real_estate_agent
-from ...database.connection import cache_manager, get_db_session
-from ...database.models import ConversationHistory
-from ...services.user_profiling_service import UserProfilingService
+from ai.langchain_pipeline import ConversationContext, get_real_estate_agent
+from database.connection import cache_manager, get_db_session
+from database.models import ConversationHistory
+from services.user_profiling_service import UserProfilingService
 
 logger = logging.getLogger(__name__)
 

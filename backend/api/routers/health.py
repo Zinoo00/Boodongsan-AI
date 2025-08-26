@@ -10,8 +10,8 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from ...ai.bedrock_client import get_bedrock_client
-from ...database.connection import health_check as db_health_check
+from ai.bedrock_client import get_bedrock_client
+from database.connection import health_check as db_health_check
 
 logger = logging.getLogger(__name__)
 

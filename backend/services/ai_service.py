@@ -13,7 +13,7 @@ import aiohttp
 import boto3
 from botocore.exceptions import ClientError
 
-from ..core.config import settings
+from core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,16 @@ class AIProvider(str, Enum):
     BEDROCK = "bedrock"
     CLOUDFLARE = "cloudflare"
     AUTO = "auto"
+
+
+class AIRequestType(str, Enum):
+    """AI request types for caching"""
+
+    CHAT = "chat"
+    PROPERTY_SEARCH = "property_search"
+    POLICY_MATCH = "policy_match"
+    ENTITY_EXTRACTION = "entity_extraction"
+    CONVERSATION = "conversation"
 
 
 class AIService:

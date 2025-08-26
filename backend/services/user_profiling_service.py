@@ -9,8 +9,8 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
-from ..database.connection import get_db_session
-from ..database.models import ConversationHistory, User, UserPreference
+from database.connection import get_db_session
+from database.models import ConversationHistory, User, UserPreference
 from .policy_service import PolicyService
 
 logger = logging.getLogger(__name__)

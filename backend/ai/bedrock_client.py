@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class BedrockConfig:
     """Bedrock 설정 클래스"""
 
-    region_name: str = "us-east-1"
+    region_name: str = "ap-northeast-2"
     model_id: str = "anthropic.claude-3-sonnet-20240229-v1:0"
     embedding_model_id: str = "amazon.titan-embed-text-v1"
     max_tokens: int = 4096

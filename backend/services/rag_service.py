@@ -10,11 +10,11 @@ from typing import Any
 
 from pydantic import BaseModel, Field, validator
 
-from ..core.config import settings
-from ..core.database import cache_manager
-from ..models.policy import PolicyRecommendation
-from ..models.property import PropertyFilter, PropertySearchResult
-from ..models.user import ConversationHistory, UserProfile
+from core.config import settings
+from core.database import cache_manager
+from models.policy import PolicyRecommendation
+from models.property import PropertyFilter, PropertySearchResult
+from models.user import ConversationHistory, UserProfile
 from .ai_service import AIService
 from .policy_service import PolicyService
 from .property_service import PropertyService

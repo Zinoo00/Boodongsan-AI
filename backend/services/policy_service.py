@@ -8,8 +8,8 @@ from typing import Any
 
 from sqlalchemy import and_, or_
 
-from ..database.connection import get_db_session
-from ..database.models import GovernmentPolicy, PolicyCondition
+from database.connection import get_db_session
+from database.models import GovernmentPolicy, PolicyCondition
 
 logger = logging.getLogger(__name__)
 

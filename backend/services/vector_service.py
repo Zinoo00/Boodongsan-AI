@@ -26,9 +26,9 @@ from qdrant_client.http.models import (
 )
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from ..core.config import settings
-from ..core.database import cache_manager
-from ..core.exceptions import ErrorCode, VectorServiceError
+from core.config import settings
+from core.database import cache_manager
+from core.exceptions import ErrorCode, VectorServiceError
 
 logger = logging.getLogger(__name__)
 
@@ -463,7 +463,7 @@ class VectorService:
         """
         try:
             # Import AI service for embedding generation
-            from ..services.ai_service import AIService
+            from services.ai_service import AIService
 
             # Check if we have AI service available
             try:

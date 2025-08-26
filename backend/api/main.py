@@ -16,23 +16,23 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 
 # Core imports
-from ..core.config import get_environment_config, settings
-from ..core.database import cleanup_database, initialize_database
+from core.config import get_environment_config, settings
+from core.database import cleanup_database, initialize_database
 
 # Service imports
-from ..services.ai_service import AIService
-from ..services.policy_service import PolicyService
-from ..services.property_service import PropertyService
-from ..services.rag_service import RAGService
-from ..services.user_service import UserService
-from ..services.hybrid_vector_service import HybridVectorService
-from .middleware.auth import AuthMiddleware
+from services.ai_service import AIService
+from services.policy_service import PolicyService
+from services.property_service import PropertyService
+from services.rag_service import RAGService
+from services.user_service import UserService
+from services.hybrid_vector_service import HybridVectorService
 
 # Middleware imports
-from .middleware.caching import CacheMiddleware
+from api.middleware.auth import AuthMiddleware
+from api.middleware.caching import CacheMiddleware
 
 # Router imports
-from .routers import chat, health, policies, properties, users
+from api.routers import chat, health, policies, properties, users
 
 # Configure logging
 logging.basicConfig(
@@ -288,11 +288,10 @@ async def get_user_service() -> UserService:
     """Dependency to get user service"""
     return app.state.user_service
 
-
 if __name__ == "__main__":
     # Development server using Uvicorn (per README architecture)
     env_config = get_environment_config()
-
+    
     if settings.ASGI_SERVER == "granian":
         # Granian server support (if requested)
         try:

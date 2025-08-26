@@ -10,10 +10,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from ..core.config import settings
-from ..core.exceptions import ErrorCode, VectorServiceError
-from .chromadb_service import ChromadbService, ChromaSearchResult
-from .vector_service import SearchResult, VectorService
+from core.config import settings
+from core.exceptions import ErrorCode, VectorServiceError
+from services.chromadb_service import ChromadbService, ChromaSearchResult
+from services.vector_service import SearchResult, VectorService
 
 logger = logging.getLogger(__name__)
 

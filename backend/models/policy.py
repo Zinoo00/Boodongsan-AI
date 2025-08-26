@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 
-from .base import Base, BaseSchema, TimestampMixin
+from models.base import Base, BaseSchema, TimestampMixin
 
 
 class PolicyType(str, Enum):

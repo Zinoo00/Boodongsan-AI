@@ -2,8 +2,8 @@
 Core module for Korean Real Estate RAG AI Chatbot
 """
 
-from .config import get_settings, settings
-from .database import DatabaseManager, get_database_session, get_redis_client
+from core.config import get_settings, settings
+from core.database import DatabaseManager, get_database_session, get_redis_client
 
 __all__ = [
     "settings",

@@ -13,9 +13,9 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
 from langchain.tools import BaseTool
 
-from ..services.policy_service import PolicyService
-from ..services.property_service import PropertyService
-from .bedrock_client import get_bedrock_client
+from services.policy_service import PolicyService
+from services.property_service import PropertyService
+from ai.bedrock_client import get_bedrock_client
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +35,8 @@ class ConversationContext:
 class PropertySearchTool(BaseTool):
     """부동산 검색 도구"""
 
-    name = "property_search"
-    description = "부동산 매물을 검색합니다. 지역, 가격대, 매물 유형 등의 조건을 받습니다."
+    name: str = "property_search"
+    description: str = "부동산 매물을 검색합니다. 지역, 가격대, 매물 유형 등의 조건을 받습니다."
 
     def __init__(self, property_service: PropertyService):
         super().__init__()
@@ -74,8 +74,8 @@ class PropertySearchTool(BaseTool):
 class PolicySearchTool(BaseTool):
     """정부 정책 검색 도구"""
 
-    name = "policy_search"
-    description = "정부 지원 정책을 검색합니다. 사용자의 나이, 소득 등 조건을 기반으로 적용 가능한 정책을 찾습니다."
+    name: str = "policy_search"
+    description: str = "정부 지원 정책을 검색합니다. 사용자의 나이, 소득 등 조건을 기반으로 적용 가능한 정책을 찾습니다."
 
     def __init__(self, policy_service: PolicyService):
         super().__init__()

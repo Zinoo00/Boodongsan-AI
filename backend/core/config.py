@@ -100,11 +100,13 @@ class Settings(BaseSettings):
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> list[str]:
+        if v is None or v == "":
+            return []
         if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
+            return [i.strip() for i in v.split(",") if i.strip()]
+        elif isinstance(v, list):
             return v
-        raise ValueError(v)
+        return []
 
     # Database - Supabase PostgreSQL
     SUPABASE_URL: HttpUrl = Field(..., description="Supabase project URL")
@@ -179,7 +181,7 @@ class Settings(BaseSettings):
         ..., min_length=32, description="AWS secret access key"
     )
     AWS_REGION: str = Field(
-        default="us-east-1", pattern=r"^[a-z]{2}-[a-z]+-\d{1}$", description="AWS region"
+        default="ap-northeast-2", pattern=r"^[a-z]{2}-[a-z]+-\d{1}$", description="AWS region"
     )
     BEDROCK_MODEL_ID: str = Field(
         default="anthropic.claude-3-sonnet-20240229-v1:0", description="AWS Bedrock model ID"
@@ -232,6 +234,15 @@ class Settings(BaseSettings):
     UPLOAD_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
     ALLOWED_FILE_TYPES: list[str] = ["csv", "xlsx", "json"]
 
+    @field_validator("ALLOWED_FILE_TYPES", mode="before")
+    @classmethod
+    def assemble_file_types(cls, v: Any) -> list[str]:
+        if isinstance(v, str) and not v.startswith("["):
+            return [i.strip() for i in v.split(",")]
+        elif isinstance(v, (list, str)):
+            return v
+        return ["csv", "xlsx", "json"]
+
     @field_validator("DEBUG", mode="before")
     @classmethod
     def parse_debug(cls, v: Any) -> bool:
@@ -279,6 +290,8 @@ class Settings(BaseSettings):
         case_sensitive=True,
         validate_assignment=True,
         extra="forbid",
+        env_parse_none_str="",  # Treat empty strings as None
+        json_schema_extra={"additionalProperties": False}
     )
 
     def get_secret_value(self, field_name: str) -> str:

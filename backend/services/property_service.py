@@ -6,7 +6,7 @@ Handles property-related business logic
 import logging
 from typing import Any
 
-from ..models.property import (
+from models.property import (
     PropertyFilter,
     PropertyResponse,
 )

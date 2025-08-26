@@ -9,7 +9,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from ...services.user_profiling_service import UserProfilingService
+from services.user_profiling_service import UserProfilingService
 
 logger = logging.getLogger(__name__)
 

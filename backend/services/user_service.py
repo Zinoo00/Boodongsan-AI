@@ -6,7 +6,7 @@ Handles user-related business logic
 import logging
 from typing import Any
 
-from ..models.user import ConversationHistory, UserProfile
+from models.user import ConversationHistory, UserProfile
 
 logger = logging.getLogger(__name__)
 

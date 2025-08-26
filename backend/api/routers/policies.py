@@ -9,7 +9,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from ...services.policy_service import PolicyService
+from services.policy_service import PolicyService
 
 logger = logging.getLogger(__name__)
 
