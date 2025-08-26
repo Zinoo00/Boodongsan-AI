@@ -10,7 +10,7 @@ from .user import ConversationHistory, User, UserProfile
 __all__ = [
     "Base",
     "Property",
-    "PropertyFilter", 
+    "PropertyFilter",
     "PropertySearchResult",
     "User",
     "UserProfile",

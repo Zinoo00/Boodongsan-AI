@@ -12,7 +12,7 @@ from .vector_service import VectorService
 __all__ = [
     "RAGService",
     "VectorService",
-    "AIService", 
+    "AIService",
     "PropertyService",
     "PolicyService",
     "UserService",

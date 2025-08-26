@@ -9,7 +9,7 @@ from .processors.data_processor import DataProcessor
 
 __all__ = [
     "RealEstateCollector",
-    "PolicyCollector", 
+    "PolicyCollector",
     "DataProcessor",
     "EmbeddingGenerator",
 ]

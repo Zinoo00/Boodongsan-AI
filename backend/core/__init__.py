@@ -7,7 +7,7 @@ from .database import DatabaseManager, get_database_session, get_redis_client
 
 __all__ = [
     "settings",
-    "get_settings", 
+    "get_settings",
     "DatabaseManager",
     "get_database_session",
     "get_redis_client",
