@@ -25,7 +25,7 @@ from .exceptions import CacheError, DatabaseError
 logger = logging.getLogger(__name__)
 
 # Type variable for generic functions
-T = TypeVar('T')
+T = TypeVar("T")
 
 # Connection retry configuration
 DB_RETRY_ATTEMPTS = 3
@@ -39,7 +39,7 @@ CACHE_RETRY_WAIT = 0.5
 
 class DatabaseManager:
     """Enhanced database connection manager with retry logic and monitoring"""
-    
+
     def __init__(self):
         self.async_engine = None
         self.sync_engine = None
@@ -51,21 +51,21 @@ class DatabaseManager:
             "total_connections": 0,
             "active_connections": 0,
             "failed_connections": 0,
-            "last_connection_attempt": None
+            "last_connection_attempt": None,
         }
-    
+
     @retry(
         stop=stop_after_attempt(DB_RETRY_ATTEMPTS),
         wait=wait_exponential(multiplier=1, min=DB_RETRY_WAIT_MIN, max=DB_RETRY_WAIT_MAX),
-        retry=retry_if_exception_type((OperationalError, DisconnectionError))
+        retry=retry_if_exception_type((OperationalError, DisconnectionError)),
     )
     async def initialize(self):
         """Initialize database connections with retry logic"""
         if self._initialized:
             return
-        
+
         self._connection_pool_stats["last_connection_attempt"] = time.time()
-        
+
         try:
             # Create async PostgreSQL engine with enhanced configuration
             self.async_engine = create_async_engine(
@@ -83,13 +83,13 @@ class DatabaseManager:
                     "server_settings": {
                         "application_name": settings.APP_NAME,
                         "jit": "off",  # Disable JIT for better connection performance
-                    }
-                }
+                    },
+                },
             )
-            
+
             # Add connection pool event listeners
             self._setup_pool_events(self.async_engine)
-            
+
             # Create sync PostgreSQL engine (for migrations)
             sync_url = settings.DATABASE_URL.replace("+asyncpg", "")
             self.sync_engine = create_engine(
@@ -103,9 +103,9 @@ class DatabaseManager:
                 echo=settings.DEBUG,
                 connect_args={
                     "application_name": f"{settings.APP_NAME}_sync",
-                }
+                },
             )
-            
+
             # Create session factories
             self.async_session_factory = async_sessionmaker(
                 self.async_engine,
@@ -114,7 +114,7 @@ class DatabaseManager:
                 autoflush=True,
                 autocommit=False,
             )
-            
+
             self.sync_session_factory = sessionmaker(
                 self.sync_engine,
                 class_=Session,
@@ -122,7 +122,7 @@ class DatabaseManager:
                 autoflush=True,
                 autocommit=False,
             )
-            
+
             # Initialize Redis client with enhanced configuration
             redis_kwargs = {
                 "encoding": "utf-8",
@@ -136,47 +136,42 @@ class DatabaseManager:
                 "socket_keepalive": True,
                 "socket_keepalive_options": {},
             }
-            
+
             if settings.REDIS_PASSWORD:
                 redis_kwargs["password"] = settings.REDIS_PASSWORD
-            
-            self.redis_client = await aioredis.from_url(
-                settings.REDIS_URL,
-                **redis_kwargs
-            )
-            
+
+            self.redis_client = await aioredis.from_url(settings.REDIS_URL, **redis_kwargs)
+
             # Test connections with detailed validation
             await self._test_connections()
-            
+
             self._initialized = True
             self._connection_pool_stats["total_connections"] += 1
-            
+
             logger.info(
                 "Database connections initialized successfully",
                 extra={
                     "pool_size": settings.DB_POOL_SIZE,
                     "max_overflow": settings.DB_MAX_OVERFLOW,
-                    "redis_max_connections": 20
-                }
+                    "redis_max_connections": 20,
+                },
             )
-            
+
         except Exception as e:
             self._connection_pool_stats["failed_connections"] += 1
-            
+
             logger.error(
                 "Failed to initialize database connections",
                 extra={
                     "error": str(e),
-                    "attempt_time": self._connection_pool_stats["last_connection_attempt"]
-                }
+                    "attempt_time": self._connection_pool_stats["last_connection_attempt"],
+                },
             )
-            
+
             raise DatabaseError(
-                message="Database initialization failed",
-                operation="initialize",
-                cause=e
+                message="Database initialization failed", operation="initialize", cause=e
             )
-    
+
     async def _test_connections(self):
         """Test database connections with comprehensive validation"""
         try:
@@ -185,120 +180,107 @@ class DatabaseManager:
                 # Basic connectivity test
                 result = await conn.execute(text("SELECT 1 as test"))
                 assert result.scalar() == 1
-                
+
                 # Check database version and settings
                 version_result = await conn.execute(text("SELECT version()"))
                 db_version = version_result.scalar()
-                
+
                 # Test transaction capability
                 await conn.execute(text("SELECT NOW()"))
-                
+
                 logger.info(f"PostgreSQL connection successful: {db_version}")
-            
+
             # Test Redis connection with multiple operations
             await self.redis_client.ping()
-            
+
             # Test Redis basic operations
             test_key = "health_check_test"
             await self.redis_client.set(test_key, "test_value", ex=10)
             test_value = await self.redis_client.get(test_key)
             assert test_value == "test_value"
             await self.redis_client.delete(test_key)
-            
+
             redis_info = await self.redis_client.info()
             logger.info(
                 "Redis connection successful",
                 extra={
                     "redis_version": redis_info.get("redis_version"),
-                    "connected_clients": redis_info.get("connected_clients")
-                }
+                    "connected_clients": redis_info.get("connected_clients"),
+                },
             )
-            
+
         except Exception as e:
-            logger.error(
-                "Database connection test failed",
-                extra={"error": str(e)},
-                exc_info=True
-            )
+            logger.error("Database connection test failed", extra={"error": str(e)}, exc_info=True)
             raise DatabaseError(
-                message="Database connection test failed",
-                operation="test_connections",
-                cause=e
+                message="Database connection test failed", operation="test_connections", cause=e
             )
-    
+
     @asynccontextmanager
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
         """Get async database session with enhanced error handling"""
         if not self._initialized:
             await self.initialize()
-        
+
         session = None
         try:
             session = self.async_session_factory()
             self._connection_pool_stats["active_connections"] += 1
-            
+
             yield session
-            
+
         except (OperationalError, DisconnectionError) as e:
             if session:
                 await session.rollback()
-            
+
             logger.warning(
-                "Database connection error, attempting to reinitialize",
-                extra={"error": str(e)}
+                "Database connection error, attempting to reinitialize", extra={"error": str(e)}
             )
-            
+
             # Attempt to reinitialize on connection errors
             self._initialized = False
             await self.initialize()
-            
+
             raise DatabaseError(
-                message="Database connection lost",
-                operation="get_session",
-                cause=e
+                message="Database connection lost", operation="get_session", cause=e
             )
-            
+
         except Exception as e:
             if session:
                 await session.rollback()
-            
-            raise DatabaseError(
-                message="Database session error",
-                operation="get_session",
-                cause=e
-            )
-            
+
+            raise DatabaseError(message="Database session error", operation="get_session", cause=e)
+
         finally:
             if session:
                 await session.close()
                 self._connection_pool_stats["active_connections"] -= 1
-    
+
     def get_sync_session(self) -> Session:
         """Get sync database session"""
         return self.sync_session_factory()
-    
+
     async def get_redis(self):
         """Get Redis client with connection validation"""
         if not self._initialized:
             await self.initialize()
-        
+
         try:
             # Quick ping to validate connection
             await self.redis_client.ping()
             return self.redis_client
-            
+
         except Exception as e:
             logger.warning(
                 "Redis connection validation failed, attempting reconnection",
-                extra={"error": str(e)}
+                extra={"error": str(e)},
             )
-            
+
             # Attempt to recreate Redis connection
             try:
                 await self.redis_client.close()
             except:
                 pass
-            
+
             # Reinitialize Redis connection
             redis_kwargs = {
                 "encoding": "utf-8",
@@ -307,21 +289,18 @@ class DatabaseManager:
                 "retry_on_timeout": True,
                 "health_check_interval": 30,
             }
-            
+
             if settings.REDIS_PASSWORD:
                 redis_kwargs["password"] = settings.REDIS_PASSWORD
-            
-            self.redis_client = await aioredis.from_url(
-                settings.REDIS_URL,
-                **redis_kwargs
-            )
-            
+
+            self.redis_client = await aioredis.from_url(settings.REDIS_URL, **redis_kwargs)
+
             return self.redis_client
-    
+
     async def close(self):
         """Gracefully close all database connections"""
         close_errors = []
-        
+
         try:
             if self.async_engine:
                 await self.async_engine.dispose()
@@ -329,7 +308,7 @@ class DatabaseManager:
         except Exception as e:
             close_errors.append(f"Async engine: {str(e)}")
             logger.error("Error disposing async engine", extra={"error": str(e)})
-        
+
         try:
             if self.sync_engine:
                 self.sync_engine.dispose()
@@ -337,7 +316,7 @@ class DatabaseManager:
         except Exception as e:
             close_errors.append(f"Sync engine: {str(e)}")
             logger.error("Error disposing sync engine", extra={"error": str(e)})
-        
+
         try:
             if self.redis_client:
                 await self.redis_client.close()
@@ -345,33 +324,32 @@ class DatabaseManager:
         except Exception as e:
             close_errors.append(f"Redis client: {str(e)}")
             logger.error("Error closing Redis client", extra={"error": str(e)})
-        
+
         self._initialized = False
-        
+
         if close_errors:
             logger.warning(
-                "Database connections closed with errors",
-                extra={"errors": close_errors}
+                "Database connections closed with errors", extra={"errors": close_errors}
             )
         else:
             logger.info("Database connections closed successfully")
-    
+
     def _setup_pool_events(self, engine):
         """Setup connection pool event listeners for monitoring"""
-        
+
         @event.listens_for(engine.sync_engine, "connect")
         def receive_connect(dbapi_connection, connection_record):
             logger.debug("New database connection established")
             self._connection_pool_stats["total_connections"] += 1
-        
+
         @event.listens_for(engine.sync_engine, "checkout")
         def receive_checkout(dbapi_connection, connection_record, connection_proxy):
             self._connection_pool_stats["active_connections"] += 1
-        
+
         @event.listens_for(engine.sync_engine, "checkin")
         def receive_checkin(dbapi_connection, connection_record):
             self._connection_pool_stats["active_connections"] -= 1
-    
+
     async def execute_with_retry(self, operation: Callable[[], T], max_retries: int = 3) -> T:
         """Execute database operation with retry logic"""
         for attempt in range(max_retries):
@@ -382,38 +360,38 @@ class DatabaseManager:
                     raise DatabaseError(
                         message=f"Database operation failed after {max_retries} attempts",
                         operation="execute_with_retry",
-                        cause=e
+                        cause=e,
                     )
-                
-                wait_time = (2 ** attempt) * 0.5  # Exponential backoff
+
+                wait_time = (2**attempt) * 0.5  # Exponential backoff
                 logger.warning(
                     f"Database operation failed (attempt {attempt + 1}/{max_retries}), retrying in {wait_time}s",
-                    extra={"error": str(e), "wait_time": wait_time}
+                    extra={"error": str(e), "wait_time": wait_time},
                 )
                 await asyncio.sleep(wait_time)
-        
+
         raise DatabaseError(
             message="Database operation failed after all retry attempts",
-            operation="execute_with_retry"
+            operation="execute_with_retry",
         )
-    
+
     async def health_check(self) -> dict[str, Any]:
         """Comprehensive database health check with metrics"""
         from datetime import datetime
-        
+
         status = {
             "postgresql": {"status": False, "latency_ms": None, "pool_stats": None},
             "redis": {"status": False, "latency_ms": None, "memory_usage": None},
             "connection_stats": self._connection_pool_stats.copy(),
             "timestamp": datetime.utcnow().isoformat(),
         }
-        
+
         # PostgreSQL health check with metrics
         try:
             start_time = time.time()
             async with self.async_engine.begin() as conn:
                 await conn.execute(text("SELECT 1"))
-                
+
                 # Get pool statistics
                 pool = self.async_engine.pool
                 pool_stats = {
@@ -421,25 +399,23 @@ class DatabaseManager:
                     "checked_in": pool.checkedin(),
                     "checked_out": pool.checkedout(),
                     "overflow": pool.overflow(),
-                    "invalid": pool.invalid()
+                    "invalid": pool.invalid(),
                 }
-                
+
             latency = (time.time() - start_time) * 1000
-            status["postgresql"].update({
-                "status": True,
-                "latency_ms": round(latency, 2),
-                "pool_stats": pool_stats
-            })
-            
+            status["postgresql"].update(
+                {"status": True, "latency_ms": round(latency, 2), "pool_stats": pool_stats}
+            )
+
         except Exception as e:
             logger.error("PostgreSQL health check failed", extra={"error": str(e)})
             status["postgresql"]["error"] = str(e)
-        
+
         # Redis health check with metrics
         try:
             start_time = time.time()
             await self.redis_client.ping()
-            
+
             # Get Redis info
             redis_info = await self.redis_client.info("memory")
             memory_stats = {
@@ -447,95 +423,81 @@ class DatabaseManager:
                 "used_memory_human": redis_info.get("used_memory_human"),
                 "used_memory_peak": redis_info.get("used_memory_peak"),
             }
-            
+
             latency = (time.time() - start_time) * 1000
-            status["redis"].update({
-                "status": True,
-                "latency_ms": round(latency, 2),
-                "memory_usage": memory_stats
-            })
-            
+            status["redis"].update(
+                {"status": True, "latency_ms": round(latency, 2), "memory_usage": memory_stats}
+            )
+
         except Exception as e:
             logger.error("Redis health check failed", extra={"error": str(e)})
             status["redis"]["error"] = str(e)
-        
+
         return status
 
 
 class CacheManager:
     """Enhanced Redis cache management with retry logic and monitoring"""
-    
+
     def __init__(self, db_manager: DatabaseManager):
         self.db_manager = db_manager
         self.default_ttl = settings.CACHE_TTL
-        self._cache_stats = {
-            "hits": 0,
-            "misses": 0,
-            "errors": 0,
-            "total_operations": 0
-        }
-    
+        self._cache_stats = {"hits": 0, "misses": 0, "errors": 0, "total_operations": 0}
+
     @retry(
         stop=stop_after_attempt(CACHE_RETRY_ATTEMPTS),
-        wait=wait_exponential(multiplier=1, min=CACHE_RETRY_WAIT, max=2)
+        wait=wait_exponential(multiplier=1, min=CACHE_RETRY_WAIT, max=2),
     )
     async def get(self, key: str) -> str | None:
         """Get value from cache with retry logic"""
         self._cache_stats["total_operations"] += 1
-        
+
         try:
             redis_client = await self.db_manager.get_redis()
             value = await redis_client.get(key)
-            
+
             if value is not None:
                 self._cache_stats["hits"] += 1
             else:
                 self._cache_stats["misses"] += 1
-            
+
             return value
-            
+
         except Exception as e:
             self._cache_stats["errors"] += 1
             self._cache_stats["misses"] += 1
-            
-            logger.error(
-                "Cache get operation failed",
-                extra={"key": key, "error": str(e)}
-            )
-            
+
+            logger.error("Cache get operation failed", extra={"key": key, "error": str(e)})
+
             raise CacheError(
-                message="Cache get operation failed",
-                operation="get",
-                details={"key": key},
-                cause=e
+                message="Cache get operation failed", operation="get", details={"key": key}, cause=e
             )
-    
+
     @retry(
         stop=stop_after_attempt(CACHE_RETRY_ATTEMPTS),
-        wait=wait_exponential(multiplier=1, min=CACHE_RETRY_WAIT, max=2)
+        wait=wait_exponential(multiplier=1, min=CACHE_RETRY_WAIT, max=2),
     )
     async def set(self, key: str, value: str, ttl: int | None = None) -> bool:
         """Set value in cache with retry logic"""
         self._cache_stats["total_operations"] += 1
-        
+
         try:
             redis_client = await self.db_manager.get_redis()
             ttl = ttl or self.default_ttl
             await redis_client.setex(key, ttl, value)
             return True
-            
+
         except Exception as e:
             self._cache_stats["errors"] += 1
-            
+
             logger.error(
-                "Cache set operation failed",
-                extra={"key": key, "ttl": ttl, "error": str(e)}
+                "Cache set operation failed", extra={"key": key, "ttl": ttl, "error": str(e)}
             )
-            
+
             # For set operations, we might want to fail gracefully
             # depending on the use case
             return False
-    
+
     async def delete(self, key: str) -> bool:
         """Delete value from cache"""
         try:
@@ -545,7 +507,7 @@ class CacheManager:
         except Exception as e:
             logger.error(f"Cache delete failed for key {key}: {str(e)}")
             return False
-    
+
     async def exists(self, key: str) -> bool:
         """Check if key exists in cache"""
         try:
@@ -555,7 +517,7 @@ class CacheManager:
         except Exception as e:
             logger.error(f"Cache exists check failed for key {key}: {str(e)}")
             return False
-    
+
     async def get_json(self, key: str) -> dict[str, Any] | None:
         """Get JSON value from cache with proper error handling"""
         try:
@@ -563,44 +525,37 @@ class CacheManager:
             if value:
                 return json.loads(value)
             return None
-            
+
         except json.JSONDecodeError as e:
             logger.warning(
-                "Invalid JSON in cache",
-                extra={"key": key, "value": value, "error": str(e)}
+                "Invalid JSON in cache", extra={"key": key, "value": value, "error": str(e)}
             )
             # Delete corrupted cache entry
             await self.delete(key)
             return None
-            
+
         except Exception as e:
-            logger.error(
-                "Cache get_json operation failed",
-                extra={"key": key, "error": str(e)}
-            )
+            logger.error("Cache get_json operation failed", extra={"key": key, "error": str(e)})
             return None
-    
+
     async def set_json(self, key: str, value: dict[str, Any], ttl: int | None = None) -> bool:
         """Set JSON value in cache with validation"""
         try:
             # Validate that the value can be serialized
             json_value = json.dumps(value, ensure_ascii=False, default=str)
             return await self.set(key, json_value, ttl)
-            
+
         except (TypeError, ValueError) as e:
             logger.error(
                 "JSON serialization failed",
-                extra={"key": key, "value_type": type(value), "error": str(e)}
+                extra={"key": key, "value_type": type(value), "error": str(e)},
             )
             return False
-            
+
         except Exception as e:
-            logger.error(
-                "Cache set_json operation failed",
-                extra={"key": key, "error": str(e)}
-            )
+            logger.error("Cache set_json operation failed", extra={"key": key, "error": str(e)})
             return False
-    
+
     def get_cache_stats(self) -> dict[str, Any]:
         """Get cache performance statistics"""
         total_ops = self._cache_stats["total_operations"]
@@ -610,22 +565,17 @@ class CacheManager:
         else:
             hit_rate = 0
             error_rate = 0
-        
+
         return {
             **self._cache_stats,
             "hit_rate_percent": round(hit_rate, 2),
-            "error_rate_percent": round(error_rate, 2)
+            "error_rate_percent": round(error_rate, 2),
         }
-    
+
     def reset_cache_stats(self):
         """Reset cache statistics"""
-        self._cache_stats = {
-            "hits": 0,
-            "misses": 0,
-            "errors": 0,
-            "total_operations": 0
-        }
-    
+        self._cache_stats = {"hits": 0, "misses": 0, "errors": 0, "total_operations": 0}
+
     async def clear_pattern(self, pattern: str) -> int:
         """Clear all keys matching pattern"""
         try:
@@ -637,7 +587,7 @@ class CacheManager:
         except Exception as e:
             logger.error(f"Cache clear_pattern failed for pattern {pattern}: {str(e)}")
             return 0
-    
+
     async def increment(self, key: str, amount: int = 1) -> int | None:
         """Increment counter"""
         try:
@@ -646,7 +596,7 @@ class CacheManager:
         except Exception as e:
             logger.error(f"Cache increment failed for key {key}: {str(e)}")
             return None
-    
+
     async def expire(self, key: str, ttl: int) -> bool:
         """Set expiration for key"""
         try:
@@ -661,21 +611,22 @@ class CacheManager:
 db_manager = DatabaseManager()
 cache_manager = CacheManager(db_manager)
 
+
 # Database utilities for dependency injection
 class DatabaseDependency:
     """Dependency injection helper for database operations"""
-    
+
     @staticmethod
     async def get_session() -> AsyncGenerator[AsyncSession, None]:
         """Get database session for dependency injection"""
         async with db_manager.get_session() as session:
             yield session
-    
+
     @staticmethod
     async def get_redis():
         """Get Redis client for dependency injection"""
         return await db_manager.get_redis()
-    
+
     @staticmethod
     async def get_cache_manager():
         """Get cache manager for dependency injection"""
@@ -700,6 +651,7 @@ async def get_cache_manager():
 
 # Enhanced database operations with transaction support
 
+
 @asynccontextmanager
 async def transaction() -> AsyncGenerator[AsyncSession, None]:
     """Database transaction context manager with automatic rollback"""
@@ -708,18 +660,11 @@ async def transaction() -> AsyncGenerator[AsyncSession, None]:
             await session.begin()
             yield session
             await session.commit()
-            
+
         except Exception as e:
             await session.rollback()
-            logger.error(
-                "Transaction rolled back due to error",
-                extra={"error": str(e)}
-            )
-            raise DatabaseError(
-                message="Transaction failed",
-                operation="transaction",
-                cause=e
-            )
+            logger.error("Transaction rolled back due to error", extra={"error": str(e)})
+            raise DatabaseError(message="Transaction failed", operation="transaction", cause=e)
 
 
 async def execute_in_transaction(operation: Callable[[AsyncSession], T]) -> T:
@@ -735,10 +680,7 @@ async def initialize_database():
         await db_manager.initialize()
         logger.info("Database initialization completed successfully")
     except Exception as e:
-        logger.error(
-            "Database initialization failed",
-            extra={"error": str(e)}
-        )
+        logger.error("Database initialization failed", extra={"error": str(e)})
         raise
 
 
@@ -753,19 +695,16 @@ async def database_health_check():
     """Comprehensive database health check with metrics"""
     try:
         health_status = await db_manager.health_check()
-        
+
         # Add cache statistics to health check
         health_status["cache_stats"] = cache_manager.get_cache_stats()
-        
+
         return health_status
-        
+
     except Exception as e:
-        logger.error(
-            "Health check failed",
-            extra={"error": str(e)}
-        )
+        logger.error("Health check failed", extra={"error": str(e)})
         return {
             "postgresql": {"status": False, "error": str(e)},
             "redis": {"status": False, "error": str(e)},
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
