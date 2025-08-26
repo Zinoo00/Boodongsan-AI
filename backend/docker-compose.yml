@@ -1,21 +1,4 @@
-
 services:
-  # PostgreSQL 데이터베이스
-  postgres:
-    image: postgres:15
-    container_name: boodongsan_postgres
-    environment:
-      POSTGRES_DB: boodongsan
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - boodongsan_network
-
   # Redis 캐시
   redis:
     image: redis:7-alpine
@@ -27,6 +10,17 @@ services:
     networks:
       - boodongsan_network
 
+  # Chromadb (shared vector DB)
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: boodongsan_chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma
+    networks:
+      - boodongsan_network
+
   # FastAPI 백엔드
   backend:
     build:
@@ -34,27 +28,26 @@ services:
       dockerfile: Dockerfile
     container_name: boodongsan_backend
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=boodongsan
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - AWS_REGION=us-east-1
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - REDIS_URL=redis://redis:6379/0
+      - CHROMADB_HOST=chroma
+      - CHROMADB_PORT=8000
+      - AWS_REGION=ap-northeast-2
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
       - redis
+      - chroma
     volumes:
       - .:/app
       - /app/.venv
     networks:
       - boodongsan_network
-    command: uv run granian --interface asgi api.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 
   # React 프론트엔드 (향후 구현)
   frontend:
@@ -77,8 +70,8 @@ services:
       - frontend
 
 volumes:
-  postgres_data:
   redis_data:
+  chroma_data:
 
 networks:
   boodongsan_network:
