@@ -22,6 +22,7 @@ cp .env.example .env
 ```
 
 이 스크립트는 다음을 자동으로 수행합니다:
+
 - 필요한 프로그램 확인 (Docker, Python)
 - Docker 이미지 빌드
 - 데이터베이스 초기화
@@ -65,7 +66,7 @@ uvicorn api.main:app --reload
 
 ```env
 # AWS Bedrock 필수 설정
-AWS_REGION=us-east-1
+AWS_REGION=ap-northeast-2
 AWS_ACCESS_KEY_ID=your_access_key_id
 AWS_SECRET_ACCESS_KEY=your_secret_access_key
 
@@ -126,16 +127,17 @@ aws ecr create-repository --repository-name boodongsan-backend
 
 # Docker 이미지 빌드 및 푸시
 docker build -t boodongsan-backend ./backend
-docker tag boodongsan-backend:latest [ACCOUNT].dkr.ecr.us-east-1.amazonaws.com/boodongsan-backend:latest
-docker push [ACCOUNT].dkr.ecr.us-east-1.amazonaws.com/boodongsan-backend:latest
+docker tag boodongsan-backend:latest [ACCOUNT].dkr.ecr.ap-northeast-2.amazonaws.com/boodongsan-backend:latest
+docker push [ACCOUNT].dkr.ecr.ap-northeast-2.amazonaws.com/boodongsan-backend:latest
 ```
 
 ### 2. 인프라 구성
 
 **필요한 AWS 서비스:**
+
 - ECS Cluster (Fargate)
 - RDS PostgreSQL
-- ElastiCache Redis  
+- ElastiCache Redis
 - Application Load Balancer
 - API Gateway (옵션)
 - CloudWatch (로깅)
@@ -143,11 +145,13 @@ docker push [ACCOUNT].dkr.ecr.us-east-1.amazonaws.com/boodongsan-backend:latest
 ### 3. 환경별 설정
 
 **개발환경 (dev):**
+
 - t3.small 인스턴스
 - 단일 가용영역
 - 기본 보안 설정
 
 **프로덕션 (prod):**
+
 - 멀티 AZ 배포
 - Auto Scaling 설정
 - WAF 및 보안 강화
@@ -182,14 +186,16 @@ curl http://localhost:8000/api/v1/health/database
 ### 일반적인 문제들
 
 **1. AWS Bedrock 연결 실패**
+
 ```
 해결: AWS 자격증명과 리전 설정 확인
 - AWS_ACCESS_KEY_ID
-- AWS_SECRET_ACCESS_KEY  
-- AWS_REGION=us-east-1
+- AWS_SECRET_ACCESS_KEY
+- AWS_REGION=ap-northeast-2
 ```
 
 **2. 데이터베이스 연결 실패**
+
 ```bash
 # PostgreSQL 컨테이너 상태 확인
 docker-compose ps postgres
@@ -199,6 +205,7 @@ docker-compose logs postgres
 ```
 
 **3. 포트 충돌**
+
 ```bash
 # 사용중인 포트 확인
 netstat -an | grep :8000
@@ -209,6 +216,7 @@ lsof -i :8000
 ```
 
 **4. 메모리 부족**
+
 ```bash
 # Docker 메모리 사용량 확인
 docker stats
@@ -235,7 +243,7 @@ EXPLAIN ANALYZE SELECT * FROM properties WHERE district = '강남구';
 # 사용자 프로필 캐싱
 await cache_manager.set_json(f"user_profile:{user_id}", profile, ttl=3600)
 
-# 정책 검색 결과 캐싱  
+# 정책 검색 결과 캐싱
 await cache_manager.set_json(f"policies:{criteria_hash}", policies, ttl=1800)
 ```
 

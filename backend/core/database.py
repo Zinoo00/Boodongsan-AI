@@ -70,7 +70,6 @@ class DatabaseManager:
             # Create async PostgreSQL engine with enhanced configuration
             self.async_engine = create_async_engine(
                 settings.DATABASE_URL,
-                poolclass=QueuePool,
                 pool_size=settings.DB_POOL_SIZE,
                 max_overflow=settings.DB_MAX_OVERFLOW,
                 pool_timeout=30,

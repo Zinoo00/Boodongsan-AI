@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 8000
 
 # 애플리케이션 실행 (uv 런타임 사용)
-CMD ["uv", "run", "granian", "--interface", "asgi", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
