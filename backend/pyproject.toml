@@ -4,66 +4,59 @@ version = "0.1.0"
 description = "Korean Real Estate RAG backend"
 requires-python = ">=3.11,<3.12"
 readme = "README.md"
+dependencies = [
+    # Core web framework
+    "fastapi==0.116.1",
+    "uvicorn[standard]>=0.24,<0.31",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.10.1",
+    
+    # AWS and AI services
+    "boto3==1.40.11",
+    "botocore==1.40.11",
+    "langchain==0.3.27",
+    "langchain-aws==0.2.30",
+    "langchain-community==0.3.27",
+    "langchain-core==0.3.74",
+    "openai==1.91.0",
+    
+    # Database
+    "supabase>=2.7.4",
+    "asyncpg==0.30.0",
+    "redis>=5,<6",
+    "chromadb>=1.0.20",
+    "qdrant-client==1.15.1",
+    "numpy==1.26.4",
+    
+    # Security
+    "python-jose[cryptography]==3.5.0",
+    "passlib[bcrypt]==1.7.4",
+    "python-multipart==0.0.20",
+    "cryptography==45.0.6",
+    
+    # Data processing
+    "pandas==2.2.3",
+    "httpx==0.28.1",
+    "aiohttp==3.12.15",
+    "requests==2.32.4",
+    "tenacity==8.2.3",
+    
+    # Configuration
+    "python-dotenv==1.0.1",
+    "click==8.1.8",
+    "typer==0.15.2",
+    
+    # JSON processing
+    "orjson==3.11.2",
+    
+    # Email validation for Pydantic
+    "email-validator>=2.0.0",
+]
 
 [tool.uv]
 package = false
 
 [dependency-groups]
-# Default (prod) dependencies
-default = [
-  # Core web framework
-  "fastapi==0.116.1",
-  "uvicorn[standard]>=0.24,<0.31",
-  "pydantic==2.11.7",
-  "pydantic-settings==2.10.1",
-  
-  # AWS and AI services
-  "boto3==1.40.11",
-  "botocore==1.40.11",
-  "langchain==0.3.27",
-  "langchain-aws==0.2.30",
-  "langchain-community==0.3.27",
-  "langchain-core==0.3.74",
-  "openai==1.91.0",
-  
-  # Database
-  "supabase>=2.7.4",
-  "redis>=5,<6",
-  "chromadb>=1.0.20",
-  "qdrant-client==1.15.1",
-  "numpy==1.26.4",
-  "certifi==2024.7.4",
-  
-  # Security
-  "python-jose[cryptography]==3.5.0",
-  "passlib[bcrypt]==1.7.4",
-  "python-multipart==0.0.20",
-  "cryptography==45.0.6",
-  
-  # Data processing (core only)
-  "pandas==2.2.3",
-  "httpx==0.28.1",
-  "aiohttp==3.12.15",
-  "requests==2.32.4",
-  "tenacity==8.2.3",
-  
-  # Logging and monitoring
-  "structlog>=24.0.0,<26.0.0",
-  "python-json-logger==2.0.7",
-  "prometheus-client>=0.19,<0.22",
-  
-  # Configuration
-  "python-dotenv==1.0.1",
-  "click==8.1.8",
-  "typer==0.15.2",
-  
-  # JSON processing
-  "orjson==3.11.2",
-  
-  # Email validation for Pydantic
-  "email-validator>=2.0.0",
-  "greenlet>=3.2.4",
-]
 
 # Optional feature groups
 ml = [

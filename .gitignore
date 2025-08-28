@@ -1,7 +1,12 @@
+# macOS
 .DS_Store
-.env
 .cursor
 .claude
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
 testing_files
 
 # Python cache files

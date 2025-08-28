@@ -47,8 +47,8 @@ graph TB
 
 ### 컴포넌트 역할
 - **FastAPI**: RESTful API 엔드포인트 및 비즈니스 로직
-- **Granian**: 고성능 ASGI 서버 (Rust 기반)
-- **Qdrant**: 벡터 유사도 검색 및 하이브리드 검색
+- **Uvicorn**: ASGI 서버 (Python 기반)
+- **Chromadb**: 벡터 유사도 검색 및 하이브리드 검색
 - **Supabase**: 부동산 메타데이터 및 사용자 데이터 (연결 풀링, retry 로직)
 - **Redis**: 응답 캐싱 및 세션 관리 (계층화된 캐싱)
 - **AI 라우팅**: 질문 복잡도에 따른 적응형 모델 선택 (circuit breaker, failover)
@@ -57,8 +57,8 @@ graph TB
 ## 🔧 기술 스택
 
 ### Backend
-- **Web Framework**: FastAPI + Granian (ASGI Server)
-- **Vector Database**: Qdrant Cloud
+- **Web Framework**: FastAPI + Uvicorn (ASGI Server)
+- **Vector Database**: Chromadb
 - **Primary Database**: Supabase PostgreSQL
 - **Cache**: Redis
 - **AI/LLM**: 
@@ -169,7 +169,7 @@ QDRANT_API_KEY=your_qdrant_api_key
 # AI Services
 AWS_ACCESS_KEY_ID=your_aws_access_key
 AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-AWS_REGION=us-east-1
+AWS_REGION=ap-northeast-2
 CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
 
@@ -447,7 +447,7 @@ Production Environment:
 # 4. 롤백 준비 상시 대기
 
 # 자동화된 배포 파이프라인
-aws ecr get-login-password --region us-east-1 | docker login
+aws ecr get-login-password --region ap-northeast-2 | docker login
 docker build -t korean-real-estate-rag .
 docker tag korean-real-estate-rag:latest $AWS_ECR_REPO:$VERSION
 docker push $AWS_ECR_REPO:$VERSION

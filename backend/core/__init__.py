@@ -7,7 +7,7 @@ from core.database import DatabaseManager, get_supabase_client, get_redis_client
 
 __all__ = [
     "settings",
-    "get_settings", 
+    "get_settings",
     "DatabaseManager",
     "get_supabase_client",
     "get_redis_client",

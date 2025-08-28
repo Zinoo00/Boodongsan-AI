@@ -53,16 +53,13 @@ class UserService:
                     additional_preferences=profile_data.get('additional_preferences', {})
                 )
             return None
-            
+
         except Exception as e:
             logger.error(f"User profile lookup failed: {str(e)}")
             return None
-    
+
     async def get_conversation_history(
-        self,
-        user_id: str,
-        conversation_id: str,
-        limit: int = 10
+        self, user_id: str, conversation_id: str, limit: int = 10
     ) -> list[ConversationHistory]:
         """Get conversation history from Supabase"""
         try:
@@ -105,7 +102,7 @@ class UserService:
         except Exception as e:
             logger.error(f"Conversation history lookup failed: {str(e)}")
             return []
-    
+
     async def save_conversation_message(
         self,
         user_id: str,
@@ -117,7 +114,7 @@ class UserService:
         search_results: list[str] | None = None,
         recommended_policies: list[str] | None = None,
         confidence_score: float | None = None,
-        model_used: str | None = None
+        model_used: str | None = None,
     ) -> bool:
         """Save conversation message to Supabase"""
         try:

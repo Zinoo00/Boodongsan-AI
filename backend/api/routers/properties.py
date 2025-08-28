@@ -13,9 +13,11 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+
 # Pydantic 모델들
 class PropertySearchRequest(BaseModel):
     """부동산 검색 요청 모델"""
+
     region: str | None = Field(None, description="지역")
     property_type: str | None = Field(None, description="부동산 유형")
     transaction_type: str | None = Field(None, description="거래 유형")
@@ -25,11 +27,14 @@ class PropertySearchRequest(BaseModel):
     area_max: int | None = Field(None, description="최대 면적")
     room_count: int | None = Field(None, description="방 개수")
 
+
 class PropertyListResponse(BaseModel):
     """부동산 목록 응답 모델"""
+
     properties: list[dict[str, Any]] = Field(..., description="부동산 목록")
     total_count: int = Field(..., description="전체 매물 수")
     search_criteria: dict[str, Any] = Field(..., description="검색 조건")
+
 
 @router.post("/search", response_model=PropertyListResponse)
 async def search_properties(request: PropertySearchRequest):
@@ -61,10 +66,10 @@ async def search_properties(request: PropertySearchRequest):
                 "subway_distance": 500,
                 "elementary_school": "역삼초등학교",
                 "image_urls": ["/images/prop_001_1.jpg"],
-                "contact_info": "010-1234-5678"
+                "contact_info": "010-1234-5678",
             },
             {
-                "id": "prop_002", 
+                "id": "prop_002",
                 "title": "서초구 서초동 오피스텔",
                 "property_type": "오피스텔",
                 "transaction_type": "월세",
@@ -87,12 +92,12 @@ async def search_properties(request: PropertySearchRequest):
                 "subway_distance": 300,
                 "elementary_school": "서초초등학교",
                 "image_urls": ["/images/prop_002_1.jpg"],
-                "contact_info": "010-2345-6789"
+                "contact_info": "010-2345-6789",
             },
             {
                 "id": "prop_003",
                 "title": "송파구 잠실동 아파트",
-                "property_type": "아파트", 
+                "property_type": "아파트",
                 "transaction_type": "매매",
                 "address": "서울 송파구 잠실동 100-200",
                 "district": "송파구",
@@ -113,15 +118,15 @@ async def search_properties(request: PropertySearchRequest):
                 "subway_distance": 800,
                 "elementary_school": "잠실초등학교",
                 "image_urls": ["/images/prop_003_1.jpg"],
-                "contact_info": "010-3456-7890"
-            }
+                "contact_info": "010-3456-7890",
+            },
         ]
-        
+
         # 간단한 필터링 (실제로는 데이터베이스 쿼리)
         filtered_properties = []
         for prop in dummy_properties:
             match = True
-            
+
             if request.region and request.region not in prop["address"]:
                 match = False
             if request.property_type and request.property_type != prop["property_type"]:
@@ -138,22 +143,20 @@ async def search_properties(request: PropertySearchRequest):
                 match = False
             if request.room_count and prop["room_count"] != request.room_count:
                 match = False
-                
+
             if match:
                 filtered_properties.append(prop)
-        
+
         return PropertyListResponse(
             properties=filtered_properties,
             total_count=len(filtered_properties),
-            search_criteria=request.dict()
+            search_criteria=request.dict(),
         )
-        
+
     except Exception as e:
         logger.error(f"부동산 검색 실패: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail="부동산 검색 중 오류가 발생했습니다."
-        )
+        raise HTTPException(status_code=500, detail="부동산 검색 중 오류가 발생했습니다.")
+
 
 @router.get("/", response_model=PropertyListResponse)
 async def list_properties(
@@ -161,23 +164,21 @@ async def list_properties(
     property_type: str | None = Query(None, description="부동산 유형 필터"),
     transaction_type: str | None = Query(None, description="거래 유형 필터"),
     limit: int = Query(20, description="조회 개수", le=100),
-    offset: int = Query(0, description="오프셋")
+    offset: int = Query(0, description="오프셋"),
 ):
     """부동산 목록 조회"""
     try:
         # SearchRequest 객체 생성
         search_request = PropertySearchRequest(
-            region=region,
-            property_type=property_type,
-            transaction_type=transaction_type
+            region=region, property_type=property_type, transaction_type=transaction_type
         )
-        
+
         # 검색 실행
         result = await search_properties(search_request)
-        
+
         # 페이징 적용
-        properties = result.properties[offset:offset+limit]
-        
+        properties = result.properties[offset : offset + limit]
+
         return PropertyListResponse(
             properties=properties,
             total_count=result.total_count,
@@ -186,16 +187,14 @@ async def list_properties(
                 "property_type": property_type,
                 "transaction_type": transaction_type,
                 "limit": limit,
-                "offset": offset
-            }
+                "offset": offset,
+            },
         )
-        
+
     except Exception as e:
         logger.error(f"부동산 목록 조회 실패: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail="부동산 목록 조회 중 오류가 발생했습니다."
-        )
+        raise HTTPException(status_code=500, detail="부동산 목록 조회 중 오류가 발생했습니다.")
+
 
 @router.get("/{property_id}")
 async def get_property_detail(property_id: str):
@@ -237,38 +236,24 @@ async def get_property_detail(property_id: str):
             "image_urls": [
                 "/images/prop_001_1.jpg",
                 "/images/prop_001_2.jpg",
-                "/images/prop_001_3.jpg"
+                "/images/prop_001_3.jpg",
             ],
             "contact_info": "010-1234-5678",
             "amenities": [
-                {
-                    "type": "마트",
-                    "name": "롯데마트",
-                    "distance": 200
-                },
-                {
-                    "type": "병원",
-                    "name": "강남성심병원",
-                    "distance": 1000
-                },
-                {
-                    "type": "공원",
-                    "name": "양재천공원",
-                    "distance": 1500
-                }
+                {"type": "마트", "name": "롯데마트", "distance": 200},
+                {"type": "병원", "name": "강남성심병원", "distance": 1000},
+                {"type": "공원", "name": "양재천공원", "distance": 1500},
             ],
             "created_at": "2024-01-15T10:00:00Z",
-            "updated_at": "2024-01-15T15:30:00Z"
+            "updated_at": "2024-01-15T15:30:00Z",
         }
-        
+
         return {"property": dummy_detail}
-        
+
     except Exception as e:
         logger.error(f"부동산 상세 조회 실패: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail="부동산 상세 정보 조회 중 오류가 발생했습니다."
-        )
+        raise HTTPException(status_code=500, detail="부동산 상세 정보 조회 중 오류가 발생했습니다.")
+
 
 @router.get("/regions/list")
 async def get_regions():
@@ -282,20 +267,15 @@ async def get_regions():
             {"name": "마포구", "count": 85},
             {"name": "영등포구", "count": 80},
             {"name": "용산구", "count": 75},
-            {"name": "성동구", "count": 70}
+            {"name": "성동구", "count": 70},
         ]
-        
-        return {
-            "regions": regions,
-            "total_regions": len(regions)
-        }
-        
+
+        return {"regions": regions, "total_regions": len(regions)}
+
     except Exception as e:
         logger.error(f"지역 목록 조회 실패: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail="지역 목록 조회 중 오류가 발생했습니다."
-        )
+        raise HTTPException(status_code=500, detail="지역 목록 조회 중 오류가 발생했습니다.")
+
 
 @router.get("/types/list")
 async def get_property_types():
@@ -306,17 +286,11 @@ async def get_property_types():
             {"type": "오피스텔", "count": 200},
             {"type": "빌라", "count": 150},
             {"type": "단독주택", "count": 100},
-            {"type": "상가", "count": 50}
+            {"type": "상가", "count": 50},
         ]
-        
-        return {
-            "property_types": property_types,
-            "total_types": len(property_types)
-        }
-        
+
+        return {"property_types": property_types, "total_types": len(property_types)}
+
     except Exception as e:
         logger.error(f"부동산 유형 조회 실패: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail="부동산 유형 조회 중 오류가 발생했습니다."
-        )
+        raise HTTPException(status_code=500, detail="부동산 유형 조회 중 오류가 발생했습니다.")
