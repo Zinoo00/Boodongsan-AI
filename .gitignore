@@ -2,6 +2,7 @@
 .DS_Store
 .cursor
 .claude
+.mcp.json
 
 # Environment and secrets
 .env
