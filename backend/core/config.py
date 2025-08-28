@@ -6,6 +6,7 @@ Environment variables and application settings management
 import secrets
 from enum import Enum
 from typing import Any
+from urllib.parse import urlparse
 
 from pydantic import AnyHttpUrl, Field, HttpUrl, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -99,10 +100,10 @@ class Settings(BaseSettings):
         min_length=20,
         description="Supabase service role key"
     )
-    DATABASE_URL: str | None = Field(
-        default=None,
-        description="Direct PostgreSQL connection URL"
+    SUPABASE_DB_PASSWORD: SecretStr | None = Field(
+        default=None, description="Supabase Postgres DB password (not the service key)"
     )
+    DATABASE_URL: str | None = Field(default=None, description="Direct PostgreSQL connection URL")
     
     @field_validator("DATABASE_URL", mode="before")
     @classmethod 
@@ -114,18 +115,31 @@ class Settings(BaseSettings):
         # Construct from Supabase credentials
         supabase_url = values.get("SUPABASE_URL")
         service_key = values.get("SUPABASE_SERVICE_ROLE_KEY")
-        
-        if supabase_url and service_key:
-            # Extract host from Supabase URL
-            if isinstance(supabase_url, str):
-                host = supabase_url.replace("https://", "").replace("http://", "")
+        db_password = values.get("SUPABASE_DB_PASSWORD")
+
+        # Prefer DB password if available, fallback to service key
+        if supabase_url and (db_password or service_key):
+            # Derive db.<project-ref>.supabase.co from SUPABASE_URL
+            parsed = urlparse(str(supabase_url))
+            hostname = parsed.hostname or str(supabase_url).replace("https://", "").replace("http://", "")
+            host = hostname if hostname.startswith("db.") else f"db.{hostname}"
+
+            # Use DB password if available, otherwise use service key
+            if db_password:
+                pw_value = (
+                    db_password.get_secret_value()
+                    if hasattr(db_password, "get_secret_value")
+                    else str(db_password)
+                )
             else:
-                host = str(supabase_url).replace("https://", "").replace("http://", "")
-            
-            # Get secret value if it's SecretStr
-            key_value = service_key.get_secret_value() if hasattr(service_key, 'get_secret_value') else service_key
-            
-            return f"postgresql+asyncpg://postgres:{key_value}@db.{host}:5432/postgres"
+                pw_value = (
+                    service_key.get_secret_value()
+                    if hasattr(service_key, "get_secret_value")
+                    else str(service_key)
+                )
+
+            # Build asyncpg URL; SSL is enforced via connect_args in engine creation
+            return f"postgresql+asyncpg://postgres:{pw_value}@{host}:5432/postgres"
         
         # Fallback for development
         return "postgresql+asyncpg://postgres:password@localhost:5432/boodongsan"
@@ -271,10 +285,14 @@ class Settings(BaseSettings):
         
         # Critical fields that must be set in production
         production_required = {
-            "SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY",
-            "QDRANT_URL", "QDRANT_API_KEY", "AWS_ACCESS_KEY_ID", 
-            "AWS_SECRET_ACCESS_KEY", "CLOUDFLARE_ACCOUNT_ID", 
-            "CLOUDFLARE_API_TOKEN", "MOLIT_API_KEY"
+            "SUPABASE_URL",
+            "SUPABASE_ANON_KEY",
+            "SUPABASE_SERVICE_ROLE_KEY",
+            "AWS_ACCESS_KEY_ID",
+            "AWS_SECRET_ACCESS_KEY",
+            "CLOUDFLARE_ACCOUNT_ID",
+            "CLOUDFLARE_API_TOKEN",
+            "MOLIT_API_KEY",
         }
         
         if (env == Environment.PRODUCTION and 

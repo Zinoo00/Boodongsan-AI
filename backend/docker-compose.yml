@@ -1,21 +1,5 @@
 
 services:
-  # PostgreSQL 데이터베이스
-  postgres:
-    image: postgres:15
-    container_name: boodongsan_postgres
-    environment:
-      POSTGRES_DB: boodongsan
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - boodongsan_network
-
   # Redis 캐시
   redis:
     image: redis:7-alpine
@@ -34,20 +18,19 @@ services:
       dockerfile: Dockerfile
     container_name: boodongsan_backend
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=boodongsan
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - AWS_REGION=us-east-1
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - SUPABASE_DB_PASSWORD=${SUPABASE_DB_PASSWORD}
+      - REDIS_URL=redis://redis:6379/0
+      - CHROMADB_HOST=chroma
+      - CHROMADB_PORT=8000
+      - AWS_REGION=ap-northeast-2
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
       - redis
     volumes:
       - .:/app
@@ -77,7 +60,6 @@ services:
       - frontend
 
 volumes:
-  postgres_data:
   redis_data:
 
 networks:

@@ -3,3 +3,28 @@
 .cursor
 .claude
 testing_files
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Database files
+*.sqlite3
+*.db
+chromadb_data/
+
+# IDE files
+.vscode/
+.idea/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/

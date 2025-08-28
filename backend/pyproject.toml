@@ -27,12 +27,12 @@ default = [
   "openai==1.91.0",
   
   # Database
-  "asyncpg==0.30.0",
+  "supabase>=2.7.4",
   "redis>=5,<6",
+  "chromadb>=1.0.20",
   "qdrant-client==1.15.1",
   "numpy==1.26.4",
-  "sqlalchemy==2.0.39",
-  "alembic==1.16.4",
+  "certifi==2024.7.4",
   
   # Security
   "python-jose[cryptography]==3.5.0",
@@ -59,6 +59,10 @@ default = [
   
   # JSON processing
   "orjson==3.11.2",
+  
+  # Email validation for Pydantic
+  "email-validator>=2.0.0",
+  "greenlet>=3.2.4",
 ]
 
 # Optional feature groups
