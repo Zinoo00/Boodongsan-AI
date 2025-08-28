@@ -4,7 +4,7 @@ FROM ghcr.io/astral-sh/uv:python3.11-bookworm
 WORKDIR /app
 
 # 의존성 메타데이터만 먼저 복사 (캐시 최적화)
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 
 # 프로덕션 의존성 설치 (격리된 .venv에 설치)
 RUN uv sync --frozen --no-dev
