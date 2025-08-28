@@ -11,8 +11,8 @@ from typing import Any
 
 import boto3
 from botocore.exceptions import ClientError
-from langchain.embeddings import BedrockEmbeddings
-from langchain.llms.bedrock import Bedrock
+from langchain_community.embeddings import BedrockEmbeddings
+from langchain_community.llms import Bedrock
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 logger = logging.getLogger(__name__)

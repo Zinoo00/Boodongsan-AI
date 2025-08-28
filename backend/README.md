@@ -144,13 +144,19 @@ backend/
 Copy `.env.example` to `.env` and configure:
 
 ```bash
-# Database
+# Database - Supabase (required)
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_key
+SUPABASE_DB_PASSWORD=your_supabase_db_password  # from Supabase Project Settings → Database
+
+# Redis Cache
+REDIS_URL=redis://localhost:6379/0
 
 # Vector Database
-QDRANT_URL=your_qdrant_url
+CHROMADB_HOST=localhost
+CHROMADB_PORT=8000
+QDRANT_URL=your_qdrant_url  # Optional - legacy support
 QDRANT_API_KEY=your_qdrant_key
 
 # AI Services
@@ -162,6 +168,17 @@ CLOUDFLARE_API_TOKEN=your_cf_token
 # Korean Real Estate APIs
 MOLIT_API_KEY=your_molit_key
 ```
+
+## 🗄️ Database Setup
+
+### Supabase Integration
+
+The application now uses the Supabase Python client library for enhanced database connectivity:
+
+- **Primary Database**: Supabase PostgreSQL via Python client
+- **Connection Management**: Automatic retry logic and health monitoring
+- **Authentication**: Service role key for server-side operations
+- **Real-time capabilities**: Ready for Supabase real-time subscriptions
 
 ### uv Configuration Features
 
@@ -229,10 +246,42 @@ uv run pytest -v --log-level=DEBUG
 ## 📈 Monitoring
 
 The application includes:
-- **Health checks**: `/api/v1/health`
+- **Health checks**: `/api/v1/health` with Supabase and Redis status
 - **Metrics**: Prometheus metrics on port 9090 (if enabled)
 - **Logging**: Structured logging with configurable levels
-- **Database monitoring**: Connection pool and query metrics
+- **Database monitoring**: Supabase connection health and cache statistics
+
+### Health Check Response
+```json
+{
+  "supabase": {
+    "status": true,
+    "latency_ms": 45.2
+  },
+  "redis": {
+    "status": true,
+    "latency_ms": 12.3,
+    "memory_usage": {
+      "used_memory": "2.5MB",
+      "used_memory_peak": "5.1MB"
+    }
+  },
+  "cache_stats": {
+    "hits": 1250,
+    "misses": 89,
+    "hit_rate_percent": 93.35
+  }
+}
+```
+
+## 📋 Recent Changes
+
+### v1.1.0 - Supabase Integration (Latest)
+- **✅ Migration to Supabase Client**: Replaced SQLAlchemy/asyncpg with Supabase Python client
+- **✅ Enhanced Connection Management**: Improved error handling and retry logic
+- **✅ Service Layer Updates**: All services now use Supabase client operations
+- **✅ LangChain Compatibility**: Fixed deprecated import warnings
+- **✅ Performance Improvements**: Streamlined database operations and connection pooling
 
 ## 🤝 Contributing
 
