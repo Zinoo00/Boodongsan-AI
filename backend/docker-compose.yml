@@ -15,7 +15,7 @@ services:
     image: ghcr.io/chroma-core/chroma:latest
     container_name: boodongsan_chroma
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - chroma_data:/chroma
     networks:
@@ -45,7 +45,7 @@ services:
       - chroma
     volumes:
       - .:/app
-      - /app/.venv
+      - venv_data:/app/.venv
     networks:
       - boodongsan_network
     command: uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
@@ -73,6 +73,7 @@ services:
 volumes:
   redis_data:
   chroma_data:
+  venv_data:
 
 networks:
   boodongsan_network:
