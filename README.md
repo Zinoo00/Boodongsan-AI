@@ -1,6 +1,6 @@
 # BODA (BOoDongSan AI Chatbot) | 보다 (한국 부동산 RAG AI 챗봇)
 
-> **BODA** stands for **B**Oo**D**ongSan **A**I - Korean Real Estate RAG AI Chatbot
+> **BODA** stands for **BO**o**D**ongSan **A**I - Korean Real Estate RAG AI Chatbot
 
 한국 부동산 시장을 위한 RAG 기반 AI 추천 챗봇
 
