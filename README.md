@@ -1,4 +1,4 @@
-# 한국 부동산 RAG AI 챗봇 (Korean Real Estate RAG AI Chatbot)
+# BODA (**BO**o***D**ongSan **A**I Chatbot) | 보다 (한국 부동산 RAG AI 챗봇)
 
 한국 부동산 시장을 위한 RAG 기반 AI 추천 챗봇
 
