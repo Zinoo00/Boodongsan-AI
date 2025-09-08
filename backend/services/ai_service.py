@@ -12,6 +12,8 @@ from typing import Any
 import aiohttp
 import boto3
 from botocore.exceptions import ClientError
+from fastapi.responses import StreamingResponse
+from urllib3 import response
 
 from core.config import settings
 
@@ -111,6 +113,13 @@ class AIService:
 
             self.bedrock_runtime = boto3.client(
                 service_name="bedrock-runtime",
+                region_name=settings.AWS_REGION,
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            )
+
+            self.bedrock_agent_runtime = boto3.client(
+                service_name="bedrock-agent-runtime",
                 region_name=settings.AWS_REGION,
                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
@@ -960,6 +969,88 @@ class AIService:
             logger.error(f"Failed to clear AI cache: {str(e)}")
             return 0
 
+    async def do_knowledge_base_chat(self, message: str, session_id: str | None = None) -> dict[str, Any]:
+        """Knowledge Base 질의 후 전체 텍스트와 시타이션을 모아서 반환"""
+        try:
+            resp = self.bedrock_agent_runtime.retrieve_and_generate_stream(
+                input={"text": message},
+                retrieveAndGenerateConfiguration={
+                    "type": "KNOWLEDGE_BASE",
+                    "knowledgeBaseConfiguration": {
+                        "knowledgeBaseId": settings.BEDROCK_KB_ID,
+                        "modelArn": settings.BEDROCK_MODEL_ARN,
+                        "retrievalConfiguration": {
+                            "vectorSearchConfiguration": {
+                                "numberOfResults": 3,
+                                "overrideSearchType": "HYBRID",
+                            }
+                        },
+                    },
+                },
+                generationConfiguration={
+                    "inferenceConfig": {"maxTokens": 512, "temperature": 0.7, "topP": 0.9}
+                },
+                responseConfiguration={"citations": "RETURN"},
+                **({"sessionId": session_id} if session_id else {}),
+            )
+
+            text_chunks: list[str] = []
+            citations: list[Any] = []
+
+            for event in resp.get("stream", []):
+                if "chunk" in event:
+                    data = event["chunk"].get("bytes")
+                    if isinstance(data, (bytes, bytearray)):
+                        text_chunks.append(data.decode("utf-8"))
+                    elif isinstance(data, str):
+                        text_chunks.append(data)
+                if "citations" in event:
+                    citations.extend(event["citations"])
+
+            return {"text": "".join(text_chunks), "citations": citations}
+
+        except Exception as e:
+            logger.error(f"Failed to do knowledge base chat: {str(e)}")
+            return {"text": "", "citations": [], "error": str(e)}
+
+    async def do_knowledge_base_chat_stream(self, message: str, session_id: str | None = None) -> StreamingResponse:
+        """Knowledge Base 질의를 스트리밍으로 반환 (텍스트 청크 스트림)"""
+        def generator():
+            try:
+                resp = self.bedrock_agent_runtime.retrieve_and_generate_stream(
+                    input={"text": message},
+                    retrieveAndGenerateConfiguration={
+                        "type": "KNOWLEDGE_BASE",
+                        "knowledgeBaseConfiguration": {
+                            "knowledgeBaseId": settings.BEDROCK_KB_ID,
+                            "modelArn": settings.BEDROCK_MODEL_ARN,
+                            "retrievalConfiguration": {
+                                "vectorSearchConfiguration": {
+                                    "numberOfResults": 3,
+                                    "overrideSearchType": "HYBRID",
+                                }
+                            },
+                        },
+                    },
+                    generationConfiguration={
+                        "inferenceConfig": {"maxTokens": 512, "temperature": 0.7, "topP": 0.9}
+                    },
+                    responseConfiguration={"citations": "RETURN"},
+                    **({"sessionId": session_id} if session_id else {}),
+                )
+
+                for event in resp.get("stream", []):
+                    if "chunk" in event:
+                        data = event["chunk"].get("bytes")
+                        if isinstance(data, (bytes, bytearray)):
+                            yield data
+                        elif isinstance(data, str):
+                            yield data.encode("utf-8")
+            except Exception as e:
+                logger.error(f"KB streaming failed: {str(e)}")
+                yield f"[ERROR] {str(e)}".encode("utf-8")
+
+        return StreamingResponse(generator(), media_type="text/plain; charset=utf-8")
 
 # Global AI service instance
 ai_service = AIService()
