@@ -485,3 +485,172 @@ class ChromadbService:
             logger.error("Chromadb service health check failed", extra={"error": str(e)})
 
         return health_status
+
+    async def add_simple_document(self, text: str, metadata: dict[str, Any] = None) -> str:
+        """
+        간단한 문서 하나를 ChromaDB에 추가
+        
+        Args:
+            text: 문서 내용 (문자열)
+            metadata: 메타데이터 (선택사항)
+            
+        Returns:
+            str: 생성된 문서 ID
+        """
+        if not self._initialized:
+            await self.initialize()
+            
+        try:
+            doc_id = str(uuid.uuid4())
+            doc_metadata = {
+                'content_type': 'text',
+                'created_at': datetime.utcnow().isoformat(),
+                **(metadata or {})
+            }
+            
+            # ChromaDB에 문서 추가
+            await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: self.collection.add(
+                    ids=[doc_id],
+                    documents=[text],
+                    metadatas=[doc_metadata]
+                )
+            )
+            
+            logger.info(f'문서 추가 성공: {doc_id}')
+            return doc_id
+            
+        except Exception as e:
+            logger.error(f'문서 추가 실패: {str(e)}')
+            raise VectorServiceError(
+                error_code=ErrorCode.VECTOR_OPERATION_FAILED,
+                message=f'Failed to add document: {str(e)}',
+                correlation_id=str(uuid.uuid4())
+            )
+    
+    async def add_multiple_documents(self, documents: list[dict[str, Any]]) -> list[str]:
+        """
+        여러 문서를 ChromaDB에 추가
+        
+        Args:
+            documents: 문서 리스트 [{'text': '내용', 'metadata': {...}}, ...]
+            
+        Returns:
+            list[str]: 생성된 문서 ID 리스트
+        """
+        if not self._initialized:
+            await self.initialize()
+            
+        try:
+            ids = []
+            documents_text = []
+            metadatas = []
+            
+            for doc in documents:
+                doc_id = str(uuid.uuid4())
+                text = doc.get('text', '')
+                metadata = {
+                    'content_type': doc.get('content_type', 'text'),
+                    'created_at': datetime.utcnow().isoformat(),
+                    **doc.get('metadata', {})
+                }
+                
+                if not text:
+                    logger.warning(f'텍스트가 없는 문서 건너뜀: {doc_id}')
+                    continue
+                    
+                ids.append(doc_id)
+                documents_text.append(text)
+                metadatas.append(metadata)
+            
+            if ids:
+                # ChromaDB에 배치로 추가
+                await asyncio.get_event_loop().run_in_executor(
+                    None,
+                    lambda: self.collection.add(
+                        ids=ids,
+                        documents=documents_text,
+                        metadatas=metadatas
+                    )
+                )
+                
+                logger.info(f'{len(ids)}개 문서 추가 성공')
+                return ids
+            else:
+                logger.warning('추가할 유효한 문서가 없음')
+                return []
+                
+        except Exception as e:
+            logger.error(f'여러 문서 추가 실패: {str(e)}')
+            raise VectorServiceError(
+                error_code=ErrorCode.VECTOR_OPERATION_FAILED,
+                message=f'Failed to add multiple documents: {str(e)}',
+                correlation_id=str(uuid.uuid4())
+            )
+    
+    async def search_documents(self, query: str, limit: int = 5) -> list[ChromaSearchResult]:
+        """
+        문서 검색
+        
+        Args:
+            query: 검색 쿼리
+            limit: 결과 개수
+            
+        Returns:
+            list[ChromaSearchResult]: 검색 결과
+        """
+        if not self._initialized:
+            await self.initialize()
+            
+        try:
+            # ChromaDB에서 검색
+            results = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: self.collection.query(
+                    query_texts=[query],
+                    n_results=limit
+                )
+            )
+            
+            search_results = []
+            if results['ids'] and results['ids'][0]:
+                for i, doc_id in enumerate(results['ids'][0]):
+                    search_results.append(ChromaSearchResult(
+                        id=doc_id,
+                        score=results['distances'][0][i] if results['distances'] else 0.0,
+                        metadata=results['metadatas'][0][i] if results['metadatas'] else {},
+                        document=results['documents'][0][i] if results['documents'] else None
+                    ))
+            
+            logger.info(f'검색 완료: {len(search_results)}개 결과')
+            return search_results
+            
+        except Exception as e:
+            logger.error(f'문서 검색 실패: {str(e)}')
+            raise VectorServiceError(
+                error_code=ErrorCode.VECTOR_OPERATION_FAILED,
+                message=f'Failed to search documents: {str(e)}',
+                correlation_id=str(uuid.uuid4())
+            )
+    
+    async def get_document_count(self) -> int:
+        """
+        저장된 문서 개수 조회
+        
+        Returns:
+            int: 문서 개수
+        """
+        if not self._initialized:
+            await self.initialize()
+            
+        try:
+            count = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: self.collection.count()
+            )
+            return count
+            
+        except Exception as e:
+            logger.error(f'문서 개수 조회 실패: {str(e)}')
+            return 0

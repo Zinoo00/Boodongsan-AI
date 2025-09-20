@@ -33,6 +33,8 @@ from api.middleware.caching import CacheMiddleware
 
 # Router imports
 from api.routers import chat, health, policies, properties, users
+from api.routers import bedrock_test
+from api.routers import chroma_test
 
 # Configure logging
 logging.basicConfig(
@@ -155,6 +157,8 @@ app.include_router(
     properties.router, prefix=settings.API_V1_STR + "/properties", tags=["Properties"]
 )
 app.include_router(users.router, prefix=settings.API_V1_STR + "/users", tags=["Users"])
+app.include_router(bedrock_test.router, prefix=settings.API_V1_STR + "/bedrock", tags=["Bedrock Test"])
+app.include_router(chroma_test.router, prefix=settings.API_V1_STR + "/chroma", tags=["Chroma Test"])
 
 
 @app.get("/", response_model=dict[str, Any])
