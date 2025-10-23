@@ -1,0 +1,15 @@
+# 기본 패키지들
+requests
+pandas
+python-dotenv
+urllib3
+
+# RAG 시스템을 위한 패키지들 (무료 OpenSearch 사용)
+opensearch-py
+sentence-transformers
+scikit-learn
+numpy
+
+# 스케줄러
+APScheduler
+

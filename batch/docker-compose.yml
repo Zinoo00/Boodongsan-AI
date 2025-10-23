@@ -1,0 +1,92 @@
+
+
+services:
+  # 무료 OpenSearch 서버
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: boodongsan_opensearch
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - ./opensearch:/usr/share/opensearch/data
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=admin
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 1g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 부동산 데이터 수집기 (무료 OpenSearch 사용)
+  batch:
+    build: .
+    container_name: boodongsan_batch
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    environment:
+      - SERVICE_KEY=${SERVICE_KEY}
+      - OPENSEARCH_ENDPOINT=http://opensearch:9200
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=admin
+      - OPENSEARCH_USE_SSL=false
+      - OPENSEARCH_VERIFY_CERTS=false
+      - OPENSEARCH_SSL_ASSERT_HOSTNAME=false
+      - OPENSEARCH_SSL_SHOW_WARN=false
+    restart: unless-stopped
+    command: >
+      python main.py 
+      --schedule_collect
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # 즉시 수집용 서비스 (필요시 사용)
+  batch-immediate:
+    build: .
+    container_name: boodongsan_batch_immediate
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    environment:
+      - SERVICE_KEY=${SERVICE_KEY}
+      - OPENSEARCH_ENDPOINT=http://opensearch:9200
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=admin
+      - OPENSEARCH_USE_SSL=false
+      - OPENSEARCH_VERIFY_CERTS=false
+      - OPENSEARCH_SSL_ASSERT_HOSTNAME=false
+      - OPENSEARCH_SSL_SHOW_WARN=false
+    profiles:
+      - immediate
+    command: >
+      python main.py 
+      --collect_data 
+      --lawd_cd 41480
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
