@@ -55,6 +55,10 @@ vector_db/
 models/
 *.tar.gz
 
+# ONNX models (too large for git)
+*.onnx
+model/
+
 # Logs
 *.log
 logs/
