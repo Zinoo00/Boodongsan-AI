@@ -2,7 +2,7 @@
 # 이 파일을 .env로 복사하여 사용하세요
 
 # 공공데이터포털 API 키 (실제 키로 변경 필요)
-SERVICE_KEY=37gCp67V0ipctjJsXbUPPGEipHSwE5ODUuyDyyNfD9AE10kT/0N0EXHYYYuJjIV1/LYnQuWvXPpoXRgH88z8FA==
+SERVICE_KEY=
 
 # 로그 설정
 LOG_LEVEL=INFO
