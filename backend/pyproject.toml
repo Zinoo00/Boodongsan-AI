@@ -24,9 +24,13 @@ dependencies = [
     "supabase>=2.7.4",
     "asyncpg==0.30.0",
     "redis>=5,<6",
-    "chromadb>=1.0.20",
-    "qdrant-client==1.15.1",
     "numpy==1.26.4",
+
+    # LightRAG for knowledge graph-based RAG
+    "lightrag-hku[api]>=0.1.0",
+    "networkx>=3.0",  # For graph operations
+    "neo4j>=5.0",  # Optional: for Neo4J backend
+    "opensearch-py>=2.6.0",
     
     # Security
     "python-jose[cryptography]==3.5.0",
@@ -145,7 +149,6 @@ unfixable = ["T20"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "PLR2004", "PLR0913"]
-"**/models.py" = ["A003"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["backend"]

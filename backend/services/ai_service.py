@@ -632,6 +632,25 @@ class AIService:
             if market_info:
                 message_parts.append(f"시장 정보: {', '.join(market_info)}")
 
+        # LightRAG answer
+        if context.get("knowledge_answer"):
+            mode = context.get("knowledge_mode") or "hybrid"
+            message_parts.append(
+                f"LightRAG ({mode}) 결과 요약:\n{context['knowledge_answer']}"
+            )
+
+        # Vector search fallback
+        vector_results = context.get("vector_results") or []
+        if vector_results:
+            snippets = []
+            for idx, item in enumerate(vector_results[:3], 1):
+                document = (item.get("document") or "").strip()
+                if not document:
+                    document = json.dumps(item.get("metadata", {}), ensure_ascii=False)
+                snippets.append(f"- 후보 {idx}: {document[:200]}")
+            if snippets:
+                message_parts.append("벡터 검색 참고 정보:\n" + "\n".join(snippets))
+
         return "\n\n".join(message_parts)
 
     def _clean_entities(self, entities: dict[str, Any]) -> dict[str, Any]:

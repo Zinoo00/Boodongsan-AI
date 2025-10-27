@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from ai.bedrock_client import get_bedrock_client
-from database.connection import health_check as db_health_check
+from core.database import database_health_check
 
 logger = logging.getLogger(__name__)
 
@@ -47,20 +47,26 @@ async def health_check():
         # 데이터베이스 상태 확인
         try:
             db_start = datetime.utcnow()
-            db_status = await db_health_check()
+            db_status = await database_health_check()
             db_time = int((datetime.utcnow() - db_start).total_seconds() * 1000)
 
-            if db_status["postgres"] and db_status["redis"]:
+            supabase_ok = db_status.get("supabase", {}).get("status", False)
+            redis_ok = db_status.get("redis", {}).get("status", False)
+
+            if supabase_ok and redis_ok:
                 services_status["database"] = ServiceStatus(
                     status="healthy",
                     response_time_ms=db_time,
-                    message="PostgreSQL and Redis connections OK",
+                    message="Supabase and Redis connections OK",
                 )
             else:
                 services_status["database"] = ServiceStatus(
                     status="unhealthy",
                     response_time_ms=db_time,
-                    message=f"PostgreSQL: {'OK' if db_status['postgres'] else 'FAIL'}, Redis: {'OK' if db_status['redis'] else 'FAIL'}",
+                    message=(
+                        f"Supabase: {'OK' if supabase_ok else 'FAIL'}, "
+                        f"Redis: {'OK' if redis_ok else 'FAIL'}"
+                    ),
                 )
                 overall_status = "unhealthy"
 
@@ -103,7 +109,7 @@ async def health_check():
 
     except Exception as e:
         logger.error(f"헬스체크 실패: {str(e)}")
-        raise HTTPException(status_code=500, detail="헬스체크 실행 중 오류가 발생했습니다.")
+        raise HTTPException(status_code=500, detail="헬스체크 실행 중 오류가 발생했습니다.") from e
 
 
 @router.get("/database", response_model=dict[str, Any])
@@ -111,22 +117,25 @@ async def database_health():
     """데이터베이스 상태 확인"""
     try:
         start_time = datetime.utcnow()
-        db_status = await db_health_check()
+        db_status = await database_health_check()
         response_time = int((datetime.utcnow() - start_time).total_seconds() * 1000)
 
+        supabase_ok = db_status.get("supabase", {}).get("status", False)
+        redis_ok = db_status.get("redis", {}).get("status", False)
+
         return {
-            "status": "healthy" if db_status["postgres"] and db_status["redis"] else "unhealthy",
+            "status": "healthy" if supabase_ok and redis_ok else "unhealthy",
             "response_time_ms": response_time,
-            "postgres": db_status["postgres"],
-            "redis": db_status["redis"],
-            "timestamp": db_status["timestamp"],
+            "supabase": db_status.get("supabase"),
+            "redis": db_status.get("redis"),
+            "timestamp": db_status.get("timestamp"),
         }
 
     except Exception as e:
         logger.error(f"데이터베이스 헬스체크 실패: {str(e)}")
         raise HTTPException(
             status_code=500, detail="데이터베이스 헬스체크 실행 중 오류가 발생했습니다."
-        )
+        ) from e
 
 
 @router.get("/ai", response_model=dict[str, Any])
@@ -150,7 +159,7 @@ async def ai_service_health():
         logger.error(f"AI 서비스 헬스체크 실패: {str(e)}")
         raise HTTPException(
             status_code=500, detail="AI 서비스 헬스체크 실행 중 오류가 발생했습니다."
-        )
+        ) from e
 
 
 @router.get("/metrics", response_model=dict[str, Any])
@@ -207,7 +216,7 @@ async def system_metrics():
         }
     except Exception as e:
         logger.error(f"시스템 메트릭스 조회 실패: {str(e)}")
-        raise HTTPException(status_code=500, detail="시스템 메트릭스 조회 중 오류가 발생했습니다.")
+        raise HTTPException(status_code=500, detail="시스템 메트릭스 조회 중 오류가 발생했습니다.") from e
 
 
 @router.get("/version", response_model=dict[str, str])

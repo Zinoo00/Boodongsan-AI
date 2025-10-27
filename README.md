@@ -4,6 +4,72 @@
 
 한국 부동산 시장을 위한 RAG 기반 AI 추천 챗봇
 
+## 🚀 **QUICK START (5분 설치)**
+
+**Required**: Docker, Python 3.11+, 그리고 AWS 계정
+
+### **1단계: 프로젝트 설정**
+```bash
+git clone <your-repo-url>
+cd boodongsan/backend
+cp .env.example .env
+```
+
+### **2단계: 필수 환경변수 입력** 
+`.env` 파일에서 다음 항목만 입력하세요:
+```bash
+# AWS Bedrock (필수)
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+
+# OpenSearch (필수)
+OPENSEARCH_HOST=search-your-domain.ap-northeast-2.es.amazonaws.com
+OPENSEARCH_INDEX_NAME=boda_vectors
+
+# Supabase (필수)
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Cloudflare Workers AI (필수)
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
+
+# 국토교통부 API (필수)
+MOLIT_API_KEY=your_molit_api_key
+
+# Seoul Open Data (선택)
+# SEOUL_OPEN_API_KEY=sample
+```
+
+### **3단계: Docker로 실행**
+```bash
+# 모든 백엔드 컴포넌트 시작 (Redis, Neo4j, Backend)
+docker-compose up -d
+
+# 로그 확인
+docker-compose logs -f backend
+```
+
+### **4단계: 접속 확인**  
+- **API 서버**: http://localhost:8000
+- **API 문서**: http://localhost:8000/docs  
+- **헬스체크**: http://localhost:8000/api/v1/health
+
+### **🆘 문제 해결**
+```bash
+# 서비스 중지
+docker-compose down
+
+# 전체 재시작
+docker-compose down -v && docker-compose up -d
+
+# 개별 서비스 재시작  
+docker-compose restart backend
+```
+
+---
+
 ## 🎯 프로젝트 개요
 
 이 프로젝트는 한국 부동산 데이터와 정부 정책 정보를 학습하여 사용자에게 맞춤형 부동산을 추천하는 RAG(Retrieval Augmented Generation) 기반 AI 챗봇입니다.
@@ -14,6 +80,7 @@
 - 💬 자연어 기반 대화형 인터페이스
 - 📊 실거래가 데이터 기반 시장 분석
 - 🔍 지역별/조건별 맞춤 검색
+- 📡 서울시 실시간 도시데이터 연동 (인구·교통·날씨)
 
 ## 🏗️ 시스템 아키텍처
 
@@ -24,12 +91,14 @@ graph TB
     LB --> API[FastAPI + Granian]
     API --> Cache[Redis Cache]
     API --> DB[Supabase PostgreSQL]
-    API --> VDB[Qdrant Vector DB]
+    API --> KG[LightRAG + Neo4j]
+    API --> VDB[AWS OpenSearch Vector DB]
     API --> AI1[Cloudflare Workers AI]
     API --> AI2[AWS Bedrock]
     
     DC[Data Collectors] --> ETL[ETL Pipeline]
     ETL --> DB
+    ETL --> KG
     ETL --> VDB
     
     EXT1[국토교통부 API] --> DC
@@ -44,13 +113,14 @@ graph TB
 
 ### 데이터 플로우
 ```
-사용자 질문 → FastAPI → Redis 캐시 확인 → Qdrant 벡터 검색 → 컨텍스트 구성 → AI 모델 선택 → 응답 생성 → 캐시 저장 → 사용자 응답
+사용자 질문 → FastAPI → Redis 캐시 확인 → LightRAG(Neo4j) 그래프 검색 → (필요 시 AWS OpenSearch 벡터 검색) → 컨텍스트 구성 → AI 모델 선택 → 응답 생성 → 캐시 저장 → 사용자 응답
 ```
 
 ### 컴포넌트 역할
 - **FastAPI**: RESTful API 엔드포인트 및 비즈니스 로직
 - **Uvicorn**: ASGI 서버 (Python 기반)
-- **Chromadb**: 벡터 유사도 검색 및 하이브리드 검색
+- **LightRAG + Neo4j**: 지식 그래프 기반 검색
+- **AWS OpenSearch**: 벡터 유사도 검색 (LightRAG 실패 시 보조)
 - **Supabase**: 부동산 메타데이터 및 사용자 데이터 (연결 풀링, retry 로직)
 - **Redis**: 응답 캐싱 및 세션 관리 (계층화된 캐싱)
 - **AI 라우팅**: 질문 복잡도에 따른 적응형 모델 선택 (circuit breaker, failover)
@@ -60,7 +130,7 @@ graph TB
 
 ### Backend
 - **Web Framework**: FastAPI + Uvicorn (ASGI Server)
-- **Vector Database**: Chromadb
+- **Vector Database**: AWS OpenSearch
 - **Primary Database**: Supabase PostgreSQL
 - **Cache**: Redis
 - **AI/LLM**: 
@@ -93,21 +163,15 @@ boodongsan/
 │   │   └── user.py        # 사용자 모델
 │   ├── services/          # 비즈니스 로직 (엔터프라이즈급)
 │   │   ├── rag_service.py # RAG 처리 (캐싱, 재시도)
-│   │   ├── vector_service.py # 벡터 검색 (하이브리드)
+│   │   ├── opensearch_service.py # AWS OpenSearch 벡터 검색
 │   │   └── ai_service.py  # AI 서비스 (failover, circuit breaker)
-│   ├── data/              # 데이터 처리
-│   │   └── collectors/    # 데이터 수집기
-│   ├── database/          # 데이터베이스 관련
-│   │   ├── connection.py  # DB 연결 관리
-│   │   ├── models.py      # SQLAlchemy 모델
-│   │   └── policy_seed_data.py # 시드 데이터
-│   ├── ai/                # AI 관련 모듈
-│   │   ├── bedrock_client.py    # AWS Bedrock 클라이언트
-│   │   └── langchain_pipeline.py # LangChain 파이프라인
-│   ├── scripts/           # 설정 및 유틸리티 스크립트
-│   │   └── setup.sh       # 프로젝트 설정 스크립트
-│   ├── tests/             # 테스트 파일
+│   ├── ai/                # AI 관련 모듈 (예: bedrock_client.py)
+│   ├── api/               # FastAPI 라우터 및 미들웨어
+│   ├── core/              # 환경설정, 데이터베이스 헬퍼, 예외 정의
+│   ├── data/              # 데이터 처리 / 수집 스크립트
 │   ├── docs/              # 백엔드 문서
+│   ├── migrations/        # Supabase / LightRAG SQL 스키마
+│   ├── services/          # LightRAG, DataService, AIService 등 비즈니스 로직
 │   ├── .env.example       # 환경 변수 예제
 │   ├── docker-compose.yml # Docker 컨테이너 설정
 │   ├── Dockerfile         # Docker 이미지 빌드
@@ -121,95 +185,43 @@ boodongsan/
 └── PROJECT_COMPLETION_ROADMAP.md # 프로젝트 로드맵
 ```
 
-## 🚀 설치 및 실행
+## 💻 **설치 방법**
 
-### 사전 요구사항
-- Python 3.11+
-- Redis
-- API 키들:
-  - AWS Bedrock 액세스
-  - Cloudflare Workers AI API 키
-  - 국토교통부 API 키
-  - Supabase 프로젝트
+### **Method 1: Docker (권장 - 5분 설치)**
+위의 [QUICK START](#-quick-start-5분-설치) 섹션을 따라하세요.
 
-### 1. 프로젝트 클론
+### **Method 2: 로컬 Python 개발환경**
 ```bash
-git clone https://github.com/yourusername/boodongsan.git
-cd boodongsan
-```
+# 1. 프로젝트 클론 및 환경설정
+git clone <your-repo-url> 
+cd boodongsan/backend
+cp .env.example .env
+# .env 파일에 필수 API 키들 입력 (Quick Start 참조)
 
-### 2. 백엔드 의존성 설치
-```bash
-cd backend
-
-# uv를 사용하는 경우 (권장)
+# 2. uv로 Python 환경 설정 (권장)
 uv sync
 
-# 또는 기존 pip 사용
+# 또는 pip 사용
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate  
 pip install -r requirements.txt
+
+# 3. 외부 서비스 시작 (Redis, Neo4j)
+docker-compose up -d redis neo4j
+
+# 4. 개발 서버 시작
+uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 3. 환경변수 설정
-```bash
-cd backend && cp .env.example .env
-# .env 파일을 편집하여 API 키들을 입력
-```
+### **Method 3: Production 배포**
+AWS/클라우드 배포는 [DEPLOYMENT.md](DEPLOYMENT.md) 참조
 
-`.env` 파일 예시:
-```env
-# Database
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-REDIS_URL=redis://localhost:6379
+---
 
-# Vector Database
-QDRANT_URL=your_qdrant_cloud_url
-QDRANT_API_KEY=your_qdrant_api_key
-
-# AI Services
-AWS_ACCESS_KEY_ID=your_aws_access_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-AWS_REGION=ap-northeast-2
-CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
-CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
-
-# Korean Real Estate APIs
-MOLIT_API_KEY=your_molit_api_key
-HUG_API_KEY=your_hug_api_key
-HF_API_KEY=your_hf_api_key
-```
-
-### 4. 데이터베이스 설정
-```bash
-# Supabase 스키마 설정
-python scripts/setup_database.py
-
-# 벡터 데이터베이스 설정
-python scripts/setup_vector_db.py
-```
-
-### 5. 데이터 수집 및 처리
-```bash
-# 부동산 데이터 수집 (backend 폴더에서)
-cd backend && python data/collectors/real_estate_collector.py
-
-# 데이터 전처리 및 임베딩 생성
-python data/processors/data_processor.py
-
-# 벡터 DB에 데이터 삽입
-python scripts/populate_vector_db.py
-```
-
-### 6. 서버 실행
-```bash
-# 개발 서버 (backend 폴더에서 uv 사용)
-cd backend && uv run granian --interface asgi api.main:app --host 0.0.0.0 --port 8000 --reload
-
-# 또는 Docker Compose로 전체 스택 실행 (backend 폴더에서)
-cd backend && docker-compose up -d
-```
+## ⚠️ **중요 보안 알림**
+- **절대로 `.env` 파일을 Git에 커밋하지 마세요**
+- **프로덕션에서는 모든 API 키를 새로 생성하세요**
+- **JWT 시크릿 키를 정기적으로 교체하세요**
 
 ## 🔧 API 사용법
 
@@ -280,6 +292,20 @@ curl -X POST "http://localhost:8000/policies/match" \
   }'
 ```
 
+### 실시간 도시 데이터
+```bash
+curl "http://localhost:8000/api/v1/citydata?location=광화문·덕수궁"
+
+# 또는 장소 코드 사용 (예: POI009)
+curl "http://localhost:8000/api/v1/citydata?area_code=POI009"
+
+# 실시간 인구 전용 (OA-21778)
+curl "http://localhost:8000/api/v1/citydata/population?location=광화문·덕수궁"
+
+# 실시간 상권 전용 (OA-22385)
+curl "http://localhost:8000/api/v1/citydata/commercial?area_code=POI009"
+```
+
 ## 📊 데이터 소스
 
 ### 부동산 실거래가 데이터
@@ -297,6 +323,8 @@ curl -X POST "http://localhost:8000/policies/match" \
 - **교통**: 지하철역, 버스정류장 접근성
 - **교육**: 학교, 학원가 정보
 - **편의시설**: 마트, 병원, 공원 정보
+- **실시간 도시데이터**: 서울 120개 권역 인구·교통·날씨 스냅샷 (OA-21285)
+- **실시간 인구/상권 데이터**: 서울시 실시간 인구 (OA-21778), 실시간 상권현황 (OA-22385)
 
 ## 🤖 RAG 파이프라인
 
@@ -323,7 +351,7 @@ python backend/data/embeddings/policy_embedder.py
 
 ### 3. 벡터 검색 및 응답 생성
 ```
-사용자 질문 → 임베딩 → Qdrant 유사도 검색 → 관련 문서 추출 → LLM 컨텍스트 → 응답 생성
+사용자 질문 → LightRAG 그래프 검색 → (필요 시) AWS OpenSearch 유사도 검색 → 관련 문서 추출 → LLM 컨텍스트 → 응답 생성
 ```
 
 ## 🏛️ 지원 정부 정책
@@ -434,7 +462,7 @@ Production Environment:
   Compute: ECS Fargate (Auto Scaling 2-10 instances)
   Database: 
     - Supabase Pro (Multi-AZ)
-    - Qdrant Cloud (Replicated)
+    - Neo4j (Docker, APOC enabled)
     - Redis ElastiCache (Cluster Mode)
   Monitoring: CloudWatch + Grafana + Sentry
   CI/CD: GitHub Actions → ECR → ECS
@@ -484,7 +512,7 @@ reliability_metrics = {
 # 성능 메트릭
 performance_metrics = {
     "api_response_time": "avg, p95, p99",
-    "vector_search_latency": "Qdrant 검색 시간",
+    "vector_search_latency": "LightRAG/AWS OpenSearch 검색 시간",
     "ai_model_latency": "LLM 응답 생성 시간", 
     "cache_hit_rate": "다층 캐시 적중률",
     "error_rate": "5xx 에러율 (< 0.05%)",
@@ -585,7 +613,7 @@ reliability_metrics = {
 # PostgreSQL 백업 (일일)
 pg_dump --host=$SUPABASE_HOST --dbname=postgres > backup_$(date +%Y%m%d).sql
 
-# Qdrant 벡터 백업 (주간)
+# Neo4j 그래프 백업 (주간)
 qdrant-client backup --collection real-estate --output s3://backups/vectors/
 
 # Redis 백업 (실시간 복제)
@@ -669,7 +697,7 @@ pytest tests/ --cov=backend --cov-report=html
 
 ### Phase 1: 기본 RAG 시스템 ✅
 - [x] FastAPI + Granian 설정
-- [x] Qdrant 벡터 DB 연동
+- [x] LightRAG + Neo4j 그래프 연동
 - [x] 기본 임베딩 파이프라인
 - [x] 간단한 챗봇 인터페이스
 

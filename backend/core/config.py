@@ -164,27 +164,78 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str | None = None
     CACHE_TTL: int = 3600  # 1 hour
 
-    # Vector Database - Chromadb (Primary) & Qdrant (Legacy)
-    # Chromadb Configuration
-    CHROMADB_HOST: str = Field(default="localhost", description="Chromadb server host")
-    CHROMADB_PORT: int = Field(default=8000, ge=1, le=65535, description="Chromadb server port")
-    CHROMADB_COLLECTION_NAME: str = Field(
-        default="korean_real_estate",
-        pattern=r"^[a-zA-Z0-9_]+$",
-        description="Chromadb collection name",
+    # Vector Database - AWS OpenSearch
+    OPENSEARCH_HOST: str = Field(
+        default="localhost",
+        description="AWS OpenSearch host or endpoint without protocol",
     )
-
-    # Qdrant Configuration (Legacy support)
-    QDRANT_URL: HttpUrl | None = Field(
-        default=None, description="Qdrant server URL (optional for legacy support)"
+    OPENSEARCH_PORT: int = Field(
+        default=443,
+        ge=1,
+        le=65535,
+        description="AWS OpenSearch service port (default 443 for HTTPS)",
     )
-    QDRANT_API_KEY: SecretStr | None = Field(
-        default=None, description="Qdrant API key (optional for legacy support)"
+    OPENSEARCH_USE_SSL: bool = Field(default=True, description="Use SSL/TLS for OpenSearch connection")
+    OPENSEARCH_VERIFY_CERTS: bool = Field(
+        default=True,
+        description="Verify SSL certificates when connecting to OpenSearch",
     )
-    QDRANT_COLLECTION_NAME: str = Field(
-        default="korean_real_estate", pattern=r"^[a-z0-9_]+$", description="Qdrant collection name"
+    OPENSEARCH_AUTH_MODE: str = Field(
+        default="sigv4",
+        pattern=r"^(sigv4|basic|none)$",
+        description="Authentication mode for OpenSearch (sigv4|basic|none)",
     )
-    VECTOR_SIZE: int = Field(default=768, ge=128, le=4096, description="Vector embedding size")
+    OPENSEARCH_USERNAME: str | None = Field(
+        default=None,
+        description="Optional username for basic authentication with OpenSearch",
+    )
+    OPENSEARCH_PASSWORD: SecretStr | None = Field(
+        default=None,
+        description="Optional password for basic authentication with OpenSearch",
+    )
+    OPENSEARCH_INDEX_NAME: str = Field(
+        default="boda_vectors",
+        pattern=r"^[a-z0-9_-]+$",
+        description="OpenSearch index name for vector search",
+    )
+    OPENSEARCH_TEXT_FIELD: str = Field(
+        default="text",
+        pattern=r"^[a-zA-Z0-9_-]+$",
+        description="Field name storing raw document text in OpenSearch",
+    )
+    OPENSEARCH_VECTOR_FIELD: str = Field(
+        default="embedding",
+        pattern=r"^[a-zA-Z0-9_-]+$",
+        description="Field name storing knn_vector embeddings in OpenSearch",
+    )
+    OPENSEARCH_METADATA_FIELD: str = Field(
+        default="metadata",
+        pattern=r"^[a-zA-Z0-9_-]+$",
+        description="Field name storing document metadata in OpenSearch",
+    )
+    OPENSEARCH_SHARDS: int = Field(
+        default=1,
+        ge=1,
+        le=10,
+        description="Number of primary shards for the OpenSearch index",
+    )
+    OPENSEARCH_REPLICAS: int = Field(
+        default=1,
+        ge=0,
+        le=5,
+        description="Number of replica shards for the OpenSearch index",
+    )
+    OPENSEARCH_KNN_ENGINE: str = Field(
+        default="faiss",
+        pattern=r"^(faiss|nmslib|lucene)$",
+        description="Vector engine used by OpenSearch knn index",
+    )
+    OPENSEARCH_KNN_SPACE_TYPE: str = Field(
+        default="cosinesimil",
+        pattern=r"^(cosinesimil|l2|innerproduct)$",
+        description="Similarity space type for knn search",
+    )
+    VECTOR_SIZE: int = Field(default=1536, ge=128, le=4096, description="Vector embedding size")
 
     # AI Services - AWS Bedrock
     AWS_ACCESS_KEY_ID: str = Field(
@@ -216,6 +267,13 @@ class Settings(BaseSettings):
     MOLIT_API_KEY: str  # 국토교통부 API
     HUG_API_KEY: str | None = None  # 주택도시보증공사 API
     HF_API_KEY: str | None = None  # 주택금융공사 API
+    SEOUL_OPEN_API_KEY: str | None = Field(
+        default=None,
+        description=(
+            "Seoul Open Data API key for real-time city dataset (OA-21285). "
+            "Use 'sample' only for development (limited to 광화문·덕수궁)."
+        ),
+    )
 
     # Data Collection
     DATA_UPDATE_INTERVAL_HOURS: int = 24
@@ -227,6 +285,66 @@ class Settings(BaseSettings):
     SIMILARITY_THRESHOLD: float = 0.7
     MAX_CONTEXT_LENGTH: int = 4000
     RESPONSE_MAX_TOKENS: int = 1000
+
+    # LightRAG Configuration
+    USE_LIGHTRAG: bool = Field(
+        default=True, description="Enable LightRAG knowledge graph-based RAG (feature flag)"
+    )
+    LIGHTRAG_WORKING_DIR: str = Field(
+        default="./lightrag_storage", description="LightRAG working directory for storage"
+    )
+    LIGHTRAG_WORKSPACE: str = Field(
+        default="boda", description="Workspace namespace used when initializing LightRAG storages"
+    )
+    LIGHTRAG_EMBEDDING_BATCH_SIZE: int = Field(
+        default=32, ge=1, le=100, description="LightRAG embedding batch size"
+    )
+    LIGHTRAG_LLM_MAX_ASYNC: int = Field(
+        default=4, ge=1, le=16, description="LightRAG max concurrent LLM calls"
+    )
+    LIGHTRAG_EMBEDDING_MAX_ASYNC: int = Field(
+        default=16, ge=1, le=32, description="LightRAG max concurrent embedding calls"
+    )
+    LIGHTRAG_ENTITY_EXTRACT_MAX_GLEANING: int = Field(
+        default=1, ge=1, le=3, description="LightRAG entity extraction refinement iterations"
+    )
+    LIGHTRAG_MAX_TOKEN_FOR_TEXT_UNIT: int = Field(
+        default=6000, ge=1000, le=10000, description="LightRAG max tokens for text unit context"
+    )
+    LIGHTRAG_MAX_TOKEN_FOR_GLOBAL_CONTEXT: int = Field(
+        default=8000, ge=1000, le=15000, description="LightRAG max tokens for global context"
+    )
+    LIGHTRAG_MAX_TOKEN_FOR_LOCAL_CONTEXT: int = Field(
+        default=30000, ge=5000, le=50000, description="LightRAG max tokens for local context"
+    )
+    LIGHTRAG_QUERY_CACHE_TTL: int = Field(
+        default=1800, ge=60, le=86400, description="LightRAG query cache TTL in seconds (30 min)"
+    )
+
+    # Neo4j Graph Database (LightRAG primary graph store)
+    NEO4J_URI: str = Field(
+        default="bolt://localhost:7687", description="Neo4j connection URI"
+    )
+    NEO4J_USERNAME: str = Field(
+        default="neo4j", description="Neo4j database username"
+    )
+    NEO4J_PASSWORD: SecretStr = Field(
+        default=SecretStr("neo4j"), description="Neo4j database password"
+    )
+    NEO4J_DATABASE: str | None = Field(
+        default=None, description="Optional Neo4j database name (defaults to workspace)"
+    )
+    NEO4J_MAX_CONNECTION_POOL_SIZE: int = Field(
+        default=50,
+        ge=1,
+        le=200,
+        description="Maximum Neo4j driver connection pool size",
+    )
+    NEO4J_CONNECTION_TIMEOUT: float = Field(
+        default=30.0,
+        ge=0.1,
+        description="Neo4j connection timeout in seconds",
+    )
 
     # Performance
     MAX_WORKERS: int = Field(default=4, ge=1, le=32, description="Maximum worker processes")
