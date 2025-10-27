@@ -9,6 +9,7 @@
 - 🤖 **AI 임베딩**: sentence-transformers를 사용한 한국어 텍스트 임베딩
 - 📊 **스케줄링**: 5년간 전체 데이터 수집 스케줄 (API 제한 고려)
 - 🗺️ **법정동 코드 관리**: OpenSearch 기반 동적 법정동 코드 관리
+- 📦 **S3 저장**: 수집된 데이터를 S3에 CSV 형태로 자동 저장
 - ⚡ **고성능**: Python 3.11 + uv 패키지 매니저
 
 ## 🚀 빠른 시작
@@ -82,6 +83,59 @@ uv run python collect_now.py --data_type all --recent
 - **연립다세대**: 전월세, 매매 실거래가  
 - **오피스텔**: 전월세, 매매 실거래가
 
+## 📦 S3 저장 기능
+
+수집된 데이터는 OpenSearch에 저장되는 동시에 S3에 CSV 형태로 자동 저장됩니다.
+
+### S3 저장 구조
+
+```
+s3://bds-collect/
+├── data/
+│   ├── apt_rent/
+│   │   └── 41480/
+│   │       └── 2024/
+│   │           └── 12/
+│   │               └── clean_20241201.csv
+│   ├── apt_trade/
+│   │   └── 41480/
+│   │       └── 2024/
+│   │           └── 12/
+│   │               └── clean_20241201.csv
+│   ├── rh_rent/
+│   ├── rh_trade/
+│   ├── offi_rent/
+│   └── offi_trade/
+```
+
+### S3 설정
+
+1. **AWS 자격 증명 설정**:
+   - AWS CLI 설정: `aws configure`
+   - 또는 환경변수: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+
+2. **S3 버킷 생성**:
+   - 버킷이 없으면 자동으로 생성됩니다
+   - 기본 버킷명: `bds-collect`
+   - 기본 리전: `ap-northeast-2` (서울)
+
+3. **S3 저장 활성화/비활성화**:
+   - `ENABLE_S3_STORAGE=true`: S3 저장 활성화 (기본값)
+   - `ENABLE_S3_STORAGE=false`: S3 저장 비활성화
+
+### 저장되는 파일
+
+- **정제된 데이터**: `clean_{date}.csv`
+- **원본 데이터**: `raw_{date}.csv` (있는 경우)
+- **메타데이터**: S3 객체 메타데이터에 포함
+
+**파일명 예시**:
+- `clean_20241201.csv` (apt_rent)
+- `clean_20241201.csv` (apt_trade)
+- `raw_20241201.csv` (원본 데이터)
+
+**덮어쓰기 동작**: 같은 날짜에 여러 번 수집하면 기존 파일을 덮어씁니다.
+
 ## 🔧 사용법
 
 ### 법정동 코드 관리
@@ -138,7 +192,8 @@ batch/
 │   ├── services/                     # 서비스 모듈
 │   │   ├── lawd_service.py           # 법정동 코드 서비스
 │   │   ├── data_service.py           # 데이터 처리 서비스
-│   │   └── vector_service.py         # 벡터 서비스
+│   │   ├── vector_service.py         # 벡터 서비스
+│   │   └── s3_service.py             # S3 저장 서비스
 │   ├── database/                     # 데이터베이스 모듈
 │   │   └── opensearch_client.py      # OpenSearch 클라이언트
 │   ├── config/                       # 설정 모듈
@@ -191,6 +246,13 @@ SERVICE_KEY=your_actual_api_key_here
 OPENSEARCH_ENDPOINT=http://localhost:9200
 OPENSEARCH_USERNAME=admin
 OPENSEARCH_PASSWORD=admin
+
+# S3 설정 (선택사항)
+S3_BUCKET_NAME=bds-collect
+S3_REGION_NAME=ap-northeast-2
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+ENABLE_S3_STORAGE=true
 
 # 로그 설정
 LOG_DIR=logs

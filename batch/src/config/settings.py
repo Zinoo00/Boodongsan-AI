@@ -44,3 +44,12 @@ class Config:
     # 기본 수집 설정
     DEFAULT_YEARS = 1
     DEFAULT_SCHEDULE_TIME = "02:00"
+    
+    # S3 설정
+    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "bds-collect")
+    S3_REGION_NAME = os.getenv("S3_REGION_NAME", "ap-northeast-2")
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
+    
+    # S3 저장 활성화 여부
+    ENABLE_S3_STORAGE = os.getenv("ENABLE_S3_STORAGE", "true").lower() == "true"

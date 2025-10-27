@@ -16,6 +16,7 @@ from src.config.settings import Config
 from src.config.constants import DATA_TYPES
 from src.services.data_service import DataService
 from src.services.vector_service import VectorService
+from src.services.s3_service import S3Service
 from src.utils.helpers import get_lawd_codes, get_recent_months
 from src.utils.logger import setup_logger
 from collectors.apartment_collector import ApartmentDataCollector
@@ -44,6 +45,23 @@ def main():
         # 서비스 초기화
         data_service = DataService()
         vector_service = VectorService()
+        
+        # S3 서비스 초기화 (설정에 따라)
+        config = Config()
+        s3_service = None
+        if config.ENABLE_S3_STORAGE:
+            s3_service = S3Service(
+                bucket_name=config.S3_BUCKET_NAME,
+                region_name=config.S3_REGION_NAME
+            )
+            # S3 버킷 존재 확인 및 생성
+            if not s3_service.check_bucket_exists():
+                logger.info("S3 버킷이 존재하지 않습니다. 버킷을 생성합니다...")
+                if s3_service.create_bucket_if_not_exists():
+                    logger.info("S3 버킷 생성 완료")
+                else:
+                    logger.warning("S3 버킷 생성 실패. S3 저장을 건너뜁니다.")
+                    s3_service = None
         
         # 수집기 초기화
         collectors = {
@@ -125,6 +143,19 @@ def main():
             
             if success:
                 logger.info("벡터 데이터베이스 저장 완료")
+                
+                # S3에 CSV 형태로 저장
+                if s3_service:
+                    logger.info("S3에 CSV 형태로 저장 중...")
+                    s3_keys = s3_service.save_collection_results_to_s3(processed_results, args.regions, deal_ymds[0])
+                    if s3_keys:
+                        logger.info(f"S3 저장 완료: {len(s3_keys)}개 파일")
+                        for key_type, s3_key in s3_keys.items():
+                            logger.info(f"  - {key_type}: s3://{config.S3_BUCKET_NAME}/{s3_key}")
+                    else:
+                        logger.warning("S3 저장 실패")
+                else:
+                    logger.info("S3 저장이 비활성화되어 있습니다.")
             else:
                 logger.error("벡터 데이터베이스 저장 실패")
         

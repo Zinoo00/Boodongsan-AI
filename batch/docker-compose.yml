@@ -49,6 +49,11 @@ services:
       - OPENSEARCH_VERIFY_CERTS=false
       - OPENSEARCH_SSL_ASSERT_HOSTNAME=false
       - OPENSEARCH_SSL_SHOW_WARN=false
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME:-bds-collect}
+      - S3_REGION_NAME=${S3_REGION_NAME:-ap-northeast-2}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - ENABLE_S3_STORAGE=${ENABLE_S3_STORAGE:-true}
     restart: unless-stopped
     command: >
       python main.py 
@@ -79,6 +84,11 @@ services:
       - OPENSEARCH_VERIFY_CERTS=false
       - OPENSEARCH_SSL_ASSERT_HOSTNAME=false
       - OPENSEARCH_SSL_SHOW_WARN=false
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME:-bds-collect}
+      - S3_REGION_NAME=${S3_REGION_NAME:-ap-northeast-2}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - ENABLE_S3_STORAGE=${ENABLE_S3_STORAGE:-true}
     profiles:
       - immediate
     command: >

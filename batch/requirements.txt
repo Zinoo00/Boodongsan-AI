@@ -13,3 +13,6 @@ numpy
 # 스케줄러
 APScheduler
 
+# AWS S3
+boto3
+

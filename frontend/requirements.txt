@@ -1,0 +1,9 @@
+streamlit
+boto3
+pandas
+plotly
+streamlit-chat
+python-dotenv
+langchain
+langchain-community
+langchain-aws

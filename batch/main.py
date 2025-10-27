@@ -11,6 +11,7 @@ import argparse
 import subprocess
 import sys
 from src.services.lawd_service import LawdService
+from src.utils.logger import get_logger
 
 # 로깅 설정
 logging.basicConfig(
@@ -73,13 +74,32 @@ def collect_data(data_type: str, lawd_cd: str, deal_ym: str) -> bool:
         # 필요한 모듈 import
         from src.services.data_service import DataService
         from src.services.vector_service import VectorService
-        from collectors.apartment_collector import ApartmentDataCollector
-        from collectors.rh_collector import RHDataCollector
-        from collectors.offi_collector import OffiDataCollector
+        from src.services.s3_service import S3Service
+        from src.config.settings import Config
+        from src.collectors.apartment_collector import ApartmentDataCollector
+        from src.collectors.rh_collector import RHDataCollector
+        from src.collectors.offi_collector import OffiDataCollector
         
         # 서비스 초기화
         data_service = DataService()
         vector_service = VectorService()
+        
+        # S3 서비스 초기화 (설정에 따라)
+        config = Config()
+        s3_service = None
+        if config.ENABLE_S3_STORAGE:
+            s3_service = S3Service(
+                bucket_name=config.S3_BUCKET_NAME,
+                region_name=config.S3_REGION_NAME
+            )
+            # S3 버킷 존재 확인 및 생성
+            if not s3_service.check_bucket_exists():
+                logger.info("S3 버킷이 존재하지 않습니다. 버킷을 생성합니다...")
+                if s3_service.create_bucket_if_not_exists():
+                    logger.info("S3 버킷 생성 완료")
+                else:
+                    logger.warning("S3 버킷 생성 실패. S3 저장을 건너뜁니다.")
+                    s3_service = None
         
         # 수집기 초기화
         collectors = {
@@ -129,6 +149,20 @@ def collect_data(data_type: str, lawd_cd: str, deal_ym: str) -> bool:
                 
                 if success:
                     logger.info("벡터 데이터베이스 저장 완료")
+                    
+                    # S3에 CSV 형태로 저장
+                    if s3_service:
+                        logger.info("S3에 CSV 형태로 저장 중...")
+                        s3_keys = s3_service.save_collection_results_to_s3(processed_results, [lawd_cd], deal_ym)
+                        if s3_keys:
+                            logger.info(f"S3 저장 완료: {len(s3_keys)}개 파일")
+                            for key_type, s3_key in s3_keys.items():
+                                logger.info(f"  - {key_type}: s3://{config.S3_BUCKET_NAME}/{s3_key}")
+                        else:
+                            logger.warning("S3 저장 실패")
+                    else:
+                        logger.info("S3 저장이 비활성화되어 있습니다.")
+                    
                     return True
                 else:
                     logger.error("벡터 데이터베이스 저장 실패")
@@ -189,6 +223,7 @@ def schedule_collect_data(weekday: int = None):
     """스케줄된 데이터 수집 실행"""
     try:
         from datetime import datetime
+        from src.config.settings import Config
         
         # 요일 확인
         if weekday is None:
@@ -199,6 +234,13 @@ def schedule_collect_data(weekday: int = None):
         print("=" * 60)
         print(f"스케줄된 데이터 수집 ({weekday_names[weekday]})")
         print("=" * 60)
+        
+        # S3 설정 확인
+        config = Config()
+        if config.ENABLE_S3_STORAGE:
+            print(f"📦 S3 저장 활성화 - 버킷: {config.S3_BUCKET_NAME}, 리전: {config.S3_REGION_NAME}")
+        else:
+            print("📦 S3 저장 비활성화")
         
         # 요일별 법정동 코드 조회
         lawd_codes = get_lawd_codes_for_weekday(weekday)

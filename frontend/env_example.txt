@@ -1,0 +1,18 @@
+# AWS 설정
+AWS_REGION=ap-northeast-2
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+
+# AWS Bedrock 설정
+KNOWLEDGE_BASE_ID=your_knowledge_base_id
+BEDROCK_MODEL_ID=anthropic.claude-haiku-4-5-20251001-v1:0
+# Inference Profile 사용 (모델 ID 대신)
+BEDROCK_INFERENCE_PROFILE_ID=your_inference_profile_id_or_arn
+
+# S3 설정 (데이터 소스)
+S3_BUCKET_NAME=bds-collect
+S3_REGION_NAME=ap-northeast-2
+
+# Streamlit 설정
+STREAMLIT_SERVER_PORT=8501
+STREAMLIT_SERVER_ADDRESS=127.0.0.0
