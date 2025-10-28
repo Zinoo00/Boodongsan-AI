@@ -9,8 +9,9 @@
 - 🤖 **AI 임베딩**: sentence-transformers를 사용한 한국어 텍스트 임베딩
 - 📊 **스케줄링**: 5년간 전체 데이터 수집 스케줄 (API 제한 고려)
 - 🗺️ **법정동 코드 관리**: OpenSearch 기반 동적 법정동 코드 관리
-- 📦 **S3 저장**: 수집된 데이터를 S3에 CSV 형태로 자동 저장
+- 📦 **S3 저장**: 수집된 clean 데이터를 S3에 CSV 형태로 자동 저장 (raw 데이터 제외)
 - ⚡ **고성능**: Python 3.11 + uv 패키지 매니저
+- 🧹 **최적화된 코드**: 사용하지 않는 메서드 제거 및 필수 파라미터 검증
 
 ## 🚀 빠른 시작
 
@@ -71,10 +72,10 @@ cp env_example.txt .env
 # .env 파일에서 SERVICE_KEY 설정 (OpenSearch는 기본값 사용)
 
 # 스케줄러 실행 (uv가 자동으로 가상환경 사용)
-uv run python main.py --schedule --schedule_time 02:00 --data_type all --regions 41480 11680 41135
+uv run python src/collect_data_scheduled.py --schedule --schedule_time 02:00 --data_type all --regions 41480 11680 41135
 
 # 즉시 수집
-uv run python collect_now.py --data_type all --recent
+uv run python src/collect_data_now.py --data_type all --recent
 ```
 
 ## 📊 수집 데이터
@@ -85,7 +86,7 @@ uv run python collect_now.py --data_type all --recent
 
 ## 📦 S3 저장 기능
 
-수집된 데이터는 OpenSearch에 저장되는 동시에 S3에 CSV 형태로 자동 저장됩니다.
+수집된 데이터는 OpenSearch에 저장되는 동시에 S3에 CSV 형태로 자동 저장됩니다. **clean 데이터만 저장**되며, raw 데이터는 저장하지 않습니다.
 
 ### S3 저장 구조
 
@@ -103,9 +104,25 @@ s3://bds-collect/
 │   │           └── 12/
 │   │               └── clean_20241201.csv
 │   ├── rh_rent/
+│   │   └── 41480/
+│   │       └── 2024/
+│   │           └── 12/
+│   │               └── clean_20241201.csv
 │   ├── rh_trade/
+│   │   └── 41480/
+│   │       └── 2024/
+│   │           └── 12/
+│   │               └── clean_20241201.csv
 │   ├── offi_rent/
+│   │   └── 41480/
+│   │       └── 2024/
+│   │           └── 12/
+│   │               └── clean_20241201.csv
 │   └── offi_trade/
+│       └── 41480/
+│           └── 2024/
+│               └── 12/
+│                   └── clean_20241201.csv
 ```
 
 ### S3 설정
@@ -125,14 +142,16 @@ s3://bds-collect/
 
 ### 저장되는 파일
 
-- **정제된 데이터**: `clean_{date}.csv`
-- **원본 데이터**: `raw_{date}.csv` (있는 경우)
+- **정제된 데이터만**: `clean_{date}.csv` (raw 데이터는 저장하지 않음)
 - **메타데이터**: S3 객체 메타데이터에 포함
 
 **파일명 예시**:
 - `clean_20241201.csv` (apt_rent)
 - `clean_20241201.csv` (apt_trade)
-- `raw_20241201.csv` (원본 데이터)
+- `clean_20241201.csv` (rh_rent)
+- `clean_20241201.csv` (rh_trade)
+- `clean_20241201.csv` (offi_rent)
+- `clean_20241201.csv` (offi_trade)
 
 **덮어쓰기 동작**: 같은 날짜에 여러 번 수집하면 기존 파일을 덮어씁니다.
 
@@ -194,19 +213,22 @@ batch/
 │   │   ├── data_service.py           # 데이터 처리 서비스
 │   │   ├── vector_service.py         # 벡터 서비스
 │   │   └── s3_service.py             # S3 저장 서비스
+│   ├── collectors/                   # 데이터 수집기 모듈
+│   │   ├── apartment_collector.py    # 아파트 수집기
+│   │   ├── rh_collector.py          # 연립다세대 수집기
+│   │   ├── offi_collector.py        # 오피스텔 수집기
+│   │   └── base_collector.py        # 기본 수집기
 │   ├── database/                     # 데이터베이스 모듈
 │   │   └── opensearch_client.py      # OpenSearch 클라이언트
 │   ├── config/                       # 설정 모듈
 │   │   ├── constants.py              # 상수 정의
 │   │   └── settings.py               # 설정 파일
-│   └── utils/                        # 유틸리티 모듈
-│       ├── logger.py                 # 로깅 설정
-│       └── helpers.py                # 헬퍼 함수
-├── collectors/                       # 데이터 수집기 모듈
-│   ├── apartment_collector.py        # 아파트 수집기
-│   ├── rh_collector.py              # 연립다세대 수집기
-│   ├── offi_collector.py            # 오피스텔 수집기
-│   └── base_collector.py            # 기본 수집기
+│   ├── utils/                        # 유틸리티 모듈
+│   │   ├── logger.py                 # 로깅 설정
+│   │   └── helpers.py                # 헬퍼 함수
+│   ├── collect_data_now.py           # 즉시 데이터 수집 스크립트
+│   ├── collect_data_scheduled.py     # 스케줄된 데이터 수집 스크립트
+│   └── load_lawd_codes.py           # 법정동 코드 로드 스크립트
 ├── tests/                           # 테스트 파일
 │   ├── test_lawd_service.py         # 법정동 서비스 테스트
 │   └── test_data_service.py         # 데이터 서비스 테스트
@@ -357,6 +379,8 @@ curl http://localhost:9200/_cluster/health
 4. **로그 관리**: `logs/collect.log`, `logs/scheduler.log` 파일 주기적 확인
 5. **가상환경**: 모든 Python 명령어는 `.venv` 가상환경에서 실행
 6. **메모리 사용량**: OpenSearch 컨테이너는 최소 2GB RAM 권장
+7. **필수 파라미터**: 모든 데이터 수집 메서드는 `lawd_cd`와 `deal_ymd` 파라미터가 필수입니다
+8. **S3 저장**: clean 데이터만 저장되며, raw 데이터는 메모리에서만 처리됩니다
 
 ## 🐛 문제 해결
 

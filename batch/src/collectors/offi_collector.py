@@ -142,57 +142,8 @@ class OffiDataCollector(BaseDataCollector):
         except Exception as e:
             raise Exception(f"XML 응답 처리 오류: {e}")
 
-    def _parse_line(self, line: str, api_type: str = "offi_rent") -> Optional[Dict]:
-        """
-        단일 라인을 파싱하여 구조화된 데이터로 변환
 
-        Args:
-            line: 파싱할 라인
-            api_type: API 타입 ("offi_rent", "offi_trade")
-
-        Returns:
-            파싱된 데이터 딕셔너리
-        """
-        try:
-            office_info = line.split('2001')[0] if '2001' in line else line.split('2007')[0] if '2007' in line else line.split('2014')[0] if '2014' in line else line.split('2022')[0] if '2022' in line else line.split('2021')[0] if '2021' in line else line.split('2020')[0] if '2020' in line else line.split('2010')[0] if '2010' in line else line.split('2005')[0] if '2005' in line else line
-
-            import re
-            price_match = re.search(r'(\d{1,3}(?:,\d{3})*)', line)
-            price = price_match.group(1) if price_match else None
-
-            area_match = re.search(r'(\d+\.\d+)', line)
-            area = area_match.group(1) if area_match else None
-
-            floor_match = re.search(r'(\d+)층', line)
-            floor = floor_match.group(1) if floor_match else None
-
-            lawd_match = re.search(r'(\d{5})', line)
-            lawd_code = lawd_match.group(1) if lawd_match else None
-
-            dong_match = re.search(r'(\d{5})([가-힣]+동)', line)
-            dong = dong_match.group(2) if dong_match else None
-
-            base_data = {
-                'office_name': office_info.strip(),
-                'area': area,
-                'floor': floor,
-                'lawd_code': lawd_code,
-                'dong': dong,
-                'raw_data': line
-            }
-
-            if api_type == "offi_rent":
-                base_data['price'] = price
-            else:  # offi_trade
-                base_data['deal_amount'] = price
-
-            return base_data
-
-        except Exception as e:
-            print(f"라인 파싱 중 오류: {e}")
-            return None
-
-    def collect_offi_rent_data(self, lawd_cd: str = None, deal_ymd: str = None) -> dict:
+    def collect_offi_rent_data(self, lawd_cd: str, deal_ymd: str) -> dict:
         """
         오피스텔 전월세 데이터 수집 및 DataFrame 반환
 
@@ -229,7 +180,7 @@ class OffiDataCollector(BaseDataCollector):
                 'response_text': response_text
             }
 
-    def collect_offi_trade_data(self, lawd_cd: str = None, deal_ymd: str = None) -> dict:
+    def collect_offi_trade_data(self, lawd_cd: str, deal_ymd: str) -> dict:
         """
         오피스텔 매매 데이터 수집 및 DataFrame 반환
 
@@ -266,36 +217,4 @@ class OffiDataCollector(BaseDataCollector):
                 'response_text': response_text
             }
 
-    def collect_data(self, data_type: str = "offi_rent", lawd_cd: str = None, deal_ymd: str = None) -> dict:
-        """
-        데이터 수집 (기존 호환성을 위한 래퍼 메서드)
 
-        Args:
-            data_type: 데이터 타입 ("offi_rent", "offi_trade")
-            lawd_cd: 법정동 코드
-            deal_ymd: 거래 년월
-
-        Returns:
-            정제된 데이터와 raw 데이터를 포함한 딕셔너리
-        """
-        if data_type == "offi_rent":
-            return self.collect_offi_rent_data(lawd_cd, deal_ymd)
-        elif data_type == "offi_trade":
-            return self.collect_offi_trade_data(lawd_cd, deal_ymd)
-        else:
-            raise ValueError("data_type은 'offi_rent' 또는 'offi_trade'여야 합니다.")
-
-    def display_summary(self, data_dict: dict, data_type: str = "offi_rent"):
-        """
-        수집된 데이터의 요약 정보 출력
-
-        Args:
-            data_dict: collect_data에서 반환된 데이터 딕셔너리
-            data_type: 데이터 타입 ("offi_rent", "offi_trade")
-        """
-        data_type_names = {
-            "offi_rent": "오피스텔 전월세",
-            "offi_trade": "오피스텔 매매"
-        }
-        data_type_name = data_type_names.get(data_type, data_type)
-        super().display_summary(data_dict, data_type, data_type_name)

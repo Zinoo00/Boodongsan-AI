@@ -17,9 +17,9 @@ from src.services.data_service import DataService
 from src.services.vector_service import VectorService
 from src.utils.helpers import get_lawd_codes, get_recent_months
 from src.utils.logger import setup_logger
-from collectors.apartment_collector import ApartmentDataCollector
-from collectors.rh_collector import RHDataCollector
-from collectors.offi_collector import OffiDataCollector
+from src.collectors.apartment_collector import ApartmentDataCollector
+from src.collectors.rh_collector import RHDataCollector
+from src.collectors.offi_collector import OffiDataCollector
 
 def main():
     """스케줄된 데이터 수집기 메인 함수"""

@@ -15,14 +15,17 @@ AWS Knowledge Base와 연결된 Streamlit 기반의 대화형 부동산 데이�
 ### 1. 가상 환경 설정
 
 ```bash
+# 가상 환경 삭제
+rm -rf .venv
+
 # 가상 환경 생성
-python -m venv venv
+python -m venv .venv
 
 # 가상 환경 활성화 (macOS/Linux)
-source venv/bin/activate
+source .venv/bin/activate
 
 # 가상 환경 활성화 (Windows)
-# venv\Scripts\activate
+# .venv\Scripts\activate
 
 # 의존성 설치
 pip install -r requirements.txt
@@ -98,9 +101,28 @@ frontend/
 ├── requirements.txt          # Python 의존성
 ├── env_example.txt          # 환경변수 예시
 ├── README.md                # 이 파일
-└── utils/                   # 유틸리티 모듈
-    ├── aws_knowledge_base.py # AWS Knowledge Base 연결
-    └── data_loader.py        # S3 데이터 로더
+└── src/                     # 소스 코드
+    ├── __init__.py
+    ├── main.py              # 메인 앱 로직
+    ├── config/              # 설정 관리
+    │   ├── __init__.py
+    │   └── settings.py      # 환경변수, 설정
+    ├── models/              # 데이터 모델
+    │   ├── __init__.py
+    │   └── assistant.py     # RealEstateAssistant 클래스
+    ├── charts/              # 시각화
+    │   ├── __init__.py
+    │   └── visualization.py # 차트 생성 함수들
+    ├── ui/                  # UI 컴포넌트
+    │   ├── __init__.py
+    │   ├── sidebar.py       # 사이드바 UI
+    │   ├── chat.py          # 채팅 UI
+    │   ├── data_analysis.py # 데이터 분석 UI
+    │   └── data_search.py   # 데이터 검색 UI
+    └── utils/               # 유틸리티 모듈
+        ├── __init__.py
+        ├── aws_knowledge_base.py # AWS Knowledge Base 연결
+        └── data_loader.py        # S3 데이터 로더
 ```
 
 ## 🔧 사용법
@@ -204,14 +226,14 @@ streamlit run app.py --server.address 127.0.0.1
 
 ```bash
 # 가상 환경이 활성화되지 않은 경우
-source venv/bin/activate  # macOS/Linux
+source .venv/bin/activate  # macOS/Linux
 # 또는
-venv\Scripts\activate     # Windows
+.venv\Scripts\activate     # Windows
 
 # 가상 환경 재생성
-rm -rf venv
-python -m venv venv
-source venv/bin/activate
+rm -rf .venv
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -244,6 +266,7 @@ sudo python run.py --port 80
 1. S3 버킷 이름 확인
 2. S3 접근 권한 확인
 3. 데이터 파일 경로 확인
+
 
 ## 📝 라이선스
 

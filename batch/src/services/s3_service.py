@@ -56,71 +56,9 @@ class S3Service:
             logger.error(f"S3 클라이언트 초기화 실패: {e}")
             self.s3_client = None
     
-    def save_dataframe_to_s3(self, df: pd.DataFrame, data_type: str, lawd_cd: str, deal_ym: str, 
-                            data_category: str = "clean") -> Optional[str]:
-        """
-        DataFrame을 CSV 형태로 S3에 저장
-        
-        Args:
-            df: 저장할 DataFrame
-            data_type: 데이터 타입 (apartment, offi, rh)
-            lawd_cd: 법정동 코드
-            deal_ym: 거래년월 (YYYYMM)
-            data_category: 데이터 카테고리 (clean, raw)
-            
-        Returns:
-            저장된 S3 객체 키 또는 None
-        """
-        if self.s3_client is None:
-            logger.error("S3 클라이언트가 초기화되지 않았습니다.")
-            return None
-        
-        if df is None or len(df) == 0:
-            logger.warning("저장할 데이터가 없습니다.")
-            return None
-        
-        try:
-            # S3 객체 키 생성: data/{data_type}/{lawd_cd}/{year}/{month}/{data_category}_{date}.csv
-            year = deal_ym[:4]
-            month = deal_ym[4:6]
-            date = datetime.now().strftime("%Y%m%d")
-            
-            s3_key = f"data/{data_type}/{lawd_cd}/{year}/{month}/{data_category}_{date}.csv"
-            
-            # DataFrame을 CSV 형태로 메모리에 저장
-            csv_buffer = io.StringIO()
-            df.to_csv(csv_buffer, index=False, encoding='utf-8-sig')
-            csv_content = csv_buffer.getvalue()
-            
-            # S3에 업로드
-            self.s3_client.put_object(
-                Bucket=self.bucket_name,
-                Key=s3_key,
-                Body=csv_content.encode('utf-8'),
-                ContentType='text/csv; charset=utf-8',
-                Metadata={
-                    'data_type': data_type,
-                    'lawd_cd': lawd_cd,
-                    'deal_ym': deal_ym,
-                    'data_category': data_category,
-                    'record_count': str(len(df)),
-                    'upload_time': datetime.now().isoformat()
-                }
-            )
-            
-            logger.info(f"S3 저장 완료: s3://{self.bucket_name}/{s3_key} ({len(df)}개 레코드)")
-            return s3_key
-            
-        except ClientError as e:
-            logger.error(f"S3 업로드 실패: {e}")
-            return None
-        except Exception as e:
-            logger.error(f"S3 저장 중 오류: {e}")
-            return None
-    
     def save_collection_results_to_s3(self, results: Dict[str, Any], lawd_codes: list, deal_ym: str) -> Dict[str, str]:
         """
-        수집 결과를 S3에 저장
+        수집 결과를 S3에 저장 (clean 데이터만 저장)
         
         Args:
             results: 수집 결과 딕셔너리
@@ -128,12 +66,16 @@ class S3Service:
             deal_ym: 거래년월
             
         Returns:
-            저장된 S3 객체 키들의 딕셔너리
+            저장된 S3 객체 키들의 딕셔너리 (clean 데이터만)
         """
         saved_keys = {}
         
         if not results:
             logger.warning("저장할 결과가 없습니다.")
+            return saved_keys
+        
+        if self.s3_client is None:
+            logger.error("S3 클라이언트가 초기화되지 않았습니다.")
             return saved_keys
         
         for data_type, data_dict in results.items():
@@ -144,22 +86,42 @@ class S3Service:
             if len(df) == 0:
                 continue
             
-            # 정제된 데이터 저장
-            clean_key = self.save_dataframe_to_s3(
-                df, data_type, lawd_codes[0], deal_ym, "clean"
-            )
-            if clean_key:
-                saved_keys[f"{data_type}_clean"] = clean_key
-            
-            # 원본 데이터가 있으면 저장
-            if 'raw_data' in data_dict and data_dict['raw_data'] is not None:
-                raw_df = data_dict['raw_data']
-                if len(raw_df) > 0:
-                    raw_key = self.save_dataframe_to_s3(
-                        raw_df, data_type, lawd_codes[0], deal_ym, "raw"
-                    )
-                    if raw_key:
-                        saved_keys[f"{data_type}_raw"] = raw_key
+            try:
+                # S3 객체 키 생성: data/{data_type}/{lawd_cd}/{year}/{month}/clean_{date}.csv
+                year = deal_ym[:4]
+                month = deal_ym[4:6]
+                date = datetime.now().strftime("%Y%m%d")
+                
+                s3_key = f"data/{data_type}/{lawd_codes[0]}/{year}/{month}/clean_{date}.csv"
+                
+                # DataFrame을 CSV 형태로 메모리에 저장
+                csv_buffer = io.StringIO()
+                df.to_csv(csv_buffer, index=False, encoding='utf-8-sig')
+                csv_content = csv_buffer.getvalue()
+                
+                # S3에 업로드
+                self.s3_client.put_object(
+                    Bucket=self.bucket_name,
+                    Key=s3_key,
+                    Body=csv_content.encode('utf-8'),
+                    ContentType='text/csv; charset=utf-8',
+                    Metadata={
+                        'data_type': data_type,
+                        'lawd_cd': lawd_codes[0],
+                        'deal_ym': deal_ym,
+                        'data_category': 'clean',
+                        'record_count': str(len(df)),
+                        'upload_time': datetime.now().isoformat()
+                    }
+                )
+                
+                logger.info(f"S3 저장 완료: s3://{self.bucket_name}/{s3_key} ({len(df)}개 레코드)")
+                saved_keys[f"{data_type}_clean"] = s3_key
+                
+            except ClientError as e:
+                logger.error(f"S3 업로드 실패 ({data_type}): {e}")
+            except Exception as e:
+                logger.error(f"S3 저장 중 오류 ({data_type}): {e}")
         
         return saved_keys
     

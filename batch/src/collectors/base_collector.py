@@ -30,7 +30,7 @@ class BaseDataCollector:
         self.config = Config()
         self.session = requests.Session()
 
-    def make_api_request(self, api_type: str, base_url: str, api_name: str, lawd_cd: str = None, deal_ymd: str = None) -> str:
+    def make_api_request(self, api_type: str, base_url: str, api_name: str, lawd_cd: str, deal_ymd: str) -> str:
         """
         공공데이터포털 API 호출
 
@@ -38,14 +38,16 @@ class BaseDataCollector:
             api_type: API 타입
             base_url: API 기본 URL
             api_name: API 이름
-            lawd_cd: 법정동 코드 (기본값: 41480 - 파주시)
-            deal_ymd: 거래 년월 (기본값: 202412)
+            lawd_cd: 법정동 코드 (필수)
+            deal_ymd: 거래 년월 (필수)
 
         Returns:
             API 응답 데이터
         """
-        lawd_cd = lawd_cd or '41480'  # 기본값
-        deal_ymd = deal_ymd or '202412'  # 기본값
+        if not lawd_cd:
+            raise ValueError("lawd_cd는 필수 파라미터입니다.")
+        if not deal_ymd:
+            raise ValueError("deal_ymd는 필수 파라미터입니다.")
 
         params = {
             'LAWD_CD': lawd_cd,
@@ -115,15 +117,8 @@ class BaseDataCollector:
 
         data_list = []
 
-        for line in lines[1:]:
-            if line.strip():
-                try:
-                    parsed_data = self._parse_line(line, api_type)
-                    if parsed_data:
-                        data_list.append(parsed_data)
-                except Exception as e:
-                    print(f"라인 파싱 실패: {line[:100]}... - {e}")
-                    continue
+        # 텍스트 파싱은 현재 사용하지 않음 (XML 파싱 사용)
+        pass
 
         print(f"총 {len(data_list)}개의 데이터 항목을 파싱했습니다.")
         return data_list
@@ -137,124 +132,9 @@ class BaseDataCollector:
         tag = element.find(tag_name)
         return tag.text.strip() if tag is not None and tag.text else ""
 
-    def _parse_line(self, line: str, api_type: str) -> Optional[Dict]:
-        """단일 라인을 파싱하여 구조화된 데이터로 변환 - 하위 클래스에서 구현"""
-        raise NotImplementedError("하위 클래스에서 구현해야 합니다.")
 
-    def collect_data(self, data_type: str, lawd_cd: str = None, deal_ymd: str = None) -> dict:
+    def collect_data(self, data_type: str, lawd_cd: str, deal_ymd: str) -> dict:
         """데이터 수집 - 하위 클래스에서 구현"""
         raise NotImplementedError("하위 클래스에서 구현해야 합니다.")
 
-    def save_data(self, data_dict: dict, base_filename: str = None, data_type: str = None, deal_ymd: str = None, lawd_cd: str = None) -> dict:
-        """
-        정제된 데이터와 raw 데이터를 분리해서 저장
-        새로운 폴더 구조: data/{lawd_cd}/{category}/{year}/{month}/
 
-        Args:
-            data_dict: collect_data에서 반환된 데이터 딕셔너리
-            base_filename: 기본 파일명 (확장자 제외)
-            data_type: 데이터 타입
-            deal_ymd: 거래 년월 (YYYYMM 형식)
-            lawd_cd: 법정동 코드
-
-        Returns:
-            저장된 파일 경로들을 포함한 딕셔너리
-        """
-        if base_filename is None:
-            base_filename = f"{data_type}_data"
-
-        # 법정동 코드 설정
-        lawd_cd = lawd_cd or '41480'  # 기본값
-
-        # 데이터 타입에 따른 카테고리 폴더 결정
-        category_map = {
-            'apt_rent': 'apartment',
-            'apt_trade': 'apartment',
-            'rh_rent': 'rh',
-            'rh_trade': 'rh',
-            'offi_rent': 'officetel',
-            'offi_trade': 'officetel'
-        }
-
-        category = category_map.get(data_type, 'unknown')
-
-        # 년도와 월 추출
-        if deal_ymd and len(deal_ymd) == 6:
-            year = deal_ymd[:4]
-            month = deal_ymd[4:6]
-        else:
-            # 기본값 설정
-            from datetime import datetime
-            now = datetime.now()
-            year = str(now.year)
-            month = f"{now.month:02d}"
-
-        # 폴더 경로 생성: data/{lawd_cd}/{category}/{year}/{month}/
-        folder_path = os.path.join(self.config.DATA_DIR, lawd_cd, category, year, month)
-        os.makedirs(folder_path, exist_ok=True)
-
-        saved_files = {}
-
-        if 'clean_data' in data_dict and data_dict['clean_data'] is not None:
-            clean_filename = f"{base_filename}_clean.csv"
-            clean_file_path = os.path.join(folder_path, clean_filename)
-            data_dict['clean_data'].to_csv(clean_file_path, index=False, encoding='utf-8-sig')
-            saved_files['clean_data'] = clean_file_path
-            print(f"정제된 데이터 저장: {clean_file_path}")
-
-        if 'raw_data' in data_dict and data_dict['raw_data'] is not None:
-            raw_filename = f"{base_filename}_raw.csv"
-            raw_file_path = os.path.join(folder_path, raw_filename)
-            data_dict['raw_data'].to_csv(raw_file_path, index=False, encoding='utf-8-sig')
-            saved_files['raw_data'] = raw_file_path
-            print(f"Raw 데이터 저장: {raw_file_path}")
-
-        if 'response_text' in data_dict and data_dict['response_text'].strip().startswith('<?xml'):
-            xml_filename = f"{base_filename}_response.xml"
-            xml_file_path = os.path.join(folder_path, xml_filename)
-            with open(xml_file_path, 'w', encoding='utf-8') as f:
-                f.write(data_dict['response_text'])
-            saved_files['response_xml'] = xml_file_path
-            print(f"응답 XML 저장: {xml_file_path}")
-
-        return saved_files
-
-    def display_summary(self, data_dict: dict, data_type: str, data_type_name: str):
-        """
-        수집된 데이터의 요약 정보 출력
-
-        Args:
-            data_dict: collect_data에서 반환된 데이터 딕셔너리
-            data_type: 데이터 타입
-            data_type_name: 데이터 타입 이름
-        """
-        print(f"\n=== {data_type_name} 데이터 요약 ===")
-
-        if 'clean_data' in data_dict and data_dict['clean_data'] is not None:
-            clean_df = data_dict['clean_data']
-            print(f"정제된 데이터: {len(clean_df)}개 항목, {len(clean_df.columns)}개 컬럼")
-            print(f"컬럼명: {list(clean_df.columns)}")
-
-            if not clean_df.empty:
-                print(f"\n=== {data_type_name} 정제된 데이터 샘플 ===")
-                print(clean_df.head())
-
-                print(f"\n=== {data_type_name} 정제된 데이터 기본 통계 ===")
-                print(clean_df.describe())
-
-        if 'raw_data' in data_dict and data_dict['raw_data'] is not None:
-            raw_df = data_dict['raw_data']
-            print(f"\nRaw 데이터: {len(raw_df)}개 항목, {len(raw_df.columns)}개 컬럼")
-            print(f"Raw 데이터 컬럼명: {list(raw_df.columns)}")
-
-            if not raw_df.empty:
-                print(f"\n=== {data_type_name} Raw 데이터 샘플 ===")
-                print(raw_df.head())
-
-        if 'response_text' in data_dict:
-            response_text = data_dict['response_text']
-            print(f"\n응답 텍스트 길이: {len(response_text)}자")
-            if response_text.strip().startswith('<?xml'):
-                print("응답 형식: XML")
-            else:
-                print("응답 형식: 텍스트")
