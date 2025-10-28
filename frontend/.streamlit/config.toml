@@ -1,0 +1,49 @@
+# Streamlit Configuration for BODA Chatbot
+# https://docs.streamlit.io/library/advanced-features/configuration
+
+[theme]
+# Primary theme color (red for BODA branding)
+primaryColor = "#FF4B4B"
+
+# Background color
+backgroundColor = "#FFFFFF"
+
+# Secondary background color (for sidebar, etc.)
+secondaryBackgroundColor = "#F0F2F6"
+
+# Text color
+textColor = "#262730"
+
+# Font family
+font = "sans serif"
+
+[server]
+# Server port (default: 8501)
+port = 8501
+
+# Enable CORS for API access
+enableCORS = true
+
+# Enable XSRF protection
+enableXsrfProtection = true
+
+# Max upload size (MB)
+maxUploadSize = 10
+
+[browser]
+# Gather usage stats (set to false for privacy)
+gatherUsageStats = false
+
+[runner]
+# Fast rerun on file changes
+fastReruns = true
+
+# Magic enabled (auto-display variables)
+magicEnabled = false
+
+[client]
+# Show error details
+showErrorDetails = true
+
+# Toolbar mode
+toolbarMode = "minimal"

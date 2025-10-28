@@ -1,6 +1,6 @@
 """
-Database connection and management for Korean Real Estate RAG AI Chatbot
-Supabase Client and Redis integration
+데이터베이스 연결 관리 - AWS OpenSearch, Neo4j, Redis
+Korean Real Estate RAG AI Chatbot
 """
 
 import asyncio
@@ -11,8 +11,7 @@ from collections.abc import Callable
 from typing import Any, TypeVar
 
 import redis.asyncio as aioredis
-from supabase import create_client, Client
-from supabase.client import ClientOptions
+from neo4j import AsyncGraphDatabase, AsyncDriver
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from .config import settings
@@ -20,23 +19,21 @@ from .exceptions import CacheError, DatabaseError
 
 logger = logging.getLogger(__name__)
 
-# Type variable for generic functions
 T = TypeVar("T")
 
-# Connection retry configuration
+# 재시도 설정
 DB_RETRY_ATTEMPTS = 3
 DB_RETRY_WAIT_MIN = 1
 DB_RETRY_WAIT_MAX = 10
-
-# Cache retry configuration
 CACHE_RETRY_ATTEMPTS = 2
 CACHE_RETRY_WAIT = 0.5
 
 
 class DatabaseManager:
-    """Enhanced Supabase database connection manager with retry logic and monitoring"""
+    """Neo4j + Redis 연결 관리자 (OpenSearch는 별도 서비스에서 관리)"""
+
     def __init__(self):
-        self.supabase_client: Client | None = None
+        self.neo4j_driver: AsyncDriver | None = None
         self.redis_client = None
         self._initialized = False
         self._connection_stats = {
@@ -47,35 +44,33 @@ class DatabaseManager:
         }
 
     async def initialize(self):
-        """Initialize Supabase and Redis connections with retry logic"""
+        """Neo4j와 Redis 연결 초기화"""
         if self._initialized:
             return
 
         self._connection_stats["last_connection_attempt"] = time.time()
 
         try:
-            logger.info("Starting database initialization...")
-            
-            # Initialize Supabase client
-            supabase_url = str(settings.SUPABASE_URL)
-            supabase_key = settings.get_secret_value("SUPABASE_SERVICE_ROLE_KEY")
-            logger.info(f"Creating Supabase client for URL: {supabase_url}")
-            
-            # Configure client options for production use
-            client_options = ClientOptions(
-                auto_refresh_token=True,
-                persist_session=True,
-            )
-            
-            self.supabase_client = create_client(
-                supabase_url,
-                supabase_key,
-                options=client_options
-            )
-            logger.info("Supabase client created successfully")
+            logger.info("데이터베이스 초기화 시작...")
 
-            # Initialize Redis client with simplified configuration
-            logger.info(f"Creating Redis client for URL: {settings.REDIS_URL}")
+            # Neo4j 드라이버 초기화
+            logger.info(f"Neo4j 연결 중: {settings.NEO4J_URI}")
+            self.neo4j_driver = AsyncGraphDatabase.driver(
+                settings.NEO4J_URI,
+                auth=(
+                    settings.NEO4J_USERNAME,
+                    settings.get_secret_value("NEO4J_PASSWORD")
+                ),
+                max_connection_pool_size=settings.NEO4J_MAX_CONNECTION_POOL_SIZE,
+                connection_timeout=settings.NEO4J_CONNECTION_TIMEOUT,
+            )
+
+            # Neo4j 연결 테스트
+            await self.neo4j_driver.verify_connectivity()
+            logger.info("Neo4j 연결 성공")
+
+            # Redis 클라이언트 초기화
+            logger.info(f"Redis 연결 중: {settings.REDIS_URL}")
             redis_kwargs = {
                 "encoding": "utf-8",
                 "decode_responses": True,
@@ -83,130 +78,54 @@ class DatabaseManager:
                 "socket_timeout": 5,
             }
 
-            # Only add password if explicitly configured
             if hasattr(settings, 'REDIS_PASSWORD') and settings.REDIS_PASSWORD:
                 redis_kwargs["password"] = settings.REDIS_PASSWORD
 
             self.redis_client = await aioredis.from_url(settings.REDIS_URL, **redis_kwargs)
-            logger.info("Redis client created successfully")
-
-            # Test connections with detailed validation
-            logger.info("Testing connections...")
-            # Temporarily disable connection tests to allow startup
-            logger.warning("Connection tests temporarily disabled for debugging")
-            # await self._test_connections()
-            logger.info("Connection tests completed (skipped for debugging)")
+            await self.redis_client.ping()
+            logger.info("Redis 연결 성공")
 
             self._initialized = True
             self._connection_stats["total_connections"] += 1
 
-            logger.info(
-                "Supabase and Redis connections initialized successfully",
-                extra={
-                    "supabase_url": supabase_url,
-                    "redis_max_connections": 20,
-                },
-            )
+            logger.info("데이터베이스 초기화 완료")
 
         except Exception as e:
             self._connection_stats["failed_connections"] += 1
-
-            logger.error(
-                "Failed to initialize Supabase connections",
-                extra={
-                    "error": str(e),
-                    "attempt_time": self._connection_stats["last_connection_attempt"],
-                },
-            )
-
+            logger.error(f"데이터베이스 초기화 실패: {str(e)}")
             raise DatabaseError(
-                message="Supabase initialization failed", operation="initialize", cause=e
+                message="데이터베이스 초기화 실패",
+                operation="initialize",
+                cause=e
             )
 
-    async def _test_connections(self):
-        """Test Supabase and Redis connections with startup-optimized validation"""
-        try:
-            # Test Supabase connection with minimal validation during startup
-            try:
-                # Simple client validation - just ensure it's properly initialized
-                if self.supabase_client is None:
-                    raise Exception("Supabase client not initialized")
-                    
-                # Quick connectivity test with timeout
-                response = await asyncio.wait_for(
-                    asyncio.get_event_loop().run_in_executor(
-                        None, 
-                        lambda: self.supabase_client.auth.get_user()
-                    ),
-                    timeout=5.0
-                )
-                logger.info("Supabase connection validated successfully")
-            except asyncio.TimeoutError:
-                logger.warning("Supabase connection test timed out, but client is initialized")
-            except Exception as e:
-                logger.warning(f"Supabase connection test failed ({e}), but client is available")
-
-            # Test Redis connection with simplified validation
-            try:
-                # Basic ping test with timeout
-                await asyncio.wait_for(self.redis_client.ping(), timeout=3.0)
-                logger.info("Redis connection successful")
-            except asyncio.TimeoutError:
-                logger.warning("Redis ping timed out, retrying with longer timeout")
-                # Retry with longer timeout during startup
-                await asyncio.wait_for(self.redis_client.ping(), timeout=10.0)
-                logger.info("Redis connection successful (after retry)")
-
-        except Exception as e:
-            logger.error("Connection test failed", extra={"error": str(e)}, exc_info=True)
-            # Don't fail startup for connection test issues - log and continue
-            logger.warning("Connection tests failed but services may still be available")
-            # Only raise if both connections completely fail
-            try:
-                await self.redis_client.ping()
-            except:
-                raise DatabaseError(
-                    message="Critical connection failure", operation="test_connections", cause=e
-                )
-
-    def get_supabase(self) -> Client:
-        """Get Supabase client with connection validation"""
-        if not self._initialized:
+    def get_neo4j(self) -> AsyncDriver:
+        """Neo4j 드라이버 가져오기"""
+        if not self._initialized or self.neo4j_driver is None:
             raise DatabaseError(
-                message="Supabase client not initialized", 
-                operation="get_supabase"
+                message="Neo4j 드라이버가 초기화되지 않음",
+                operation="get_neo4j"
             )
-        
-        if self.supabase_client is None:
-            raise DatabaseError(
-                message="Supabase client is None", 
-                operation="get_supabase"
-            )
-        
-        return self.supabase_client
+        return self.neo4j_driver
+
     async def get_redis(self):
-        """Get Redis client with connection validation"""
+        """Redis 클라이언트 가져오기 (재연결 지원)"""
         if not self._initialized:
             await self.initialize()
 
         try:
-            # Quick ping to validate connection
             await self.redis_client.ping()
             return self.redis_client
 
         except Exception as e:
-            logger.warning(
-                "Redis connection validation failed, attempting reconnection",
-                extra={"error": str(e)},
-            )
+            logger.warning(f"Redis 재연결 시도: {str(e)}")
 
-            # Attempt to recreate Redis connection
             try:
                 await self.redis_client.close()
             except:
                 pass
 
-            # Reinitialize Redis connection
+            # Redis 재연결
             redis_kwargs = {
                 "encoding": "utf-8",
                 "decode_responses": True,
@@ -219,98 +138,90 @@ class DatabaseManager:
                 redis_kwargs["password"] = settings.REDIS_PASSWORD
 
             self.redis_client = await aioredis.from_url(settings.REDIS_URL, **redis_kwargs)
-
             return self.redis_client
 
     async def close(self):
-        """Gracefully close all connections"""
+        """모든 연결 종료"""
         close_errors = []
 
         try:
-            if self.supabase_client:
-                # Supabase client doesn't require explicit closing like SQLAlchemy
-                # but we can clear the reference
-                self.supabase_client = None
-                logger.debug("Supabase client cleared")
+            if self.neo4j_driver:
+                await self.neo4j_driver.close()
+                logger.debug("Neo4j 드라이버 종료")
         except Exception as e:
-            close_errors.append(f"Supabase client: {str(e)}")
-            logger.error("Error clearing Supabase client", extra={"error": str(e)})
+            close_errors.append(f"Neo4j: {str(e)}")
+            logger.error(f"Neo4j 종료 오류: {str(e)}")
 
         try:
             if self.redis_client:
                 await self.redis_client.close()
-                logger.debug("Redis client closed")
+                logger.debug("Redis 클라이언트 종료")
         except Exception as e:
-            close_errors.append(f"Redis client: {str(e)}")
-            logger.error("Error closing Redis client", extra={"error": str(e)})
+            close_errors.append(f"Redis: {str(e)}")
+            logger.error(f"Redis 종료 오류: {str(e)}")
 
         self._initialized = False
 
         if close_errors:
-            logger.warning(
-                "Connections closed with errors", extra={"errors": close_errors}
-            )
+            logger.warning(f"연결 종료 시 오류 발생: {close_errors}")
         else:
-            logger.info("Connections closed successfully")
+            logger.info("모든 연결 정상 종료")
 
     async def execute_with_retry(self, operation: Callable[[], T], max_retries: int = 3) -> T:
-        """Execute Supabase operation with retry logic"""
+        """재시도 로직을 포함한 작업 실행"""
         for attempt in range(max_retries):
             try:
                 return await operation()
             except Exception as e:
                 if attempt == max_retries - 1:
                     raise DatabaseError(
-                        message=f"Supabase operation failed after {max_retries} attempts",
+                        message=f"작업 실패 (재시도 {max_retries}회)",
                         operation="execute_with_retry",
                         cause=e,
                     )
 
-                wait_time = (2**attempt) * 0.5  # Exponential backoff
+                wait_time = (2**attempt) * 0.5
                 logger.warning(
-                    f"Supabase operation failed (attempt {attempt + 1}/{max_retries}), retrying in {wait_time}s",
+                    f"작업 실패 (시도 {attempt + 1}/{max_retries}), {wait_time}초 후 재시도",
                     extra={"error": str(e), "wait_time": wait_time},
                 )
                 await asyncio.sleep(wait_time)
 
         raise DatabaseError(
-            message="Supabase operation failed after all retry attempts",
+            message="모든 재시도 실패",
             operation="execute_with_retry",
         )
 
     async def health_check(self) -> dict[str, Any]:
-        """Comprehensive health check with metrics"""
+        """헬스 체크 (Neo4j + Redis)"""
         from datetime import datetime
 
         status = {
-            "supabase": {"status": False, "latency_ms": None},
+            "neo4j": {"status": False, "latency_ms": None},
             "redis": {"status": False, "latency_ms": None, "memory_usage": None},
             "connection_stats": self._connection_stats.copy(),
             "timestamp": datetime.utcnow().isoformat(),
         }
 
-        # Supabase health check with metrics
+        # Neo4j 헬스 체크
         try:
             start_time = time.time()
-            # Simple test to verify Supabase connection
-            await asyncio.get_event_loop().run_in_executor(
-                None,
-                lambda: self.supabase_client.auth.get_user()
-            )
+            async with self.neo4j_driver.session() as session:
+                result = await session.run("RETURN 1 AS health")
+                await result.single()
             latency = (time.time() - start_time) * 1000
-            status["supabase"].update(
+            status["neo4j"].update(
                 {"status": True, "latency_ms": round(latency, 2)}
             )
-
         except Exception as e:
-            logger.error("Supabase health check failed", extra={"error": str(e)})
-            status["supabase"]["error"] = str(e)
-        # Redis health check with metrics
+            logger.error(f"Neo4j 헬스 체크 실패: {str(e)}")
+            status["neo4j"]["error"] = str(e)
+
+        # Redis 헬스 체크
         try:
             start_time = time.time()
             await self.redis_client.ping()
 
-            # Get Redis info
             redis_info = await self.redis_client.info("memory")
             memory_stats = {
                 "used_memory": redis_info.get("used_memory"),
@@ -322,16 +233,15 @@ class DatabaseManager:
             status["redis"].update(
                 {"status": True, "latency_ms": round(latency, 2), "memory_usage": memory_stats}
             )
-
         except Exception as e:
-            logger.error("Redis health check failed", extra={"error": str(e)})
+            logger.error(f"Redis 헬스 체크 실패: {str(e)}")
             status["redis"]["error"] = str(e)
 
         return status
 
 
 class CacheManager:
-    """Enhanced Redis cache management with retry logic and monitoring"""
+    """Redis 캐시 관리자 (재시도 로직 포함)"""
 
     def __init__(self, db_manager: DatabaseManager):
         self.db_manager = db_manager
@@ -343,7 +253,7 @@ class CacheManager:
         wait=wait_exponential(multiplier=1, min=CACHE_RETRY_WAIT, max=2),
     )
     async def get(self, key: str) -> str | None:
-        """Get value from cache with retry logic"""
+        """캐시에서 값 가져오기"""
         self._cache_stats["total_operations"] += 1
 
         try:
@@ -360,11 +270,12 @@ class CacheManager:
         except Exception as e:
             self._cache_stats["errors"] += 1
             self._cache_stats["misses"] += 1
-
-            logger.error("Cache get operation failed", extra={"key": key, "error": str(e)})
-
+            logger.error(f"캐시 조회 실패 (key: {key}): {str(e)}")
             raise CacheError(
-                message="Cache get operation failed", operation="get", details={"key": key}, cause=e
+                message="캐시 조회 실패",
+                operation="get",
+                details={"key": key},
+                cause=e
             )
 
     @retry(
@@ -372,7 +283,7 @@ class CacheManager:
         wait=wait_exponential(multiplier=1, min=CACHE_RETRY_WAIT, max=2),
     )
     async def set(self, key: str, value: str, ttl: int | None = None) -> bool:
-        """Set value in cache with retry logic"""
+        """캐시에 값 저장"""
         self._cache_stats["total_operations"] += 1
 
         try:
@@ -383,37 +294,31 @@ class CacheManager:
 
         except Exception as e:
             self._cache_stats["errors"] += 1
-
-            logger.error(
-                "Cache set operation failed", extra={"key": key, "ttl": ttl, "error": str(e)}
-            )
-
-            # For set operations, we might want to fail gracefully
-            # depending on the use case
+            logger.error(f"캐시 저장 실패 (key: {key}): {str(e)}")
             return False
 
     async def delete(self, key: str) -> bool:
-        """Delete value from cache"""
+        """캐시에서 값 삭제"""
         try:
             redis_client = await self.db_manager.get_redis()
             result = await redis_client.delete(key)
             return result > 0
         except Exception as e:
-            logger.error(f"Cache delete failed for key {key}: {str(e)}")
+            logger.error(f"캐시 삭제 실패 (key: {key}): {str(e)}")
             return False
 
     async def exists(self, key: str) -> bool:
-        """Check if key exists in cache"""
+        """캐시에 키 존재 여부 확인"""
         try:
             redis_client = await self.db_manager.get_redis()
             result = await redis_client.exists(key)
             return result > 0
         except Exception as e:
-            logger.error(f"Cache exists check failed for key {key}: {str(e)}")
+            logger.error(f"캐시 존재 확인 실패 (key: {key}): {str(e)}")
             return False
 
     async def get_json(self, key: str) -> dict[str, Any] | None:
-        """Get JSON value from cache with proper error handling"""
+        """JSON 값 가져오기"""
         try:
             value = await self.get(key)
             if value:
@@ -421,37 +326,30 @@ class CacheManager:
             return None
 
         except json.JSONDecodeError as e:
-            logger.warning(
-                "Invalid JSON in cache", extra={"key": key, "value": value, "error": str(e)}
-            )
-            # Delete corrupted cache entry
-            await self.delete(key)
+            logger.warning(f"잘못된 JSON 캐시 (key: {key}): {str(e)}")
+            await self.delete(key)  # 손상된 캐시 삭제
             return None
 
         except Exception as e:
-            logger.error("Cache get_json operation failed", extra={"key": key, "error": str(e)})
+            logger.error(f"JSON 캐시 조회 실패 (key: {key}): {str(e)}")
             return None
 
     async def set_json(self, key: str, value: dict[str, Any], ttl: int | None = None) -> bool:
-        """Set JSON value in cache with validation"""
+        """JSON 값 저장"""
         try:
-            # Validate that the value can be serialized
             json_value = json.dumps(value, ensure_ascii=False, default=str)
             return await self.set(key, json_value, ttl)
 
         except (TypeError, ValueError) as e:
-            logger.error(
-                "JSON serialization failed",
-                extra={"key": key, "value_type": type(value), "error": str(e)},
-            )
+            logger.error(f"JSON 직렬화 실패 (key: {key}): {str(e)}")
             return False
 
         except Exception as e:
-            logger.error("Cache set_json operation failed", extra={"key": key, "error": str(e)})
+            logger.error(f"JSON 캐시 저장 실패 (key: {key}): {str(e)}")
             return False
 
     def get_cache_stats(self) -> dict[str, Any]:
-        """Get cache performance statistics"""
+        """캐시 성능 통계"""
         total_ops = self._cache_stats["total_operations"]
         if total_ops > 0:
             hit_rate = (self._cache_stats["hits"] / total_ops) * 100
@@ -467,11 +365,11 @@ class CacheManager:
         }
 
     def reset_cache_stats(self):
-        """Reset cache statistics"""
+        """캐시 통계 초기화"""
         self._cache_stats = {"hits": 0, "misses": 0, "errors": 0, "total_operations": 0}
 
     async def clear_pattern(self, pattern: str) -> int:
-        """Clear all keys matching pattern"""
+        """패턴과 일치하는 모든 키 삭제"""
         try:
             redis_client = await self.db_manager.get_redis()
             keys = await redis_client.keys(pattern)
@@ -479,115 +377,95 @@ class CacheManager:
                 return await redis_client.delete(*keys)
             return 0
         except Exception as e:
-            logger.error(f"Cache clear_pattern failed for pattern {pattern}: {str(e)}")
+            logger.error(f"패턴 캐시 삭제 실패 (pattern: {pattern}): {str(e)}")
             return 0
 
     async def increment(self, key: str, amount: int = 1) -> int | None:
-        """Increment counter"""
+        """카운터 증가"""
         try:
             redis_client = await self.db_manager.get_redis()
             return await redis_client.incrby(key, amount)
         except Exception as e:
-            logger.error(f"Cache increment failed for key {key}: {str(e)}")
+            logger.error(f"캐시 증가 실패 (key: {key}): {str(e)}")
             return None
 
     async def expire(self, key: str, ttl: int) -> bool:
-        """Set expiration for key"""
+        """키의 만료 시간 설정"""
         try:
             redis_client = await self.db_manager.get_redis()
             return await redis_client.expire(key, ttl)
         except Exception as e:
-            logger.error(f"Cache expire failed for key {key}: {str(e)}")
+            logger.error(f"만료 시간 설정 실패 (key: {key}): {str(e)}")
             return False
 
 
-# Global database manager instance
+# 전역 데이터베이스 매니저 인스턴스
 db_manager = DatabaseManager()
 cache_manager = CacheManager(db_manager)
 
 
-# Database utilities for dependency injection
+# 의존성 주입용 헬퍼
 class DatabaseDependency:
-    """Dependency injection helper for database operations"""
+    """의존성 주입 헬퍼"""
 
     @staticmethod
-    def get_supabase() -> Client:
-        """Get Supabase client for dependency injection"""
-        return db_manager.get_supabase()
+    def get_neo4j() -> AsyncDriver:
+        """Neo4j 드라이버 가져오기"""
+        return db_manager.get_neo4j()
 
     @staticmethod
     async def get_redis():
-        """Get Redis client for dependency injection"""
+        """Redis 클라이언트 가져오기"""
         return await db_manager.get_redis()
 
     @staticmethod
     async def get_cache_manager():
-        """Get cache manager for dependency injection"""
+        """캐시 매니저 가져오기"""
         return cache_manager
 
 
-def get_supabase_client() -> Client:
-    """FastAPI dependency for Supabase client"""
-    return db_manager.get_supabase()
+def get_neo4j_driver() -> AsyncDriver:
+    """FastAPI 의존성용 Neo4j 드라이버"""
+    return db_manager.get_neo4j()
 
 
 async def get_redis_client():
-    """FastAPI dependency for Redis client"""
+    """FastAPI 의존성용 Redis 클라이언트"""
     return await db_manager.get_redis()
 
 
 async def get_cache_manager():
-    """FastAPI dependency for cache manager"""
+    """FastAPI 의존성용 캐시 매니저"""
     return cache_manager
 
 
-# Enhanced Supabase operations with error handling
-
-async def execute_supabase_operation(operation: Callable[[Client], T]) -> T:
-    """Execute Supabase operation with error handling"""
-    try:
-        client = db_manager.get_supabase()
-        return await asyncio.get_event_loop().run_in_executor(
-            None, 
-            lambda: operation(client)
-        )
-    except Exception as e:
-        logger.error("Supabase operation failed", extra={"error": str(e)})
-        raise DatabaseError(message="Supabase operation failed", operation="execute_operation", cause=e)
-
-
-# Database initialization function for app startup
+# 앱 시작/종료 함수
 async def initialize_database():
-    """Initialize Supabase and Redis connections with comprehensive validation"""
+    """데이터베이스 초기화 (앱 시작 시)"""
     try:
         await db_manager.initialize()
-        logger.info("Supabase and Redis initialization completed successfully")
+        logger.info("데이터베이스 초기화 완료")
     except Exception as e:
-        logger.error("Database initialization failed", extra={"error": str(e)})
+        logger.error(f"데이터베이스 초기화 실패: {str(e)}")
         raise
 
 
-# Database cleanup function for app shutdown
 async def cleanup_database():
-    """Cleanup database connections"""
+    """데이터베이스 정리 (앱 종료 시)"""
     await db_manager.close()
 
 
-# Health check function
 async def database_health_check():
-    """Comprehensive database health check with metrics"""
+    """데이터베이스 헬스 체크"""
     try:
         health_status = await db_manager.health_check()
-
-        # Add cache statistics to health check
         health_status["cache_stats"] = cache_manager.get_cache_stats()
-
         return health_status
 
     except Exception as e:
-        logger.error("Health check failed", extra={"error": str(e)})
+        logger.error(f"헬스 체크 실패: {str(e)}")
         return {
-            "supabase": {"status": False, "error": str(e)},
+            "neo4j": {"status": False, "error": str(e)},
             "redis": {"status": False, "error": str(e)},
             "timestamp": time.time(),
         }

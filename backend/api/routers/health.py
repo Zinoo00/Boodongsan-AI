@@ -50,21 +50,21 @@ async def health_check():
             db_status = await database_health_check()
             db_time = int((datetime.utcnow() - db_start).total_seconds() * 1000)
 
-            supabase_ok = db_status.get("supabase", {}).get("status", False)
+            neo4j_ok = db_status.get("neo4j", {}).get("status", False)
             redis_ok = db_status.get("redis", {}).get("status", False)
 
-            if supabase_ok and redis_ok:
+            if neo4j_ok and redis_ok:
                 services_status["database"] = ServiceStatus(
                     status="healthy",
                     response_time_ms=db_time,
-                    message="Supabase and Redis connections OK",
+                    message="Neo4j and Redis connections OK",
                 )
             else:
                 services_status["database"] = ServiceStatus(
                     status="unhealthy",
                     response_time_ms=db_time,
                     message=(
-                        f"Supabase: {'OK' if supabase_ok else 'FAIL'}, "
+                        f"Neo4j: {'OK' if neo4j_ok else 'FAIL'}, "
                         f"Redis: {'OK' if redis_ok else 'FAIL'}"
                     ),
                 )
@@ -120,13 +120,13 @@ async def database_health():
         db_status = await database_health_check()
         response_time = int((datetime.utcnow() - start_time).total_seconds() * 1000)
 
-        supabase_ok = db_status.get("supabase", {}).get("status", False)
+        neo4j_ok = db_status.get("neo4j", {}).get("status", False)
         redis_ok = db_status.get("redis", {}).get("status", False)
 
         return {
-            "status": "healthy" if supabase_ok and redis_ok else "unhealthy",
+            "status": "healthy" if neo4j_ok and redis_ok else "unhealthy",
             "response_time_ms": response_time,
-            "supabase": db_status.get("supabase"),
+            "neo4j": db_status.get("neo4j"),
             "redis": db_status.get("redis"),
             "timestamp": db_status.get("timestamp"),
         }

@@ -162,7 +162,7 @@ class RAGService:
         ai_response: str,
         context: dict[str, Any],
     ) -> None:
-        """Store user/assistant messages in Supabase (best effort)."""
+        """Store user/assistant messages in Neo4j (best effort)."""
         try:
             await self.user_service.save_conversation_message(
                 user_id=user_id,
@@ -215,9 +215,20 @@ class RAGService:
 
     def _format_vector_result(self, result: OpenSearchVectorResult) -> dict[str, Any]:
         """Normalize OpenSearch search results."""
+        metadata = dict(result.metadata) if result.metadata else {}
+        doc_type = (
+            metadata.get("type")
+            or metadata.get("document_type")
+            or metadata.get("data_type")
+            or metadata.get("category")
+        )
+        if doc_type and "type" not in metadata:
+            metadata["type"] = doc_type
+
         return {
             "id": result.id,
             "score": result.score,
-            "metadata": result.metadata,
+            "metadata": metadata,
             "document": result.document,
+            "type": doc_type,
         }

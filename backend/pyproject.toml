@@ -20,17 +20,15 @@ dependencies = [
     "langchain-core==0.3.74",
     "openai==1.91.0",
     
-    # Database
-    "supabase>=2.7.4",
-    "asyncpg==0.30.0",
-    "redis>=5,<6",
+    # 데이터베이스 - Neo4j, Redis, OpenSearch
+    "neo4j>=5.0",  # 그래프 데이터베이스
+    "redis>=5,<6",  # 캐시
+    "opensearch-py>=2.6.0",  # 벡터 검색
     "numpy==1.26.4",
 
-    # LightRAG for knowledge graph-based RAG
+    # LightRAG - Neo4j 백엔드 지식 그래프 RAG
     "lightrag-hku[api]>=0.1.0",
-    "networkx>=3.0",  # For graph operations
-    "neo4j>=5.0",  # Optional: for Neo4J backend
-    "opensearch-py>=2.6.0",
+    "networkx>=3.0",  # 그래프 연산
     
     # Security
     "python-jose[cryptography]==3.5.0",
@@ -41,7 +39,6 @@ dependencies = [
     # Data processing
     "pandas==2.2.3",
     "httpx==0.28.1",
-    "aiohttp==3.12.15",
     "requests==2.32.4",
     "tenacity==8.2.3",
     

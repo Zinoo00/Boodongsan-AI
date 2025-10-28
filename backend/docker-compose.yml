@@ -30,6 +30,31 @@ services:
     networks:
       - boodongsan_network
 
+  # OpenSearch (벡터 검색)
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: boodongsan_opensearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISABLE_SECURITY_PLUGIN=true  # 개발환경: 보안 플러그인 비활성화
+      - plugins.security.disabled=true
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    networks:
+      - boodongsan_network
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+
   # FastAPI 백엔드
   backend:
     build:
@@ -37,10 +62,6 @@ services:
       dockerfile: Dockerfile
     container_name: boodongsan_backend
     environment:
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - SUPABASE_DB_PASSWORD=${SUPABASE_DB_PASSWORD}
       - REDIS_URL=redis://redis:6379/0
       - USE_LIGHTRAG=${USE_LIGHTRAG:-true}
       - LIGHTRAG_WORKING_DIR=${LIGHTRAG_WORKING_DIR:-/app/lightrag_storage}
@@ -51,6 +72,11 @@ services:
       - NEO4J_DATABASE=${NEO4J_DATABASE:-}
       - NEO4J_MAX_CONNECTION_POOL_SIZE=${NEO4J_MAX_CONNECTION_POOL_SIZE:-50}
       - NEO4J_CONNECTION_TIMEOUT=${NEO4J_CONNECTION_TIMEOUT:-30.0}
+      - OPENSEARCH_HOST=opensearch
+      - OPENSEARCH_PORT=9200
+      - OPENSEARCH_AUTH_MODE=none
+      - OPENSEARCH_USE_SSL=false
+      - OPENSEARCH_VERIFY_CERTS=false
       - AWS_REGION=ap-northeast-2
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
@@ -59,6 +85,7 @@ services:
     depends_on:
       - redis
       - neo4j
+      - opensearch
     volumes:
       - .:/app
       - venv_data:/app/.venv
@@ -91,6 +118,7 @@ volumes:
   redis_data:
   neo4j_data:
   neo4j_logs:
+  opensearch_data:
   venv_data:
   lightrag_storage:
 

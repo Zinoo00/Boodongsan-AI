@@ -1,6 +1,6 @@
 """
 AI Service for Korean Real Estate RAG AI Chatbot
-Supports dual AI providers: AWS Bedrock and Cloudflare Workers AI
+Uses AWS Bedrock (Claude) as primary AI provider
 """
 
 import asyncio
@@ -9,7 +9,6 @@ import logging
 from enum import Enum
 from typing import Any
 
-import aiohttp
 import boto3
 from botocore.exceptions import ClientError
 
@@ -22,7 +21,6 @@ class AIProvider(str, Enum):
     """AI provider types"""
 
     BEDROCK = "bedrock"
-    CLOUDFLARE = "cloudflare"
     AUTO = "auto"
 
 
@@ -42,7 +40,6 @@ class AIService:
     def __init__(self):
         self.bedrock_client = None
         self.bedrock_runtime = None
-        self.session = None
         self._initialized = False
 
         # Provider configuration
@@ -54,19 +51,14 @@ class AIService:
                 "temperature": 0.7,
                 "top_p": 0.9,
             },
-            AIProvider.CLOUDFLARE: {
-                "model_name": settings.CLOUDFLARE_MODEL_NAME,
-                "max_tokens": 2000,
-                "temperature": 0.7,
-            },
         }
 
-        # Provider selection strategy
+        # Provider selection strategy (모두 Bedrock 사용)
         self.provider_strategy = {
-            "simple_chat": AIProvider.CLOUDFLARE,
+            "simple_chat": AIProvider.BEDROCK,
             "complex_analysis": AIProvider.BEDROCK,
             "entity_extraction": AIProvider.BEDROCK,
-            "intent_classification": AIProvider.CLOUDFLARE,
+            "intent_classification": AIProvider.BEDROCK,
             "rag_response": AIProvider.BEDROCK,
             "embedding": AIProvider.BEDROCK,
         }
@@ -80,20 +72,11 @@ class AIService:
             # Initialize AWS Bedrock
             await self._initialize_bedrock()
 
-            # Initialize HTTP session for Cloudflare
-            self.session = aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=30),
-                headers={
-                    "Authorization": f"Bearer {settings.CLOUDFLARE_API_TOKEN}",
-                    "Content-Type": "application/json",
-                },
-            )
-
-            # Test both providers
-            await self._test_providers()
+            # Test provider
+            await self._test_bedrock()
 
             self._initialized = True
-            logger.info("AI service initialized with dual providers")
+            logger.info("AI service initialized with AWS Bedrock")
 
         except Exception as e:
             logger.error(f"Failed to initialize AI service: {str(e)}")
@@ -122,20 +105,6 @@ class AIService:
             logger.error(f"Failed to initialize Bedrock: {str(e)}")
             raise
 
-    async def _test_providers(self):
-        """Test both AI providers"""
-        try:
-            # Test Bedrock
-            await self._test_bedrock()
-
-            # Test Cloudflare
-            await self._test_cloudflare()
-
-            logger.info("Both AI providers tested successfully")
-
-        except Exception as e:
-            logger.warning(f"Provider testing completed with warnings: {str(e)}")
-
     async def _test_bedrock(self):
         """Test AWS Bedrock connection"""
         try:
@@ -145,17 +114,6 @@ class AIService:
 
         except Exception as e:
             logger.error(f"Bedrock connection test failed: {str(e)}")
-            raise
-
-    async def _test_cloudflare(self):
-        """Test Cloudflare Workers AI connection"""
-        try:
-            test_messages = [{"role": "user", "content": "Hello"}]
-            response = await self._call_cloudflare(test_messages)
-            logger.info("Cloudflare connection test successful")
-
-        except Exception as e:
-            logger.error(f"Cloudflare connection test failed: {str(e)}")
             raise
 
     async def generate_rag_response(
@@ -218,7 +176,7 @@ class AIService:
             return {
                 "text": response_text,
                 "confidence_score": confidence_score,
-                "model_used": f"{provider.value}_{self.provider_config[provider]['model_id' if provider == AIProvider.BEDROCK else 'model_name']}",
+                "model_used": f"{provider.value}_{self.provider_config[provider]['model_id']}",
                 "context_used": {
                     "properties_count": len(context.get("properties", [])),
                     "policies_count": len(context.get("policies", [])),
@@ -314,7 +272,7 @@ class AIService:
             # Select provider
             if provider == AIProvider.AUTO:
                 provider = self.provider_strategy.get(
-                    "intent_classification", AIProvider.CLOUDFLARE
+                    "intent_classification", AIProvider.BEDROCK
                 )
 
             system_prompt = """
@@ -402,33 +360,14 @@ class AIService:
     async def _generate_response(
         self, messages: list[dict[str, str]], provider: AIProvider, max_tokens: int = 1000
     ) -> str:
-        """Generate response using specified provider"""
+        """Generate response using AWS Bedrock"""
 
         try:
-            if provider == AIProvider.BEDROCK:
-                return await self._call_bedrock(messages, max_tokens)
-            elif provider == AIProvider.CLOUDFLARE:
-                return await self._call_cloudflare(messages, max_tokens)
-            else:
-                raise ValueError(f"Unsupported provider: {provider}")
+            return await self._call_bedrock(messages, max_tokens)
 
         except Exception as e:
-            logger.error(f"Response generation failed with {provider}: {str(e)}")
-
-            # Fallback to alternative provider
-            fallback_provider = (
-                AIProvider.CLOUDFLARE if provider == AIProvider.BEDROCK else AIProvider.BEDROCK
-            )
-            logger.info(f"Falling back to {fallback_provider}")
-
-            try:
-                if fallback_provider == AIProvider.BEDROCK:
-                    return await self._call_bedrock(messages, max_tokens)
-                else:
-                    return await self._call_cloudflare(messages, max_tokens)
-            except Exception as fallback_error:
-                logger.error(f"Fallback provider also failed: {str(fallback_error)}")
-                raise
+            logger.error(f"Response generation failed: {str(e)}")
+            raise
 
     async def _call_bedrock(self, messages: list[dict[str, str]], max_tokens: int = 1000) -> str:
         """Call AWS Bedrock Claude model"""
@@ -475,44 +414,6 @@ class AIService:
             raise
         except Exception as e:
             logger.error(f"Bedrock call failed: {str(e)}")
-            raise
-
-    async def _call_cloudflare(self, messages: list[dict[str, str]], max_tokens: int = 1000) -> str:
-        """Call Cloudflare Workers AI"""
-
-        try:
-            url = f"https://api.cloudflare.com/client/v4/accounts/{settings.CLOUDFLARE_ACCOUNT_ID}/ai/run/{settings.CLOUDFLARE_MODEL_NAME}"
-
-            # Format messages for Cloudflare
-            formatted_messages = []
-            for message in messages:
-                if message["role"] in ["system", "user", "assistant"]:
-                    formatted_messages.append(
-                        {"role": message["role"], "content": message["content"]}
-                    )
-
-            payload = {
-                "messages": formatted_messages,
-                "max_tokens": max_tokens,
-                "temperature": self.provider_config[AIProvider.CLOUDFLARE]["temperature"],
-                "stream": False,
-            }
-
-            async with self.session.post(url, json=payload) as response:
-                if response.status == 200:
-                    data = await response.json()
-
-                    if data.get("success") and data.get("result"):
-                        return data["result"]["response"]
-                    else:
-                        error_msg = data.get("errors", ["Unknown error"])[0]
-                        raise Exception(f"Cloudflare API error: {error_msg}")
-                else:
-                    error_text = await response.text()
-                    raise Exception(f"Cloudflare API HTTP {response.status}: {error_text}")
-
-        except Exception as e:
-            logger.error(f"Cloudflare call failed: {str(e)}")
             raise
 
     def _build_rag_system_prompt(self) -> str:
@@ -798,9 +699,6 @@ class AIService:
     async def close(self):
         """Close AI service connections with cleanup"""
         try:
-            if self.session:
-                await self.session.close()
-
             # Reset circuit breakers
             for provider in self._circuit_breakers:
                 self._circuit_breakers[provider] = CircuitBreakerState()
@@ -828,12 +726,6 @@ class AIService:
                     "circuit_breaker_open": self._is_circuit_breaker_open(AIProvider.BEDROCK),
                     "error": None,
                 },
-                "cloudflare": {
-                    "available": False,
-                    "response_time_ms": None,
-                    "circuit_breaker_open": self._is_circuit_breaker_open(AIProvider.CLOUDFLARE),
-                    "error": None,
-                },
             },
             "metrics": {
                 "bedrock": {
@@ -850,20 +742,6 @@ class AIService:
                         AIProvider.BEDROCK
                     ].circuit_breaker_trips,
                 },
-                "cloudflare": {
-                    "success_rate": self._metrics[AIProvider.CLOUDFLARE].get_success_rate(),
-                    "avg_response_time_ms": self._metrics[
-                        AIProvider.CLOUDFLARE
-                    ].get_avg_response_time(),
-                    "total_requests": self._metrics[AIProvider.CLOUDFLARE].total_requests,
-                    "cache_hit_rate": (
-                        self._metrics[AIProvider.CLOUDFLARE].cache_hits
-                        / max(self._metrics[AIProvider.CLOUDFLARE].total_requests, 1)
-                    ),
-                    "circuit_breaker_trips": self._metrics[
-                        AIProvider.CLOUDFLARE
-                    ].circuit_breaker_trips,
-                },
             },
             "cache_enabled": self._cache_enabled,
             "health_check_time_ms": 0,
@@ -873,35 +751,17 @@ class AIService:
             if not self._initialized:
                 await self.initialize()
 
-            # Test providers in parallel
-            test_tasks = [
-                self._health_check_provider(AIProvider.BEDROCK),
-                self._health_check_provider(AIProvider.CLOUDFLARE),
-            ]
+            # Test Bedrock provider
+            result = await self._health_check_provider(AIProvider.BEDROCK)
 
-            results = await asyncio.gather(*test_tasks, return_exceptions=True)
-
-            # Process results
-            for i, result in enumerate(results):
-                provider = [AIProvider.BEDROCK, AIProvider.CLOUDFLARE][i]
-                provider_key = provider.value
-
-                if isinstance(result, Exception):
-                    health["providers"][provider_key]["error"] = str(result)
-                    logger.debug(f"{provider_key} health check failed: {str(result)}")
-                else:
-                    health["providers"][provider_key]["available"] = True
-                    health["providers"][provider_key]["response_time_ms"] = result
-
-            # Determine overall service status
-            any_available = any(provider["available"] for provider in health["providers"].values())
-
-            if not any_available:
+            if isinstance(result, Exception):
+                health["providers"]["bedrock"]["error"] = str(result)
                 health["service_status"] = "unhealthy"
-            elif all(provider["available"] for provider in health["providers"].values()):
-                health["service_status"] = "healthy"
+                logger.debug(f"Bedrock health check failed: {str(result)}")
             else:
-                health["service_status"] = "degraded"
+                health["providers"]["bedrock"]["available"] = True
+                health["providers"]["bedrock"]["response_time_ms"] = result
+                health["service_status"] = "healthy"
 
         except Exception as e:
             logger.error(f"AI service health check failed: {str(e)}")
@@ -917,12 +777,7 @@ class AIService:
 
         try:
             test_messages = [{"role": "user", "content": "Health check"}]
-
-            if provider == AIProvider.BEDROCK:
-                await self._call_bedrock_enhanced(test_messages, max_tokens=5)
-            elif provider == AIProvider.CLOUDFLARE:
-                await self._call_cloudflare_enhanced(test_messages, max_tokens=5)
-
+            await self._call_bedrock_enhanced(test_messages, max_tokens=5)
             return (time.time() - start_time) * 1000
 
         except Exception as e:
@@ -946,21 +801,6 @@ class AIService:
                         AIProvider.BEDROCK
                     ].circuit_breaker_trips,
                     "circuit_breaker_open": self._is_circuit_breaker_open(AIProvider.BEDROCK),
-                },
-                "cloudflare": {
-                    "total_requests": self._metrics[AIProvider.CLOUDFLARE].total_requests,
-                    "successful_requests": self._metrics[AIProvider.CLOUDFLARE].successful_requests,
-                    "failed_requests": self._metrics[AIProvider.CLOUDFLARE].failed_requests,
-                    "success_rate": self._metrics[AIProvider.CLOUDFLARE].get_success_rate(),
-                    "avg_response_time_ms": self._metrics[
-                        AIProvider.CLOUDFLARE
-                    ].get_avg_response_time(),
-                    "cache_hits": self._metrics[AIProvider.CLOUDFLARE].cache_hits,
-                    "rate_limit_hits": self._metrics[AIProvider.CLOUDFLARE].rate_limit_hits,
-                    "circuit_breaker_trips": self._metrics[
-                        AIProvider.CLOUDFLARE
-                    ].circuit_breaker_trips,
-                    "circuit_breaker_open": self._is_circuit_breaker_open(AIProvider.CLOUDFLARE),
                 },
             },
             "cache_enabled": self._cache_enabled,

@@ -1,5 +1,5 @@
 """
-Property router backed by DataService (Supabase).
+Property router backed by DataService (OpenSearch).
 """
 
 from __future__ import annotations

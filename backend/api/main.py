@@ -77,7 +77,7 @@ async def lifespan(app: FastAPI):
                 lightrag_service = None
 
         logger.info("Initializing business services...")
-        data_service = DataService()
+        data_service = DataService(vector_service=vector_service)
         user_service = UserService()
 
         logger.info("Initializing Seoul city data service...")
@@ -210,7 +210,7 @@ async def api_info():
             "Real-time market information",
             "Conversation history management",
             "Vector-based similarity search",
-            "Dual AI provider support (AWS Bedrock + Cloudflare)",
+            "AI-powered responses (AWS Bedrock Claude)",
         ],
         "endpoints": {
             "chat": f"{settings.API_V1_STR}/chat",
@@ -222,10 +222,10 @@ async def api_info():
         "architecture": {
             "framework": "FastAPI",
             "asgi_server": "Uvicorn",
-            "database": "Supabase PostgreSQL",
-            "vector_db": "AWS OpenSearch",
+            "graph_db": "Neo4j",
+            "vector_db": "OpenSearch",
             "cache": "Redis",
-            "ai_providers": ["AWS Bedrock", "Cloudflare Workers AI"],
+            "ai_provider": "AWS Bedrock (Claude)",
         },
     }
 

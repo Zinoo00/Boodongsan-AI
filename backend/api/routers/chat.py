@@ -113,7 +113,7 @@ async def get_conversation_history(
     user_id: str = Query(..., description="사용자 ID"),
     limit: int = Query(20, ge=1, le=200, description="가져올 메시지 수"),
 ) -> ConversationHistoryResponse:
-    """Return the stored conversation history from Supabase."""
+    """Return the stored conversation history from Neo4j."""
     try:
         records = await user_service.get_conversation_history(user_id, conversation_id, limit=limit)
     except Exception as exc:  # pragma: no cover

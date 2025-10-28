@@ -7,9 +7,8 @@ import os
 import secrets
 from enum import Enum
 from typing import Any
-from urllib.parse import urlparse
 
-from pydantic import AnyHttpUrl, Field, HttpUrl, SecretStr, field_validator
+from pydantic import AnyHttpUrl, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -109,79 +108,30 @@ class Settings(BaseSettings):
             return v
         return []
 
-    # Database - Supabase PostgreSQL
-    SUPABASE_URL: HttpUrl = Field(..., description="Supabase project URL")
-    SUPABASE_ANON_KEY: SecretStr = Field(..., min_length=20, description="Supabase anonymous key")
-    SUPABASE_SERVICE_ROLE_KEY: SecretStr = Field(
-        ..., min_length=20, description="Supabase service role key"
-    )
-    SUPABASE_DB_PASSWORD: SecretStr | None = Field(
-        default=None, description="Supabase Postgres DB password (not the service key)"
-    )
-    DATABASE_URL: str | None = Field(default=None, description="Direct PostgreSQL connection URL")
-    
-    @field_validator("DATABASE_URL", mode="before")
-    @classmethod
-    def assemble_db_connection(cls, v: str | None, info) -> str:
-        values = info.data if hasattr(info, "data") else {}
-        if isinstance(v, str) and v:
-            return v
-
-        # Construct from Supabase credentials
-        supabase_url = values.get("SUPABASE_URL")
-        service_key = values.get("SUPABASE_SERVICE_ROLE_KEY")
-        db_password = values.get("SUPABASE_DB_PASSWORD")
-
-        # Prefer DB password if available, fallback to service key
-        if supabase_url and (db_password or service_key):
-            # Derive db.<project-ref>.supabase.co from SUPABASE_URL
-            parsed = urlparse(str(supabase_url))
-            hostname = parsed.hostname or str(supabase_url).replace("https://", "").replace("http://", "")
-            host = hostname if hostname.startswith("db.") else f"db.{hostname}"
-
-            # Use DB password if available, otherwise use service key
-            if db_password:
-                pw_value = (
-                    db_password.get_secret_value()
-                    if hasattr(db_password, "get_secret_value")
-                    else str(db_password)
-                )
-            else:
-                pw_value = (
-                    service_key.get_secret_value()
-                    if hasattr(service_key, "get_secret_value")
-                    else str(service_key)
-                )
-
-            # Build asyncpg URL; SSL is enforced via connect_args in engine creation
-            return f"postgresql+asyncpg://postgres:{pw_value}@{host}:5432/postgres"
-        
-        # Fallback for development
-        return "postgresql+asyncpg://postgres:password@localhost:5432/boodongsan"
-
+    # Redis 캐시
     # Redis Cache
     REDIS_URL: str = "redis://localhost:6379/0"
     REDIS_PASSWORD: str | None = None
     CACHE_TTL: int = 3600  # 1 hour
 
-    # Vector Database - AWS OpenSearch
+    # Vector Database - OpenSearch (오픈소스)
     OPENSEARCH_HOST: str = Field(
         default="localhost",
-        description="AWS OpenSearch host or endpoint without protocol",
+        description="OpenSearch host or endpoint without protocol",
     )
     OPENSEARCH_PORT: int = Field(
-        default=443,
+        default=9200,
         ge=1,
         le=65535,
-        description="AWS OpenSearch service port (default 443 for HTTPS)",
+        description="OpenSearch service port (default 9200 for HTTP)",
     )
-    OPENSEARCH_USE_SSL: bool = Field(default=True, description="Use SSL/TLS for OpenSearch connection")
+    OPENSEARCH_USE_SSL: bool = Field(default=False, description="Use SSL/TLS for OpenSearch connection")
     OPENSEARCH_VERIFY_CERTS: bool = Field(
-        default=True,
+        default=False,
         description="Verify SSL certificates when connecting to OpenSearch",
     )
     OPENSEARCH_AUTH_MODE: str = Field(
-        default="sigv4",
+        default="none",
         pattern=r"^(sigv4|basic|none)$",
         description="Authentication mode for OpenSearch (sigv4|basic|none)",
     )
@@ -220,7 +170,7 @@ class Settings(BaseSettings):
         description="Number of primary shards for the OpenSearch index",
     )
     OPENSEARCH_REPLICAS: int = Field(
-        default=1,
+        default=0,
         ge=0,
         le=5,
         description="Number of replica shards for the OpenSearch index",
@@ -252,15 +202,6 @@ class Settings(BaseSettings):
     )
     BEDROCK_EMBEDDING_MODEL_ID: str = Field(
         default="amazon.titan-embed-text-v1", description="AWS Bedrock embedding model ID"
-    )
-
-    # AI Services - Cloudflare Workers AI
-    CLOUDFLARE_ACCOUNT_ID: str = Field(
-        ..., min_length=32, max_length=32, description="Cloudflare account ID"
-    )
-    CLOUDFLARE_API_TOKEN: SecretStr = Field(..., min_length=20, description="Cloudflare API token")
-    CLOUDFLARE_MODEL_NAME: str = Field(
-        default="@cf/meta/llama-2-7b-chat-int8", description="Cloudflare Workers AI model name"
     )
 
     # Korean Real Estate APIs
@@ -394,14 +335,11 @@ class Settings(BaseSettings):
 
         # Critical fields that must be set in production
         production_required = {
-            "SUPABASE_URL",
-            "SUPABASE_ANON_KEY",
-            "SUPABASE_SERVICE_ROLE_KEY",
             "AWS_ACCESS_KEY_ID",
             "AWS_SECRET_ACCESS_KEY",
-            "CLOUDFLARE_ACCOUNT_ID",
-            "CLOUDFLARE_API_TOKEN",
             "MOLIT_API_KEY",
+            "NEO4J_URI",
+            "NEO4J_PASSWORD",
         }
 
         if (
@@ -435,8 +373,8 @@ class TestSettings(Settings):
     """Test environment settings"""
 
     ENVIRONMENT: Environment = Environment.DEVELOPMENT
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/test_boodongsan"
     REDIS_URL: str = "redis://localhost:6379/1"  # Different Redis DB for tests
+    NEO4J_URI: str = "bolt://localhost:7687"
     DEBUG: bool = True
 
 

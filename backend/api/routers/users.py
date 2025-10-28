@@ -1,5 +1,5 @@
 """
-User router backed by Supabase UserService.
+User router backed by Neo4j UserService.
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ async def get_user_profile(
     user_id: str,
     user_service: Annotated["UserService", Depends(get_user_service)],
 ) -> UserProfileResponse:
-    """Return the primary user profile from Supabase."""
+    """Return the primary user profile from Neo4j."""
     try:
         profile = await user_service.get_primary_profile(user_id)
     except Exception as exc:  # pragma: no cover
