@@ -437,6 +437,6 @@ def _render_data_table(df):
     st.subheader("📋 상세 데이터")
     st.dataframe(
         df.head(100),  # 처음 100건만 표시
-        use_container_width=True,
+        width='stretch',
         hide_index=True
     )

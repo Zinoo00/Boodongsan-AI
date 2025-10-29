@@ -118,7 +118,7 @@ def create_price_heatmap(df: pd.DataFrame, price_column: str, colorscale: str, p
                 )
             
             # 날짜별, 가격대별 거래 건수 집계
-            heatmap_data = valid_data.groupby([valid_data[date_col].dt.date, 'price_range']).size().unstack(fill_value=0)
+            heatmap_data = valid_data.groupby([valid_data[date_col].dt.date, 'price_range'], observed=True).size().unstack(fill_value=0)
             
             if not heatmap_data.empty:
                 # 날짜를 오름차순으로 정렬하고 yyyy.mm.dd 형식으로 변환
@@ -142,7 +142,7 @@ def create_price_heatmap(df: pd.DataFrame, price_column: str, colorscale: str, p
                     height=400
                 )
                 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width='stretch')
             else:
                 st.info("히트맵 데이터가 없습니다.")
         else:
