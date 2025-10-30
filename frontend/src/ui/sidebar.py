@@ -12,21 +12,25 @@ def render_sidebar():
     with st.sidebar:
         st.header("🔧 설정")
         
-        # AWS 설정
-        st.subheader("AWS 설정")
         # AWS 리전은 환경변수에서 가져옴
         aws_region = AWS_REGION
         
         # Knowledge Base ID는 환경변수에서 가져옴
         knowledge_base_id = KNOWLEDGE_BASE_ID
         
-        # 검색 설정
-        st.subheader("검색 설정")
-        max_results = st.slider(
-            "최대 검색 결과 수",
-            min_value=1,
-            max_value=10,
-            value=5
+        # 💬 AI 채팅 설정
+        st.subheader("💬 AI 채팅 설정")
+        
+        # 검색 타입 선택
+        search_type = st.selectbox(
+            "검색 타입",
+            options=["hybrid", "vector", "keyword"],
+            format_func=lambda x: {
+                "hybrid": "🔀 하이브리드 (벡터 + 키워드)",
+                "vector": "🧠 벡터 검색 (의미적 유사성)",
+                "keyword": "🔍 키워드 검색 (정확한 매칭)"
+            }[x],
+            help="하이브리드: 가장 정확한 결과, 벡터: 의미적 유사성, 키워드: 정확한 키워드 매칭"
         )
         
         # 데이터 필터
@@ -73,10 +77,21 @@ def render_sidebar():
             date_range = None
             selected_year = None
             selected_month = None
+            
+        # 🔍 데이터 검색 설정
+        st.subheader("🔍 데이터 검색 설정")
+        
+        max_results = st.slider(
+            "최대 검색 결과 수",
+            min_value=1,
+            max_value=10,
+            value=5
+        )
     
     return {
         'aws_region': aws_region,
         'knowledge_base_id': knowledge_base_id,
+        'search_type': search_type,
         'max_results': max_results,
         'selected_regions': selected_regions,
         'data_loading_mode': data_loading_mode,

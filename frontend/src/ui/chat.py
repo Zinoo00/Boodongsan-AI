@@ -11,7 +11,7 @@ from ..utils.aws_knowledge_base import format_retrieval_results
 logger = logging.getLogger(__name__)
 
 
-def render_chat_interface(aws_region: str, knowledge_base_id: str, max_results: int):
+def render_chat_interface(aws_region: str, knowledge_base_id: str, max_results: int, search_type: str = "hybrid"):
     """채팅 인터페이스 렌더링"""
     st.header("💬 부동산 AI 어시스턴트와 대화하기")
     
@@ -24,32 +24,7 @@ def render_chat_interface(aws_region: str, knowledge_base_id: str, max_results: 
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     
-    # 채팅 입력창을 화면 아래쪽에 고정 (사이드바 고려)
-    st.markdown("""
-    <style>
-    .stChatInput {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 21rem !important;  /* 사이드바 너비만큼 오른쪽으로 이동 */
-        right: 0 !important;
-        z-index: 999 !important;
-        background: var(--background-color) !important;
-        border-top: 1px solid var(--border-color) !important;
-        padding: 1rem !important;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
-    }
-    .main .block-container {
-        padding-bottom: 100px !important;
-    }
-    @media (max-width: 768px) {
-        .stChatInput {
-            left: 0 !important;  /* 모바일에서는 전체 너비 사용 */
-        }
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    # 사용자 입력 (화면 아래쪽 고정)
+    # 사용자 입력 
     if prompt := st.chat_input("부동산에 대해 무엇이든 물어보세요!", key="chat_input"):
         # 사용자 메시지 추가
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -63,8 +38,8 @@ def render_chat_interface(aws_region: str, knowledge_base_id: str, max_results: 
                 assistant = RealEstateAssistant(aws_region)
                 
                 if knowledge_base_id:
-                    logger.info(f"AI 채팅 시작 - Knowledge Base ID: {knowledge_base_id}")
-                    knowledge_response = assistant.query_knowledge_base(prompt, knowledge_base_id, max_results)
+                    logger.info(f"AI 채팅 시작 - Knowledge Base ID: {knowledge_base_id}, 검색 타입: {search_type}")
+                    knowledge_response = assistant.query_knowledge_base(prompt, knowledge_base_id, max_results, search_type)
                     
                     # 에러 체크
                     if 'error' in knowledge_response:

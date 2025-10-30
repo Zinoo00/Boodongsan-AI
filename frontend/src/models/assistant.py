@@ -14,9 +14,14 @@ class RealEstateAssistant:
         self.kb_client = AWSKnowledgeBase(region_name)
         self.data_loader = S3DataLoader(region_name=region_name)
         
-    def query_knowledge_base(self, query: str, knowledge_base_id: str, max_results: int = 5) -> Dict[str, Any]:
+    def query_knowledge_base(self, query: str, knowledge_base_id: str, max_results: int = 5, search_type: str = "hybrid") -> Dict[str, Any]:
         """AWS Knowledge Base에서 데이터 검색"""
-        return self.kb_client.retrieve_documents(knowledge_base_id, query, max_results)
+        if search_type == "vector":
+            return self.kb_client.retrieve_vector_search(knowledge_base_id, query, max_results)
+        if search_type == "keyword":
+            return self.kb_client.retrieve_keyword_search(knowledge_base_id, query, max_results)
+        # 기본값: 하이브리드
+        return self.kb_client.retrieve_hybrid_search(knowledge_base_id, query, max_results)
     
     def generate_response(self, query: str, context: str, model_id: str = None) -> str:
         """Claude 모델을 사용하여 응답 생성"""

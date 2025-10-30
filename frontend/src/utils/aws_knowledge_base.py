@@ -39,26 +39,53 @@ class AWSKnowledgeBase:
             self.bedrock_runtime = None
     
     def retrieve_documents(self, knowledge_base_id: str, query: str, 
-                          max_results: int = 5) -> Dict[str, Any]:
-        """Knowledge Base에서 문서 검색"""
+                          max_results: int = 10, search_type: str = "hybrid") -> Dict[str, Any]:
+        """Knowledge Base에서 문서 검색 (하이브리드 검색 지원)
+        
+        Args:
+            knowledge_base_id: Knowledge Base ID
+            query: 검색 쿼리
+            max_results: 최대 결과 수
+            search_type: 검색 타입 ("vector", "keyword", "hybrid")
+        """
         if not self.bedrock_agent_runtime:
             logger.error("AWS 클라이언트가 초기화되지 않았습니다.")
             return {"error": "AWS 클라이언트가 초기화되지 않았습니다."}
         
-        logger.info(f"Knowledge Base 검색 시작 - ID: {knowledge_base_id}, 쿼리: {query[:50]}...")
+        logger.info(f"Knowledge Base 검색 시작 - ID: {knowledge_base_id}, 쿼리: {query[:50]}..., 타입: {search_type}")
         
         try:
+            # 검색 설정 구성: 사이드바 선택(search_type)에 따라 동적으로 지정
+            # Bedrock KB의 overrideSearchType은 'HYBRID' 또는 'SEMANTIC'를 사용
+            if search_type == "vector":
+                override_type = 'SEMANTIC'
+            else:
+                # "hybrid" 및 그 외 기본값은 HYBRID로 처리
+                override_type = 'HYBRID'
+
+            retrieval_config = {
+                'vectorSearchConfiguration': {
+                    'overrideSearchType': override_type,
+                    'numberOfResults': max_results
+                }
+            }
+            
+            # 하이브리드 검색의 경우 더 많은 결과를 가져와서 후처리
+            if search_type == "hybrid":
+                # 하이브리드 검색을 위해 더 많은 결과를 가져오기
+                retrieval_config['vectorSearchConfiguration']['numberOfResults'] = max_results * 2
+            
             response = self.bedrock_agent_runtime.retrieve(
                 knowledgeBaseId=knowledge_base_id,
                 retrievalQuery={
                     'text': query
                 },
-                retrievalConfiguration={
-                    'vectorSearchConfiguration': {
-                        'numberOfResults': max_results
-                    }
-                }
+                retrievalConfiguration=retrieval_config
             )
+            # 하이브리드 검색 결과 처리 (벡터 검색 결과를 다양화)
+            if search_type == "hybrid":
+                response = self._process_hybrid_results(response, max_results, query)
+            
             logger.info(f"Knowledge Base 검색 성공 - {len(response.get('retrievalResults', []))}개 결과")
             
             # 검색 결과 상세 로그
@@ -68,8 +95,9 @@ class AWSKnowledgeBase:
                     content = result.get('content', {})
                     text = content.get('text', '')[:100] + '...' if len(content.get('text', '')) > 100 else content.get('text', '')
                     location = result.get('location', {})
+                    search_type_result = result.get('searchType', 'unknown')
                     
-                    logger.info(f"  결과 {i}: 신뢰도={score:.3f}, 내용='{text}', 위치={location}")
+                    logger.info(f"  결과 {i}: 신뢰도={score:.3f}, 타입={search_type_result}, 내용='{text}', 위치={location}")
             else:
                 logger.warning("검색 결과에 'retrievalResults' 키가 없습니다.")
             
@@ -94,6 +122,101 @@ class AWSKnowledgeBase:
         except Exception as e:
             logger.error(f"Knowledge Base 검색 중 예상치 못한 오류: {str(e)}")
             return {"error": f"예상치 못한 오류: {str(e)}"}
+    
+    def _process_hybrid_results(self, response: Dict[str, Any], max_results: int, query: str) -> Dict[str, Any]:
+        """하이브리드 검색 결과 처리 및 다양화"""
+        if 'retrievalResults' not in response:
+            return response
+        
+        results = response['retrievalResults']
+        
+        # 중복 제거를 위한 딕셔너리 (내용 기반)
+        unique_results = {}
+        
+        for result in results:
+            content = result.get('content', {})
+            text = content.get('text', '')
+            
+            # 텍스트 내용을 키로 사용하여 중복 제거
+            if text and text not in unique_results:
+                # 검색 타입 정보 추가
+                result['searchType'] = 'hybrid'
+                unique_results[text] = result
+        
+        # 하이브리드 점수 계산 (신뢰도 + 키워드 매칭 보너스)
+        for result in unique_results.values():
+            base_score = result.get('score', 0)
+            text = result.get('content', {}).get('text', '').lower()
+            query_lower = query.lower()
+            
+            # 키워드 매칭 보너스 계산
+            keyword_bonus = 0
+            query_words = query_lower.split()
+            for word in query_words:
+                if word in text:
+                    keyword_bonus += 0.1
+            
+            # 하이브리드 점수 = 기본 점수 + 키워드 보너스
+            result['hybridScore'] = base_score + keyword_bonus
+        
+        # 하이브리드 점수로 정렬
+        sorted_results = sorted(unique_results.values(), 
+                              key=lambda x: x.get('hybridScore', 0), 
+                              reverse=True)
+        
+        # 최대 결과 수만큼 제한
+        final_results = sorted_results[:max_results]
+        
+        logger.info(f"하이브리드 검색 결과 처리: {len(results)}개 -> {len(final_results)}개 (다양화 후)")
+        
+        return {
+            'retrievalResults': final_results,
+            'nextToken': response.get('nextToken'),
+            'queryId': response.get('queryId')
+        }
+    
+    def retrieve_vector_search(self, knowledge_base_id: str, query: str, 
+                             max_results: int = 5) -> Dict[str, Any]:
+        """벡터 검색만 수행"""
+        return self.retrieve_documents(knowledge_base_id, query, max_results, "vector")
+    
+    def retrieve_keyword_search(self, knowledge_base_id: str, query: str, 
+                              max_results: int = 5) -> Dict[str, Any]:
+        """키워드 검색 시뮬레이션 (벡터 검색 + 키워드 보너스)"""
+        # 키워드 검색을 위해 더 많은 결과를 가져와서 키워드 매칭으로 필터링
+        results = self.retrieve_documents(knowledge_base_id, query, max_results * 2, "vector")
+        
+        if 'retrievalResults' not in results:
+            return results
+        
+        # 키워드 매칭 점수로 재정렬
+        for result in results['retrievalResults']:
+            text = result.get('content', {}).get('text', '').lower()
+            query_lower = query.lower()
+            
+            # 키워드 매칭 점수 계산
+            keyword_score = 0
+            query_words = query_lower.split()
+            for word in query_words:
+                if word in text:
+                    keyword_score += 1
+            
+            result['keywordScore'] = keyword_score
+            result['searchType'] = 'keyword'
+        
+        # 키워드 점수로 정렬
+        results['retrievalResults'] = sorted(
+            results['retrievalResults'], 
+            key=lambda x: x.get('keywordScore', 0), 
+            reverse=True
+        )[:max_results]
+        
+        return results
+    
+    def retrieve_hybrid_search(self, knowledge_base_id: str, query: str, 
+                             max_results: int = 5) -> Dict[str, Any]:
+        """하이브리드 검색 수행 (벡터 + 키워드)"""
+        return self.retrieve_documents(knowledge_base_id, query, max_results, "hybrid")
     
     def generate_response(self, query: str, context: str, 
                          model_id: str = None) -> str:
@@ -121,7 +244,7 @@ class AWSKnowledgeBase:
         try:
             prompt = f"""
 당신은 부동산 전문 AI 어시스턴트입니다. 
-사용자의 질문에 대해 제공된 부동산 데이터를 바탕으로 정확하고 도움이 되는 답변을 제공해주세요.
+사용자의 질문에 대해 제공된 부동산 및 정책 데이터를 바탕으로 정확하고 도움이 되는 답변을 제공해주세요.
 
 사용자 질문: {query}
 

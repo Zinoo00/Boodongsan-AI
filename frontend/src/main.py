@@ -29,7 +29,8 @@ def main():
         render_chat_interface(
             sidebar_config['aws_region'],
             sidebar_config['knowledge_base_id'],
-            sidebar_config['max_results']
+            sidebar_config['max_results'],
+            sidebar_config['search_type']
         )
     
     with tab2:
@@ -45,7 +46,8 @@ def main():
         render_data_search(
             sidebar_config['aws_region'],
             sidebar_config['knowledge_base_id'],
-            sidebar_config['max_results']
+            sidebar_config['max_results'],
+            sidebar_config['search_type']
         )
 
 

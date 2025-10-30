@@ -9,7 +9,7 @@ from ..models import RealEstateAssistant
 logger = logging.getLogger(__name__)
 
 
-def render_data_search(aws_region: str, knowledge_base_id: str, max_results: int):
+def render_data_search(aws_region: str, knowledge_base_id: str, max_results: int, search_type: str = "hybrid"):
     """데이터 검색 UI 렌더링"""
     st.header("🔍 데이터 검색")
     
@@ -25,8 +25,8 @@ def render_data_search(aws_region: str, knowledge_base_id: str, max_results: int
                 assistant = RealEstateAssistant(aws_region)
                 
                 if knowledge_base_id:
-                    logger.info(f"데이터 검색 시작 - 쿼리: {search_query[:50]}...")
-                    results = assistant.query_knowledge_base(search_query, knowledge_base_id, max_results)
+                    logger.info(f"데이터 검색 시작 - 쿼리: {search_query[:50]}..., 검색 타입: {search_type}")
+                    results = assistant.query_knowledge_base(search_query, knowledge_base_id, max_results, search_type)
                     
                     if 'error' in results:
                         logger.error(f"검색 오류: {results['error']}")
