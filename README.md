@@ -12,7 +12,7 @@
 - 🏘️ **맞춤형 매물 추천** (벡터 유사도 검색)
 - 📋 **정부 지원 정책 매칭** (자격 조건 자동 분석)
 - 🔍 **실시간 시장 정보** (국토교통부 OpenAPI)
-- 💬 **대화 이력 관리** (Neo4j 그래프 DB)
+- 💬 **대화 이력 관리** (경량 JSON 스토리지)
 
 ## 🏗️ 기술 스택
 
@@ -20,8 +20,7 @@
 - **Framework**: FastAPI, Uvicorn
 - **AI**: AWS Bedrock (Claude)
 - **RAG**: LightRAG (지식 그래프 기반)
-- **Vector DB**: OpenSearch (k-NN)
-- **Graph DB**: Neo4j
+- **Vector DB**: NanoVectorDB (LightRAG) + OpenSearch
 - **Cache**: Redis
 - **OpenAPI**: 국토교통부 (MOLIT), Seoul Open Data
 
@@ -54,7 +53,7 @@ cp .env.example .env
 uv sync
 
 # 4. 외부 서비스 시작
-docker-compose up -d neo4j redis opensearch
+docker-compose up -d redis opensearch
 
 # 5. 백엔드 실행
 uv run uvicorn api.main:app --reload
@@ -70,7 +69,6 @@ streamlit run app.py
 - 프론트엔드: http://localhost:8501
 - Backend API: http://localhost:8000
 - API Docs: http://localhost:8000/docs
-- Neo4j Browser: http://localhost:7474
 
 ## 📁 프로젝트 구조
 
@@ -117,10 +115,9 @@ uv run pytest --cov
 핵심 환경 변수 (.env 파일):
 
 ```bash
-# Neo4j
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=neo4j
+# LightRAG storage
+LIGHTRAG_WORKING_DIR=./lightrag_storage
+LIGHTRAG_WORKSPACE=BODA
 
 # OpenSearch (로컬 Docker)
 OPENSEARCH_HOST=localhost
@@ -147,7 +144,7 @@ Streamlit Frontend (Port 8501)
   ↓
 FastAPI Backend (Port 8000)
   ↓
-├─ LightRAG → Neo4j (지식 그래프)
+├─ LightRAG (NetworkXStorage + NanoVectorDB)
 ├─ OpenSearch (벡터 검색)
 ├─ AWS Bedrock (AI 응답)
 └─ Redis (캐싱)

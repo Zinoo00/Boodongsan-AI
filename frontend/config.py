@@ -66,7 +66,11 @@ class FrontendSettings(BaseSettings):
     @property
     def api_base_url(self) -> str:
         """API base URL 반환"""
-        return f"{self.BACKEND_URL}{self.API_V1_STR}"
+        base = str(self.BACKEND_URL).rstrip("/")
+        prefix = self.API_V1_STR
+        if not prefix.startswith("/"):
+            prefix = f"/{prefix}"
+        return f"{base}{prefix}"
 
     @property
     def chat_endpoint(self) -> str:

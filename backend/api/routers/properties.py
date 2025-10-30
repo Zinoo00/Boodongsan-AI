@@ -4,19 +4,16 @@ Property router backed by DataService (OpenSearch).
 
 from __future__ import annotations
 
-import logging
 from collections import Counter
 from typing import Annotated, TYPE_CHECKING, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from api.main import get_data_service
+from api.dependencies import get_data_service
 
 if TYPE_CHECKING:
     from services.data_service import DataService
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -50,18 +47,14 @@ async def search_properties(
     data_service: Annotated["DataService", Depends(get_data_service)],
 ) -> PropertyListResponse:
     """Search properties with flexible filters."""
-    try:
-        filters = {k: v for k, v in request.model_dump().items() if v not in (None, "")}
-        results = await data_service.search_properties(filters=filters)
+    filters = {k: v for k, v in request.model_dump().items() if v not in (None, "")}
+    results = await data_service.search_properties(filters=filters)
 
-        return PropertyListResponse(
-            properties=results,
-            total_count=len(results),
-            filters=filters,
-        )
-    except Exception as exc:  # pragma: no cover
-        logger.exception("Property search failed")
-        raise HTTPException(status_code=500, detail="매물 검색 중 오류가 발생했습니다.") from exc
+    return PropertyListResponse(
+        properties=results,
+        total_count=len(results),
+        filters=filters,
+    )
 
 
 @router.get("/", response_model=PropertyListResponse)
@@ -74,24 +67,20 @@ async def list_properties(
     offset: int = Query(0, ge=0, description="오프셋"),
 ) -> PropertyListResponse:
     """Return a window of properties."""
-    try:
-        filters = {
-            "district": district,
-            "property_type": property_type,
-            "transaction_type": transaction_type,
-        }
-        filters = {k: v for k, v in filters.items() if v}
+    filters = {
+        "district": district,
+        "property_type": property_type,
+        "transaction_type": transaction_type,
+    }
+    filters = {k: v for k, v in filters.items() if v}
 
-        results = await data_service.search_properties(filters=filters, limit=limit, offset=offset)
+    results = await data_service.search_properties(filters=filters, limit=limit, offset=offset)
 
-        return PropertyListResponse(
-            properties=results,
-            total_count=len(results),
-            filters={"limit": limit, "offset": offset, **filters},
-        )
-    except Exception as exc:  # pragma: no cover
-        logger.exception("Property listing failed")
-        raise HTTPException(status_code=500, detail="매물 목록을 불러오지 못했습니다.") from exc
+    return PropertyListResponse(
+        properties=results,
+        total_count=len(results),
+        filters={"limit": limit, "offset": offset, **filters},
+    )
 
 
 @router.get("/{property_id}")

@@ -68,9 +68,10 @@ class BODAAPIClient:
             base_url: 백엔드 API URL (기본값: settings.api_base_url)
             timeout: 요청 타임아웃 초 (기본값: settings.API_TIMEOUT)
         """
-        self.base_url = base_url or settings.api_base_url
+        base = base_url or settings.api_base_url
+        self.base_url = base.rstrip("/")
         self.timeout = timeout or settings.API_TIMEOUT
-        self.client = httpx.Client(timeout=self.timeout)
+        self.client = httpx.Client(timeout=self.timeout, follow_redirects=True)
 
     def __enter__(self):
         return self
@@ -194,9 +195,7 @@ class BODAAPIClient:
             dict: Health status information
         """
         try:
-            # Health endpoint는 /api/v1 prefix 없이 직접 접근
-            backend_base = str(settings.BACKEND_URL)
-            response = self.client.get(f"{backend_base}/api/v1/health")
+            response = self.client.get(f"{self.base_url}/health")
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as e:

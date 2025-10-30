@@ -20,13 +20,12 @@ dependencies = [
     "langchain-core==0.3.74",
     "openai==1.91.0",
     
-    # 데이터베이스 - Neo4j, Redis, OpenSearch
-    "neo4j>=5.0",  # 그래프 데이터베이스
+    # 데이터베이스 - Redis, OpenSearch
     "redis>=5,<6",  # 캐시
     "opensearch-py>=2.6.0",  # 벡터 검색
     "numpy==1.26.4",
 
-    # LightRAG - Neo4j 백엔드 지식 그래프 RAG
+    # LightRAG - local knowledge graph RAG (NanoVectorDB + NetworkX)
     "lightrag-hku[api]>=0.1.0",
     "networkx>=3.0",  # 그래프 연산
     

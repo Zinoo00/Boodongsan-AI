@@ -4,20 +4,17 @@ Chat router powered by the simplified RAG pipeline.
 
 from __future__ import annotations
 
-import logging
 import uuid
 from typing import TYPE_CHECKING, Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
 
-from api.main import get_rag_service, get_user_service
+from api.dependencies import get_rag_service, get_user_service
 
 if TYPE_CHECKING:
     from services.rag_service import RAGService
     from services.user_service import UserService
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -25,12 +22,10 @@ router = APIRouter()
 class ChatRequest(BaseModel):
     """Chat request payload."""
 
-    message: str = Field(..., min_length=1, max_length=2000, description="사용자 메시지")
-    user_id: str = Field(..., description="사용자 ID")
-    conversation_id: str | None = Field(None, description="대화 ID (없으면 새로 생성)")
-    session_context: dict[str, Any] | None = Field(
-        default=None, description="선택적 세션 컨텍스트 (엔티티, 최근 기록 등)"
-    )
+    message: str
+    user_id: str
+    conversation_id: str | None = None
+    session_context: dict[str, Any] | None = None
 
 
 class ChatResponse(BaseModel):
@@ -40,17 +35,16 @@ class ChatResponse(BaseModel):
     conversation_id: str
     response: str
     knowledge_mode: str | None = None
-    knowledge_cached: bool = False
     processing_time_ms: float
     vector_results: list[dict[str, Any]] = Field(default_factory=list)
-    rag_context: dict[str, Any]
+    rag_context: dict[str, Any] = Field(default_factory=dict)
 
 
 class ConversationHistoryResponse(BaseModel):
     """Conversation history response."""
 
     conversation_id: str
-    messages: list[dict[str, Any]]
+    messages: list[dict[str, Any]] = Field(default_factory=list)
     total_count: int
 
 
@@ -69,25 +63,14 @@ async def send_message(
 ) -> ChatResponse:
     """Process a chat message through the RAG pipeline."""
     conversation_id = payload.conversation_id or str(uuid.uuid4())
+    rag_result = await rag_service.process_query(
+        user_query=payload.message,
+        user_id=payload.user_id,
+        conversation_id=conversation_id,
+        session_context=payload.session_context,
+    )
 
-    try:
-        rag_result = await rag_service.process_query(
-            user_query=payload.message,
-            user_id=payload.user_id,
-            conversation_id=conversation_id,
-            session_context=payload.session_context,
-        )
-    except Exception as exc:  # pragma: no cover - upstream exceptions handled via logging
-        logger.exception("RAG processing failed")
-        raise HTTPException(status_code=500, detail="메시지를 처리하는 중 오류가 발생했습니다.") from exc
-
-    ai_response = rag_result["ai_response"].get("text") if rag_result.get("ai_response") else None
-
-    # Fallback to knowledge answer if AI response missing
-    if not ai_response:
-        knowledge = rag_result.get("knowledge") or {}
-        ai_response = knowledge.get("answer") or "답변을 생성하지 못했습니다."
-
+    ai_response = rag_result["ai_response"]["text"]
     knowledge = rag_result.get("knowledge") or {}
 
     return ChatResponse(
@@ -95,7 +78,6 @@ async def send_message(
         conversation_id=conversation_id,
         response=ai_response,
         knowledge_mode=knowledge.get("mode"),
-        knowledge_cached=knowledge.get("cached", False),
         processing_time_ms=rag_result.get("processing_time_ms", 0.0),
         vector_results=rag_result.get("vector_results", []),
         rag_context=rag_result.get("context", {}),
@@ -113,12 +95,8 @@ async def get_conversation_history(
     user_id: str = Query(..., description="사용자 ID"),
     limit: int = Query(20, ge=1, le=200, description="가져올 메시지 수"),
 ) -> ConversationHistoryResponse:
-    """Return the stored conversation history from Neo4j."""
-    try:
-        records = await user_service.get_conversation_history(user_id, conversation_id, limit=limit)
-    except Exception as exc:  # pragma: no cover
-        logger.exception("Conversation history lookup failed")
-        raise HTTPException(status_code=500, detail="대화 이력을 불러오지 못했습니다.") from exc
+    """Return the stored conversation history."""
+    records = await user_service.get_conversation_history(user_id, conversation_id, limit=limit)
 
     messages: list[dict[str, Any]] = []
     for item in records:

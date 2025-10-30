@@ -1,449 +1,104 @@
 """
-Core configuration module for Korean Real Estate RAG AI Chatbot
-Environment variables and application settings management
+Simplified application configuration for the Korean Real Estate RAG AI Chatbot.
 """
 
-import os
-import secrets
-from enum import Enum
 from typing import Any
 
-from pydantic import AnyHttpUrl, Field, SecretStr, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-class Environment(str, Enum):
-    """Application environment"""
-
-    DEVELOPMENT = "development"
-    STAGING = "staging"
-    PRODUCTION = "production"
-
-
-class LogLevel(str, Enum):
-    """Logging levels"""
-
-    DEBUG = "DEBUG"
-    INFO = "INFO"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    CRITICAL = "CRITICAL"
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Application settings with comprehensive validation"""
+    """Minimal settings without additional validation or fallbacks."""
 
     # Application
-    APP_NAME: str = Field(
-        default="Korean Real Estate RAG AI Chatbot", description="Application name"
-    )
-    APP_VERSION: str = Field(
-        default="1.0.0", pattern=r"^\d+\.\d+\.\d+$", description="Semantic version"
-    )
-    API_V1_STR: str = Field(
-        default="/api/v1", pattern=r"^/api/v\d+$", description="API version prefix"
-    )
-    SECRET_KEY: SecretStr = Field(
-        default_factory=lambda: SecretStr(secrets.token_urlsafe(32)),
-        min_length=32,
-        description="Application secret key",
-    )
-    ENVIRONMENT: Environment = Field(
-        default=Environment.DEVELOPMENT, description="Runtime environment"
-    )
-    DEBUG: bool = Field(default=False, description="Debug mode flag")
+    APP_NAME: str = "Korean Real Estate RAG AI Chatbot"
+    APP_VERSION: str = "1.0.0"
+    API_V1_STR: str = "/api/v1"
+    SECRET_KEY: str = "dev-secret"
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = True
 
-    # Server - Uvicorn Configuration
-    HOST: str = Field(default="0.0.0.0", description="Server host address")
-    PORT: int = Field(default=8000, ge=1, le=65535, description="Server port")
-    WORKERS: int = Field(default=1, ge=1, le=32, description="Number of worker processes")
-    LOG_LEVEL: LogLevel = LogLevel.INFO
-    RELOAD: bool = Field(default=False, description="Enable auto-reload for development")
+    # Server
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    WORKERS: int = 1
+    RELOAD: bool = True
+    LOG_LEVEL: str = "INFO"
+    ASGI_SERVER: str = "uvicorn"
 
-    # ASGI Server Selection
-    ASGI_SERVER: str = Field(
-        default="uvicorn", description="ASGI server to use (uvicorn recommended per architecture)"
-    )
+    # HTTP
+    BACKEND_CORS_ORIGINS: list[str] = []
+    ALLOWED_HOSTS: list[str] = []
 
-    # Security
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
-    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
-    ALGORITHM: str = "HS256"
-    JWT_SECRET_KEY: str = Field(
-        default_factory=lambda: os.getenv("JWT_SECRET_KEY") or secrets.token_urlsafe(32),
-        min_length=32,
-        description="JWT signing key - must be consistent across restarts",
-    )
-    JWT_REFRESH_SECRET_KEY: str = Field(
-        default_factory=lambda: os.getenv("JWT_REFRESH_SECRET_KEY") or secrets.token_urlsafe(32),
-        min_length=32,
-        description="JWT refresh signing key - must be consistent across restarts",
-    )
-
-    # Production security
-    ALLOWED_HOSTS: list[str] = Field(
-        default_factory=list, description="Allowed hosts for TrustedHostMiddleware"
-    )
-
-    @field_validator("ALLOWED_HOSTS", mode="before")
-    @classmethod
-    def assemble_allowed_hosts(cls, v: Any) -> list[str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        return []
-
-    # CORS
-    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
-
-    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    @classmethod
-    def assemble_cors_origins(cls, v: Any) -> list[str]:
-        if v is None or v == "":
-            return []
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",") if i.strip()]
-        elif isinstance(v, list):
-            return v
-        return []
-
-    # Redis 캐시
-    # Redis Cache
+    # Cache
     REDIS_URL: str = "redis://localhost:6379/0"
     REDIS_PASSWORD: str | None = None
-    CACHE_TTL: int = 3600  # 1 hour
+    CACHE_TTL: int = 3600
 
-    # Vector Database - OpenSearch (오픈소스)
-    OPENSEARCH_HOST: str = Field(
-        default="localhost",
-        description="OpenSearch host or endpoint without protocol",
-    )
-    OPENSEARCH_PORT: int = Field(
-        default=9200,
-        ge=1,
-        le=65535,
-        description="OpenSearch service port (default 9200 for HTTP)",
-    )
-    OPENSEARCH_USE_SSL: bool = Field(default=False, description="Use SSL/TLS for OpenSearch connection")
-    OPENSEARCH_VERIFY_CERTS: bool = Field(
-        default=False,
-        description="Verify SSL certificates when connecting to OpenSearch",
-    )
-    OPENSEARCH_AUTH_MODE: str = Field(
-        default="none",
-        pattern=r"^(sigv4|basic|none)$",
-        description="Authentication mode for OpenSearch (sigv4|basic|none)",
-    )
-    OPENSEARCH_USERNAME: str | None = Field(
-        default=None,
-        description="Optional username for basic authentication with OpenSearch",
-    )
-    OPENSEARCH_PASSWORD: SecretStr | None = Field(
-        default=None,
-        description="Optional password for basic authentication with OpenSearch",
-    )
-    OPENSEARCH_INDEX_NAME: str = Field(
-        default="boda_vectors",
-        pattern=r"^[a-z0-9_-]+$",
-        description="OpenSearch index name for vector search",
-    )
-    OPENSEARCH_TEXT_FIELD: str = Field(
-        default="text",
-        pattern=r"^[a-zA-Z0-9_-]+$",
-        description="Field name storing raw document text in OpenSearch",
-    )
-    OPENSEARCH_VECTOR_FIELD: str = Field(
-        default="embedding",
-        pattern=r"^[a-zA-Z0-9_-]+$",
-        description="Field name storing knn_vector embeddings in OpenSearch",
-    )
-    OPENSEARCH_METADATA_FIELD: str = Field(
-        default="metadata",
-        pattern=r"^[a-zA-Z0-9_-]+$",
-        description="Field name storing document metadata in OpenSearch",
-    )
-    OPENSEARCH_SHARDS: int = Field(
-        default=1,
-        ge=1,
-        le=10,
-        description="Number of primary shards for the OpenSearch index",
-    )
-    OPENSEARCH_REPLICAS: int = Field(
-        default=0,
-        ge=0,
-        le=5,
-        description="Number of replica shards for the OpenSearch index",
-    )
-    OPENSEARCH_KNN_ENGINE: str = Field(
-        default="faiss",
-        pattern=r"^(faiss|nmslib|lucene)$",
-        description="Vector engine used by OpenSearch knn index",
-    )
-    OPENSEARCH_KNN_SPACE_TYPE: str = Field(
-        default="cosinesimil",
-        pattern=r"^(cosinesimil|l2|innerproduct)$",
-        description="Similarity space type for knn search",
-    )
-    VECTOR_SIZE: int = Field(default=1536, ge=128, le=4096, description="Vector embedding size")
-
-    # AI Services - AWS Bedrock
-    AWS_ACCESS_KEY_ID: str = Field(
-        ..., min_length=16, max_length=32, description="AWS access key ID"
-    )
-    AWS_SECRET_ACCESS_KEY: SecretStr = Field(
-        ..., min_length=32, description="AWS secret access key"
-    )
-    AWS_REGION: str = Field(
-        default="ap-northeast-2", pattern=r"^[a-z]{2}-[a-z]+-\d{1}$", description="AWS region"
-    )
-    BEDROCK_MODEL_ID: str = Field(
-        default="anthropic.claude-3-sonnet-20240229-v1:0", description="AWS Bedrock model ID"
-    )
-    BEDROCK_EMBEDDING_MODEL_ID: str = Field(
-        default="amazon.titan-embed-text-v1", description="AWS Bedrock embedding model ID"
-    )
-
-    # Korean Real Estate APIs
-    MOLIT_API_KEY: str  # 국토교통부 API
-    HUG_API_KEY: str | None = None  # 주택도시보증공사 API
-    HF_API_KEY: str | None = None  # 주택금융공사 API
-    SEOUL_OPEN_API_KEY: str | None = Field(
-        default=None,
-        description=(
-            "Seoul Open Data API key for real-time city dataset (OA-21285). "
-            "Use 'sample' only for development (limited to 광화문·덕수궁)."
-        ),
-    )
-
-    # Data Collection
-    DATA_UPDATE_INTERVAL_HOURS: int = 24
-    MAX_CONCURRENT_REQUESTS: int = 10
-    REQUEST_TIMEOUT_SECONDS: int = 30
-
-    # RAG Configuration
+    # Vector / RAG
+    OPENSEARCH_HOST: str = "localhost"
+    OPENSEARCH_PORT: int = 9200
+    OPENSEARCH_USE_SSL: bool = False
+    OPENSEARCH_VERIFY_CERTS: bool = False
+    OPENSEARCH_AUTH_MODE: str = "none"
+    OPENSEARCH_USERNAME: str | None = None
+    OPENSEARCH_PASSWORD: str | None = None
+    OPENSEARCH_INDEX_NAME: str = "boda_vectors"
+    OPENSEARCH_TEXT_FIELD: str = "text"
+    OPENSEARCH_VECTOR_FIELD: str = "embedding"
+    OPENSEARCH_METADATA_FIELD: str = "metadata"
+    OPENSEARCH_SHARDS: int = 1
+    OPENSEARCH_REPLICAS: int = 0
+    OPENSEARCH_KNN_ENGINE: str = "faiss"
+    OPENSEARCH_KNN_SPACE_TYPE: str = "cosinesimil"
+    VECTOR_SIZE: int = 1536
     MAX_SEARCH_RESULTS: int = 10
-    SIMILARITY_THRESHOLD: float = 0.7
-    MAX_CONTEXT_LENGTH: int = 4000
     RESPONSE_MAX_TOKENS: int = 1000
 
-    # LightRAG Configuration
-    USE_LIGHTRAG: bool = Field(
-        default=True, description="Enable LightRAG knowledge graph-based RAG (feature flag)"
-    )
-    LIGHTRAG_WORKING_DIR: str = Field(
-        default="./lightrag_storage", description="LightRAG working directory for storage"
-    )
-    LIGHTRAG_WORKSPACE: str = Field(
-        default="boda", description="Workspace namespace used when initializing LightRAG storages"
-    )
-    LIGHTRAG_EMBEDDING_BATCH_SIZE: int = Field(
-        default=32, ge=1, le=100, description="LightRAG embedding batch size"
-    )
-    LIGHTRAG_LLM_MAX_ASYNC: int = Field(
-        default=4, ge=1, le=16, description="LightRAG max concurrent LLM calls"
-    )
-    LIGHTRAG_EMBEDDING_MAX_ASYNC: int = Field(
-        default=16, ge=1, le=32, description="LightRAG max concurrent embedding calls"
-    )
-    LIGHTRAG_ENTITY_EXTRACT_MAX_GLEANING: int = Field(
-        default=1, ge=1, le=3, description="LightRAG entity extraction refinement iterations"
-    )
-    LIGHTRAG_MAX_TOKEN_FOR_TEXT_UNIT: int = Field(
-        default=6000, ge=1000, le=10000, description="LightRAG max tokens for text unit context"
-    )
-    LIGHTRAG_MAX_TOKEN_FOR_GLOBAL_CONTEXT: int = Field(
-        default=8000, ge=1000, le=15000, description="LightRAG max tokens for global context"
-    )
-    LIGHTRAG_MAX_TOKEN_FOR_LOCAL_CONTEXT: int = Field(
-        default=30000, ge=5000, le=50000, description="LightRAG max tokens for local context"
-    )
-    LIGHTRAG_QUERY_CACHE_TTL: int = Field(
-        default=1800, ge=60, le=86400, description="LightRAG query cache TTL in seconds (30 min)"
-    )
+    # AI
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+    AWS_REGION: str = "ap-northeast-2"
+    BEDROCK_MODEL_ID: str = "anthropic.claude-3-sonnet-20240229-v1:0"
+    BEDROCK_EMBEDDING_MODEL_ID: str = "amazon.titan-embed-text-v1"
 
-    # Neo4j Graph Database (LightRAG primary graph store)
-    NEO4J_URI: str = Field(
-        default="bolt://localhost:7687", description="Neo4j connection URI"
-    )
-    NEO4J_USERNAME: str = Field(
-        default="neo4j", description="Neo4j database username"
-    )
-    NEO4J_PASSWORD: SecretStr = Field(
-        default=SecretStr("neo4j"), description="Neo4j database password"
-    )
-    NEO4J_DATABASE: str | None = Field(
-        default=None, description="Optional Neo4j database name (defaults to workspace)"
-    )
-    NEO4J_MAX_CONNECTION_POOL_SIZE: int = Field(
-        default=50,
-        ge=1,
-        le=200,
-        description="Maximum Neo4j driver connection pool size",
-    )
-    NEO4J_CONNECTION_TIMEOUT: float = Field(
-        default=30.0,
-        ge=0.1,
-        description="Neo4j connection timeout in seconds",
-    )
+    # External APIs
+    MOLIT_API_KEY: str = ""
+    HUG_API_KEY: str | None = None
+    HF_API_KEY: str | None = None
+    SEOUL_OPEN_API_KEY: str | None = None
 
-    # Performance
-    MAX_WORKERS: int = Field(default=4, ge=1, le=32, description="Maximum worker processes")
-    WORKER_TIMEOUT: int = Field(
-        default=120, ge=30, le=3600, description="Worker timeout in seconds"
-    )
-    DB_POOL_SIZE: int = Field(default=10, ge=5, le=50, description="Database connection pool size")
-    DB_MAX_OVERFLOW: int = Field(
-        default=20, ge=0, le=100, description="Database connection pool overflow"
-    )
+    # LightRAG / Storage
+    USE_LIGHTRAG: bool = False
+    LIGHTRAG_WORKING_DIR: str = "./lightrag_storage"
+    LIGHTRAG_WORKSPACE: str = "boda"
 
-    # Monitoring
-    ENABLE_METRICS: bool = True
-    METRICS_PORT: int = 9090
-    LOG_FILE_PATH: str | None = None
-
-    # File Storage
-    UPLOAD_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
-    ALLOWED_FILE_TYPES: list[str] = ["csv", "xlsx", "json"]
-
-    @field_validator("ALLOWED_FILE_TYPES", mode="before")
-    @classmethod
-    def assemble_file_types(cls, v: Any) -> list[str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        return ["csv", "xlsx", "json"]
-
-    @field_validator("DEBUG", mode="before")
-    @classmethod
-    def parse_debug(cls, v: Any) -> bool:
-        """Parse debug flag from various input types"""
-        if isinstance(v, bool):
-            return v
-        if isinstance(v, str):
-            return v.lower() in ("true", "1", "yes", "on")
-        return bool(v)
-
-    @field_validator("*", mode="before")
-    @classmethod
-    def validate_required_in_production(cls, v: Any, info) -> Any:
-        field = info.field_name if hasattr(info, "field_name") else None
-        values = info.data if hasattr(info, "data") else {}
-        """Ensure required fields are set in production"""
-        env = values.get("ENVIRONMENT", Environment.DEVELOPMENT)
-
-        # Critical fields that must be set in production
-        production_required = {
-            "AWS_ACCESS_KEY_ID",
-            "AWS_SECRET_ACCESS_KEY",
-            "MOLIT_API_KEY",
-            "NEO4J_URI",
-            "NEO4J_PASSWORD",
-        }
-
-        if (
-            env == Environment.PRODUCTION
-            and field in production_required
-            and (v is None or v == "")
-        ):
-            raise ValueError(f"{field} is required in production environment")
-
-        return v
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=True,
-        validate_assignment=True,
-        extra="forbid",
-        env_parse_none_str="",  # Treat empty strings as None
-        json_schema_extra={"additionalProperties": False}
-    )
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        case_sensitive = False
+        extra = "ignore"
 
     def get_secret_value(self, field_name: str) -> str:
-        """Safely get secret value from SecretStr fields"""
-        value = getattr(self, field_name)
-        if hasattr(value, "get_secret_value"):
-            return value.get_secret_value()
+        value = getattr(self, field_name, "")
+        if value is None:
+            return ""
         return str(value)
 
 
-class TestSettings(Settings):
-    """Test environment settings"""
-
-    ENVIRONMENT: Environment = Environment.DEVELOPMENT
-    REDIS_URL: str = "redis://localhost:6379/1"  # Different Redis DB for tests
-    NEO4J_URI: str = "bolt://localhost:7687"
-    DEBUG: bool = True
-
-
-# Global settings instance
 settings = Settings()
 
 
 def get_settings() -> Settings:
-    """Get application settings"""
     return settings
 
 
 def get_environment_config() -> dict[str, Any]:
-    """Get environment-specific configuration"""
-    base_config = {
+    return {
         "reload": settings.RELOAD,
         "debug": settings.DEBUG,
-        "log_level": settings.LOG_LEVEL.value.lower(),
+        "log_level": settings.LOG_LEVEL.lower(),
         "workers": settings.WORKERS,
         "host": settings.HOST,
         "port": settings.PORT,
     }
-
-    # Environment-specific overrides
-    if settings.ENVIRONMENT == Environment.DEVELOPMENT:
-        base_config.update({"reload": True, "debug": True, "log_level": "debug"})
-    elif settings.ENVIRONMENT == Environment.STAGING:
-        base_config.update({"reload": False, "debug": False, "log_level": "info"})
-    elif settings.ENVIRONMENT == Environment.PRODUCTION:
-        base_config.update({"reload": False, "debug": False, "log_level": "warning"})
-
-    return base_config
-
-
-# API Rate Limiting
-RATE_LIMIT_CONFIG = {
-    "default": "100/minute",
-    "chat": "30/minute",
-    "search": "50/minute",
-    "upload": "5/minute",
-}
-
-
-# Logging configuration
-LOGGING_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "default": {
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        },
-        "detailed": {
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(pathname)s:%(lineno)d - %(funcName)s - %(message)s",
-        },
-    },
-    "handlers": {
-        "default": {
-            "formatter": "default",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",
-        },
-        "file": {
-            "formatter": "detailed",
-            "class": "logging.FileHandler",
-            "filename": settings.LOG_FILE_PATH or "app.log",
-        },
-    },
-    "root": {
-        "level": settings.LOG_LEVEL.value,
-        "handlers": ["default"] + (["file"] if settings.LOG_FILE_PATH else []),
-    },
-}

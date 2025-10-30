@@ -5,7 +5,7 @@
 ## 프로젝트 개요
 
 - **벡터 DB**: OpenSearch (k-NN 검색)
-- **그래프 DB**: Neo4j (사용자 데이터, 대화 이력)
+- **지식 그래프/사용자 데이터**: LightRAG 로컬 스토리지 (NetworkX + JSON)
 - **캐시**: Redis
 - **AI**: AWS Bedrock (Claude)
 - **RAG**: LightRAG (지식 그래프 기반)
@@ -23,8 +23,8 @@ cp .env.example .env
 # 의존성 설치
 uv sync
 
-# 외부 서비스 시작 (Neo4j, Redis, OpenSearch)
-docker-compose up -d neo4j redis opensearch
+# 외부 서비스 시작 (Redis, OpenSearch)
+docker-compose up -d redis opensearch
 
 # 백엔드 실행
 uv run uvicorn api.main:app --reload
@@ -38,10 +38,9 @@ streamlit run app.py
 ## 필수 환경 변수
 
 ```bash
-# Neo4j
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=neo4j
+# LightRAG storage
+LIGHTRAG_WORKING_DIR=./lightrag_storage
+LIGHTRAG_WORKSPACE=BODA
 
 # OpenSearch (로컬 Docker)
 OPENSEARCH_HOST=localhost
@@ -78,20 +77,20 @@ docker-compose up
 사용자 쿼리
   → Streamlit Frontend
   → FastAPI Backend
-  → LightRAG (지식 그래프 검색)
+  → LightRAG (로컬 지식 그래프 + NanoVectorDB)
   → OpenSearch (벡터 유사도 검색)
   → AWS Bedrock (응답 생성)
-  → Neo4j (대화 이력 저장)
+  → JSON Storage (대화 이력 저장)
   → 사용자에게 응답 반환
 ```
 
 ### 주요 서비스
 
 - **AIService**: AWS Bedrock (Claude)
-- **LightRAGService**: Neo4j 기반 지식 그래프 RAG
+- **LightRAGService**: LightRAG 기본 스토리지 (NetworkX/NanoVectorDB)
 - **OpenSearchVectorService**: 벡터 검색
 - **DataService**: 매물/정책 데이터 관리
-- **UserService**: 사용자 프로필 및 대화 이력 (Neo4j)
+- **UserService**: 사용자 프로필 및 대화 이력 (JSON 스토리지)
 - **RAGService**: RAG 파이프라인 오케스트레이션
 
 ## 개발 가이드
@@ -110,12 +109,6 @@ docker-compose up
 
 ## 문제 해결
 
-### Neo4j 연결 오류
-```bash
-docker-compose up -d neo4j
-# http://localhost:7474 접속하여 확인
-```
-
 ### OpenSearch 연결 오류
 ```bash
 # AWS 자격증명 확인
@@ -132,4 +125,3 @@ rm -rf ./lightrag_storage
 
 - Backend API Docs: http://localhost:8000/docs
 - Frontend: http://localhost:8501
-- Neo4j Browser: http://localhost:7474
