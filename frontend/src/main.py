@@ -36,10 +36,15 @@ def main():
     with tab2:
         render_data_analysis(
             sidebar_config['aws_region'],
+            sidebar_config['data_type'],
             sidebar_config['data_loading_mode'],
             sidebar_config['date_range'],
             sidebar_config['selected_year'],
-            sidebar_config['selected_month']
+            sidebar_config['selected_month'],
+            sidebar_config['selected_regions'],
+            sidebar_config.get('selected_region_labels', []),
+            sidebar_config.get('start_year_month'),
+            sidebar_config.get('end_year_month')
         )
     
     with tab3:

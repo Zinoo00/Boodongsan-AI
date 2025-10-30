@@ -16,3 +16,12 @@ S3_REGION_NAME=ap-northeast-2
 # Streamlit 설정
 STREAMLIT_SERVER_PORT=8501
 STREAMLIT_SERVER_ADDRESS=127.0.0.0
+
+# OpenSearch 설정 (지역 옵션 동적 로딩에 사용)
+# 예시: 로컬 도커로 실행 시 http://localhost:9200, 매니지드 도메인은 https://your-domain:9200
+OPENSEARCH_ENDPOINT=http://localhost:9200
+# 보안 미사용 시 비워두세요
+OPENSEARCH_USERNAME=
+OPENSEARCH_PASSWORD=
+# lawd_codes 인덱스명 (batch에서 생성한 인덱스명과 일치해야 함)
+OPENSEARCH_INDEX_LAWD_CODES=lawd_codes

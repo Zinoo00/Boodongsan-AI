@@ -14,50 +14,61 @@ from ..utils.data_loader import S3DataLoader
 logger = logging.getLogger(__name__)
 
 
-def render_data_analysis(aws_region: str, data_loading_mode: str, date_range=None, selected_year=None, selected_month=None):
+def render_data_analysis(aws_region: str, data_type: str, data_loading_mode: str, date_range=None, selected_year=None, selected_month=None, selected_regions=None, selected_region_labels=None, start_year_month=None, end_year_month=None):
     """데이터 분석 UI 렌더링"""
     st.header("📊 부동산 데이터 분석")
     
+    # 지역 선택 여부 확인
+    selected_regions = selected_regions or []
+    selected_region_labels = selected_region_labels or []
+    if not selected_regions:
+        st.info("왼쪽에서 지역을 선택하면 해당 지역 데이터만 조회합니다.")
+        return
+
     # S3에서 실제 데이터 로드
     with st.spinner("S3에서 데이터를 로드하고 있습니다..."):
         try:
             data_loader = S3DataLoader(region_name=aws_region)
             
-            # 데이터 타입 선택
-            selected_type_name = st.selectbox(
-                "데이터 타입 선택",
-                list(DATA_TYPE_OPTIONS.keys()),
-                help="분석할 부동산 데이터 타입을 선택하세요"
-            )
-            
-            data_type = DATA_TYPE_OPTIONS[selected_type_name]
+            # 데이터 타입은 사이드바에서 선택된 값 사용
             
             # 데이터 로딩 방식에 따라 데이터 로드
-            if data_loading_mode == "📅 년월 선택":
-                df = _load_data_by_year_month(data_loader, data_type)
-            elif data_loading_mode == "🔄 최신 데이터":
-                # 기존 최신 데이터 로드
-                df = data_loader.load_latest_data(data_type, "41480")
-            else:
-                # 전체 데이터 로드 (여러 년월 통합)
-                df = data_loader.load_latest_data(data_type, "41480", max_files=50)
+            if data_loading_mode == "날짜 필터 사용":
+                # 날짜 범위의 년월에 해당하는 파일만 로드 후, 일자 필터는 아래에서 적용
+                if not (date_range and len(date_range) == 2 and date_range[0] and date_range[1]):
+                    st.warning("⚠️ 날짜 범위를 선택해주세요.")
+                    return
+                start_date = pd.to_datetime(date_range[0])
+                end_date = pd.to_datetime(date_range[1])
+                # 년월 리스트 생성
+                months = []
+                cursor = pd.Timestamp(start_date.year, start_date.month, 1)
+                end_cursor = pd.Timestamp(end_date.year, end_date.month, 1)
+                while cursor <= end_cursor:
+                    months.append((str(cursor.year), str(cursor.month).zfill(2)))
+                    cursor = (cursor + pd.offsets.MonthBegin(1))
+
+                frames = []
+                for lawd_cd in selected_regions:
+                    for (yy, mm) in months:
+                        part = data_loader.load_data_by_year_month(data_type, lawd_cd, yy, mm)
+                        if part is not None and not part.empty:
+                            frames.append(part)
+                df = pd.concat(frames, ignore_index=True) if frames else None
+            elif data_loading_mode == "전체 조회":
+                # 전체 데이터 로드 (여러 파일) - 각 지역별로 병합
+                frames = []
+                for lawd_cd in selected_regions:
+                    part = data_loader.load_latest_data(data_type, lawd_cd, max_files=50)
+                    if part is not None and not part.empty:
+                        frames.append(part)
+                df = pd.concat(frames, ignore_index=True) if frames else None
             
             if df is not None and not df.empty:
-                st.success(f"✅ {data_type} 데이터 로드 완료 ({len(df)}건)")
-                
-                # 로드된 파일 정보 표시
-                if '수집년월' in df.columns:
-                    unique_months = df['수집년월'].unique()
-                    st.info(f"📅 로드된 데이터 기간: {', '.join(sorted(unique_months))}")
-                
-                if '파일경로' in df.columns:
-                    unique_files = df['파일경로'].nunique()
-                    st.info(f"📁 로드된 파일 수: {unique_files}개")
-                
                 # 데이터 전처리
                 df = _preprocess_data(df, data_type)
                 
-                # 거래일 범위 필터 적용
+                # 거래일 범위 필터 적용 (사이드바에서만 선택)
                 if date_range is not None and len(date_range) == 2 and date_range[0] is not None and date_range[1] is not None:
                     df = _apply_date_filter(df, date_range)
                 
@@ -76,55 +87,17 @@ def render_data_analysis(aws_region: str, data_loading_mode: str, date_range=Non
             logger.error(f"데이터 분석 탭 오류: {str(e)}")
 
 
-def _load_data_by_year_month(data_loader, data_type):
-    """년월별 데이터 로드"""
-    # 사용 가능한 년월 조회
-    available_data = data_loader.get_available_years_months(data_type, "41480")
-    
-    if not available_data['years']:
-        st.warning("⚠️ 사용 가능한 데이터가 없습니다.")
+def _load_data_by_year_month(data_loader, data_type, selected_regions, start_year_month, end_year_month):
+    """년월별 데이터 로드 (사이드바에서 받은 기간으로만 로드)"""
+    if not start_year_month or not end_year_month:
+        st.warning("⚠️ 사이드바에서 시작/종료 년월을 선택해주세요.")
         return None
-    
-    # 년월 기간 선택
-    st.subheader("📅 년월 기간 선택")
-    
-    # 사용 가능한 년월 목록 생성
-    available_year_months = []
-    for year in available_data['years']:
-        for month in available_data['months'].get(year, []):
-            year_month = f"{year}.{month.zfill(2)}"
-            available_year_months.append(year_month)
-    
-    if not available_year_months:
-        st.warning("⚠️ 사용 가능한 데이터가 없습니다.")
-        return None
-    
-    # 시작 년월 선택
-    start_year_month = st.selectbox(
-        "시작 년월",
-        available_year_months,
-        help="분석 시작 년월을 선택하세요"
-    )
-    
-    # 종료 년월 선택 (시작 년월 이후만 선택 가능)
-    start_index = available_year_months.index(start_year_month)
-    end_options = available_year_months[start_index:]
-    
-    end_year_month = st.selectbox(
-        "종료 년월",
-        end_options,
-        index=0,  # 기본값은 시작 년월과 동일
-        help="분석 종료 년월을 선택하세요"
-    )
-    
-    # 선택된 기간 표시
-    st.success(f"✅ 선택된 기간: {start_year_month} ~ {end_year_month}")
-    
+
     # 년월을 년도와 월로 분리
     start_year, start_month = start_year_month.split('.')
     end_year, end_month = end_year_month.split('.')
     
-    # 선택된 기간의 모든 년월 데이터 로드
+    # 선택된 기간의 모든 년월 데이터 로드 (선택된 모든 지역에 대해 병합)
     all_dataframes = []
     current_year = int(start_year)
     current_month = int(start_month)
@@ -135,11 +108,16 @@ def _load_data_by_year_month(data_loader, data_type):
         year_str = str(current_year)
         month_str = str(current_month).zfill(2)
         
-        # 해당 년월의 데이터 로드
-        monthly_df = data_loader.load_data_by_year_month(data_type, "41480", year_str, month_str)
-        if monthly_df is not None and not monthly_df.empty:
-            all_dataframes.append(monthly_df)
-            st.info(f"📅 {year_str}년 {month_str}월 데이터 로드: {len(monthly_df)}건")
+        # 각 지역의 해당 년월 데이터 로드 후 병합
+        monthly_frames = []
+        for lawd_cd in selected_regions:
+            monthly_df = data_loader.load_data_by_year_month(data_type, lawd_cd, year_str, month_str)
+            if monthly_df is not None and not monthly_df.empty:
+                monthly_frames.append(monthly_df)
+        if monthly_frames:
+            merged = pd.concat(monthly_frames, ignore_index=True)
+            all_dataframes.append(merged)
+            st.info(f"📅 {year_str}년 {month_str}월 데이터 로드: {len(merged)}건")
         
         # 다음 월로 이동
         current_month += 1
@@ -150,12 +128,6 @@ def _load_data_by_year_month(data_loader, data_type):
     if all_dataframes:
         # 모든 데이터 통합
         df = pd.concat(all_dataframes, ignore_index=True)
-        st.success(f"🎉 총 {len(df)}건의 데이터가 로드되었습니다.")
-        
-        # 일자 필터링 옵션
-        st.subheader("📅 일자 필터링")
-        df = _setup_day_filtering(df)
-        
         return df
     else:
         st.warning("⚠️ 선택된 기간에 데이터가 없습니다.")
@@ -312,23 +284,10 @@ def _apply_date_filter(df, date_range):
     if date_col is not None:
         start_date = pd.to_datetime(date_range[0])
         end_date = pd.to_datetime(date_range[1])
-        
-        # 디버깅: 실제 데이터의 날짜 범위 확인
-        valid_dates = df[date_col].dropna()
-        if not valid_dates.empty:
-            min_date = valid_dates.min()
-            max_date = valid_dates.max()
-            st.info(f"🔍 데이터 날짜 범위: {min_date.strftime('%Y-%m-%d')} ~ {max_date.strftime('%Y-%m-%d')} (총 {len(valid_dates)}건)")
-            st.info(f"🎯 선택한 필터 범위: {start_date.strftime('%Y-%m-%d')} ~ {end_date.strftime('%Y-%m-%d')}")
-        
         # 날짜 범위 내 데이터만 필터링
         df = df[(df[date_col] >= start_date) & (df[date_col] <= end_date)]
-        
-        if not df.empty:
-            st.info(f"📅 거래일 범위 필터 적용: {date_range[0].strftime('%Y-%m-%d')} ~ {date_range[1].strftime('%Y-%m-%d')} ({len(df)}건)")
-        else:
+        if df.empty:
             st.warning("⚠️ 선택한 거래일 범위에 해당하는 데이터가 없습니다.")
-            st.info("💡 팁: 사이드바에서 거래일 범위를 조정하거나, 날짜 필터를 해제해보세요.")
             df = None
     else:
         st.warning("⚠️ 날짜 컬럼을 찾을 수 없습니다. 날짜 필터링을 건너뜁니다.")
@@ -404,10 +363,10 @@ def _render_charts(df):
     with col1:
         # 거래금액 또는 보증금 히트맵
         if 'deal_amount' in df.columns and not df['deal_amount'].isna().all():
-            st.subheader("날짜별 가격대별 거래 건수")
+            st.subheader("매매 거래 분포")
             create_price_heatmap(df, 'deal_amount', 'Blues', '가격대')
         elif 'deposit' in df.columns and not df['deposit'].isna().all():
-            st.subheader("날짜별 보증금대별 거래 건수")
+            st.subheader("전월세 거래 분포")
             create_price_heatmap(df, 'deposit', 'Greens', '보증금대')
         else:
             st.info("거래금액/보증금 데이터가 없습니다.")
@@ -435,8 +394,10 @@ def _render_charts(df):
 def _render_data_table(df):
     """데이터 테이블 표시"""
     st.subheader("📋 상세 데이터")
+    # 표시에서 제외할 컬럼 제거
+    display_df = df.drop(columns=["수집년월", "파일경로", "deal_date"], errors='ignore')
     st.dataframe(
-        df.head(100),  # 처음 100건만 표시
+        display_df.head(100),  # 처음 100건만 표시
         width='stretch',
         hide_index=True
     )

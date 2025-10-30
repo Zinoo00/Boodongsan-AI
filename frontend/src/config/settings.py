@@ -20,6 +20,12 @@ KNOWLEDGE_BASE_ID = os.getenv("KNOWLEDGE_BASE_ID", "")
 BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID")
 BEDROCK_INFERENCE_PROFILE_ID = os.getenv("BEDROCK_INFERENCE_PROFILE_ID")
 
+# OpenSearch 설정 (지역 옵션 동적 로딩에 사용)
+OPENSEARCH_ENDPOINT = os.getenv("OPENSEARCH_ENDPOINT")
+OPENSEARCH_USERNAME = os.getenv("OPENSEARCH_USERNAME")
+OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD")
+OPENSEARCH_INDEX_LAWD_CODES = os.getenv("OPENSEARCH_INDEX_LAWD_CODES", "lawd_codes")
+
 # Streamlit 페이지 설정
 def setup_page_config():
     """Streamlit 페이지 설정"""
@@ -50,7 +56,7 @@ DATA_TYPE_OPTIONS = {
     "연립다세대 전월세": "rh_rent"
 }
 
-# 지역 옵션
+# 지역 옵션 (동적 로딩 실패 시 폴백)
 REGION_OPTIONS = ["분당구", "강남구", "서초구", "송파구", "마포구"]
 
 # 데이터 로딩 모드

@@ -4,7 +4,9 @@
 
 import streamlit as st
 from datetime import datetime, timedelta
-from ..config import AWS_REGION, KNOWLEDGE_BASE_ID, REGION_OPTIONS, DATA_LOADING_MODES
+from ..config import AWS_REGION, KNOWLEDGE_BASE_ID, DATA_LOADING_MODES, DATA_TYPE_OPTIONS
+from ..services.opensearch_service import get_level2_regions
+from ..utils.data_loader import S3DataLoader
 
 
 def render_sidebar():
@@ -33,50 +35,48 @@ def render_sidebar():
             help="하이브리드: 가장 정확한 결과, 벡터: 의미적 유사성, 키워드: 정확한 키워드 매칭"
         )
         
-        # 데이터 필터
-        st.subheader("데이터 필터")
+        # 📊 데이터 분석 설정 - 데이터 타입을 사이드바로 이동
+        st.subheader("📊 데이터 분석 설정")
+        selected_type_name = st.selectbox(
+            "데이터 타입",
+            list(DATA_TYPE_OPTIONS.keys()),
+            help="분석/조회에 사용할 데이터 타입을 선택하세요"
+        )
+        selected_data_type = DATA_TYPE_OPTIONS[selected_type_name]
+        
+        try:
+            dynamic_regions = get_level2_regions()
+        except Exception:
+            dynamic_regions = []
+
+        region_options = dynamic_regions
+        if not region_options:
+            st.warning("OpenSearch에서 지역 목록을 불러오지 못했습니다. 환경변수나 인덱스를 확인해주세요.")
+
         selected_regions = st.multiselect(
             "지역 선택",
-            REGION_OPTIONS,
-            default=["분당구", "강남구"]
+            region_options,
+            format_func=lambda x: x[1],
+            default=[]
         )
         
-        # 데이터 로딩 방식 선택
+        # 데이터 로딩 방식 선택 (두 가지 옵션만 제공)
         data_loading_mode = st.radio(
             "데이터 로딩 방식",
-            DATA_LOADING_MODES,
-            help="년월 선택: 특정 년월의 데이터를 로드하고 일자로 필터링"
+            ["날짜 필터 사용", "전체 조회"],
+            help="날짜 필터를 사용하거나 전체 데이터를 조회합니다."
         )
-        
-        if data_loading_mode == "📅 년월 선택":
-            # 년월 선택 모드
-            st.info("💡 년월을 선택하면 해당 월의 모든 데이터를 로드하고 일자로 필터링할 수 있습니다.")
-            selected_year = None
-            selected_month = None
-            date_range = None
-        elif data_loading_mode == "🔄 최신 데이터":
-            # 기존 최신 데이터 모드
-            use_date_filter = st.checkbox(
-                "날짜 필터 사용",
-                value=True,
-                help="체크 해제하면 모든 날짜의 데이터를 표시합니다"
+
+        if data_loading_mode == "날짜 필터 사용":
+            date_range = st.date_input(
+                "거래일 범위",
+                value=(datetime.now() - timedelta(days=30), datetime.now()),
+                max_value=datetime.now()
             )
-            
-            if use_date_filter:
-                date_range = st.date_input(
-                    "거래일 범위",
-                    value=(datetime.now() - timedelta(days=30), datetime.now()),
-                    max_value=datetime.now()
-                )
-            else:
-                date_range = None
-            selected_year = None
-            selected_month = None
         else:
-            # 전체 데이터 모드
             date_range = None
-            selected_year = None
-            selected_month = None
+        selected_year = None
+        selected_month = None
             
         # 🔍 데이터 검색 설정
         st.subheader("🔍 데이터 검색 설정")
@@ -87,15 +87,19 @@ def render_sidebar():
             max_value=10,
             value=5
         )
+
+        
     
     return {
         'aws_region': aws_region,
         'knowledge_base_id': knowledge_base_id,
         'search_type': search_type,
         'max_results': max_results,
-        'selected_regions': selected_regions,
+        'selected_regions': [code for code, _ in selected_regions],
+        'selected_region_labels': [label for _, label in selected_regions],
         'data_loading_mode': data_loading_mode,
         'date_range': date_range,
         'selected_year': selected_year,
-        'selected_month': selected_month
+        'selected_month': selected_month,
+        'data_type': selected_data_type
     }
