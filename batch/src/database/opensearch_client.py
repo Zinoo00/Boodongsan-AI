@@ -1,6 +1,6 @@
 """
-무료 OpenSearch 클라이언트 모듈
-ChromaDB 대신 무료 OpenSearch를 사용하여 벡터 데이터를 저장하고 검색합니다.
+OpenSearch 클라이언트 모듈
+OpenSearch를 사용하여 벡터 데이터를 저장하고 검색합니다.
 """
 
 import os

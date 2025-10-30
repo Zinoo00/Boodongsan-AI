@@ -63,7 +63,7 @@ uv sync --native-tls
 # ONNX 모델 다운로드 (선택사항)
 mkdir -p model && \
 curl -k -L -o model/all-MiniLM-L6-v2-onnx.tar.gz \
-  "https://chroma-onnx-models.s3.amazonaws.com/all-MiniLM-L6-v2/onnx.tar.gz" && \
+  "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx.tar.gz" && \
 tar -xzf model/all-MiniLM-L6-v2-onnx.tar.gz -C model && \
 rm model/all-MiniLM-L6-v2-onnx.tar.gz
 

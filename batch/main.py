@@ -11,6 +11,7 @@ import argparse
 import subprocess
 import sys
 from src.services.lawd_service import LawdService
+from src.collectors.molit_policy_collector import MolitPolicyCollector
 from src.utils.logger import get_logger
 
 # 로깅 설정
@@ -354,6 +355,8 @@ def main():
   python main.py --collect_data --lawd_cd 41480  # 데이터 수집
   python main.py --schedule_collect                # 5년간 전체 데이터 수집 (현재 요일)
   python main.py --schedule_collect --weekday 0   # 월요일 데이터 수집
+  python main.py --collect_policy --policy_mode md  # 국토부 정책(주거안정) 고정 페이지 → Markdown 업로드
+  python main.py --collect_policy --policy_mode pdf --policy_max 5 --policy_start_date 2025-10-01 --policy_end_date 2025-10-31  # 보도자료 PDF 수집
         """
     )
     
@@ -404,6 +407,38 @@ def main():
         type=int,
         choices=range(0, 7),
         help='요일별 수집 (0=월요일, 1=화요일, ..., 6=일요일)'
+    )
+    
+    parser.add_argument(
+        '--collect_policy',
+        action='store_true',
+        help='국토부 정책 수집 (pdf 또는 md 모드)'
+    )
+
+    parser.add_argument(
+        '--policy_mode',
+        type=str,
+        choices=['pdf', 'md'],
+        help='정책 수집 모드: pdf(보도자료 PDF) | md(정책 고정 페이지 Markdown)'
+    )
+    
+    parser.add_argument(
+        '--policy_max',
+        type=int,
+        default=3,
+        help='수집할 최대 정책자료 건수 (기본값: 3)'
+    )
+    
+    parser.add_argument(
+        '--policy_start_date',
+        type=str,
+        help='정책자료 수집 시작일 (YYYY-MM-DD 형식)'
+    )
+    
+    parser.add_argument(
+        '--policy_end_date',
+        type=str,
+        help='정책자료 수집 종료일 (YYYY-MM-DD 형식)'
     )
     
     args = parser.parse_args()
@@ -574,6 +609,76 @@ def main():
             logger.error(f"데이터 수집 실패: {e}")
             return 1
     
+    # 국토부 정책자료 수집 모드인지 확인
+    elif args.collect_policy:
+        print("=" * 60)
+        print("국토부 정책 수집")
+        print("=" * 60)
+
+        # 모드 필수 확인
+        if not args.policy_mode:
+            print("❌ 오류: --collect_policy 사용 시 --policy_mode (pdf|md)를 지정해야 합니다.")
+            print("사용 예시:")
+            print("  python main.py --collect_policy --policy_mode md")
+            print("  python main.py --collect_policy --policy_mode pdf --policy_max 5 --policy_start_date 2025-10-01 --policy_end_date 2025-10-31")
+            return 1
+
+        try:
+            collector = MolitPolicyCollector()
+
+            if args.policy_mode == 'md':
+                # 고정 정책 페이지 → Markdown 업로드
+                results = collector.collect_policy_pages_to_markdown()
+                if results:
+                    print(f"✅ {len(results)}건의 정책 페이지를 Markdown으로 업로드했습니다:")
+                    for i, result in enumerate(results, 1):
+                        print(f"  {i}. {result['title']}")
+                        print(f"     S3 위치: {result['s3_url']}")
+                        print()
+                else:
+                    print("❌ 업로드된 Markdown이 없습니다.")
+                    return 1
+                print("=" * 60)
+                return 0
+
+            elif args.policy_mode == 'pdf':
+                # PDF 수집은 파라미터 3개 모두 필수
+                missing = []
+                if args.policy_max is None:
+                    missing.append('--policy_max')
+                if not args.policy_start_date:
+                    missing.append('--policy_start_date')
+                if not args.policy_end_date:
+                    missing.append('--policy_end_date')
+                if missing:
+                    print(f"❌ 오류: pdf 모드에서는 {', '.join(missing)} 파라미터가 필요합니다.")
+                    print("사용 예시:")
+                    print("  python main.py --collect_policy --policy_mode pdf --policy_max 5 --policy_start_date 2025-10-01 --policy_end_date 2025-10-31")
+                    return 1
+
+                results = collector.collect(
+                    max_items=args.policy_max,
+                    start_date=args.policy_start_date,
+                    end_date=args.policy_end_date
+                )
+
+                if results:
+                    print(f"✅ {len(results)}건의 정책자료 PDF를 수집했습니다:")
+                    for i, result in enumerate(results, 1):
+                        print(f"  {i}. {result['title']} ({result['date']})")
+                        print(f"     S3 위치: {result['s3_url']}")
+                        print()
+                else:
+                    print("❌ 조건에 맞는 정책자료 PDF를 찾을 수 없습니다.")
+                    return 1
+                print("=" * 60)
+                return 0
+
+        except Exception as e:
+            print(f"❌ 정책자료 수집 중 오류가 발생했습니다: {e}")
+            logger.error(f"정책자료 수집 실패: {e}")
+            return 1
+    
     else:
         # 기본 모드 - 도움말 표시
         print("=" * 60)
@@ -584,6 +689,8 @@ def main():
         print("  --reload_lawd_codes               # lawd_codes 테이블 재수집")
         print("  --collect_data --lawd_cd --deal_ym # 데이터 수집")
         print("  --schedule_collect                # 5년간 전체 데이터 수집")
+        print("  --collect_policy --policy_mode md  # 국토부 정책(고정 페이지) Markdown 업로드")
+        print("  --collect_policy --policy_mode pdf --policy_max --policy_start_date --policy_end_date  # 보도자료 PDF 수집")
         print("  --help                           # 도움말 표시")
         print("=" * 60)
         return 0

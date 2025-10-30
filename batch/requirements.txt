@@ -16,3 +16,6 @@ APScheduler
 # AWS S3
 boto3
 
+# 웹 스크래핑
+beautifulsoup4
+

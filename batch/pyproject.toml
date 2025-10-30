@@ -1,5 +1,5 @@
 [project]
-name = "bds-collector"
+name = "boodongsan-batch"
 version = "0.1.0"
 description = "부동산 데이터 수집기 - 공공데이터포털 API를 사용하여 부동산 데이터를 수집하고 OpenSearch에 저장"
 authors = [

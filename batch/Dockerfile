@@ -20,7 +20,7 @@ COPY . .
 # ONNX 모델 다운로드 (SSL 문제 해결)
 RUN mkdir -p /app/model && \
     curl -k -L -o /app/model/all-MiniLM-L6-v2-onnx.tar.gz \
-    "https://chroma-onnx-models.s3.amazonaws.com/all-MiniLM-L6-v2/onnx.tar.gz" && \
+    "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx.tar.gz" && \
     tar -xzf /app/model/all-MiniLM-L6-v2-onnx.tar.gz \
     -C /app/model && \
     rm /app/model/all-MiniLM-L6-v2-onnx.tar.gz

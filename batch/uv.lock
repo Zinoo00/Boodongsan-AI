@@ -19,7 +19,7 @@ wheels = [
 ]
 
 [[package]]
-name = "bds-collector"
+name = "boodongsan-batch"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
