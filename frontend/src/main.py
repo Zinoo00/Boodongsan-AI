@@ -30,7 +30,8 @@ def main():
             sidebar_config['aws_region'],
             sidebar_config['knowledge_base_id'],
             sidebar_config['max_results'],
-            sidebar_config['search_type']
+            sidebar_config['search_type'],
+            sidebar_config.get('model_id')
         )
     
     with tab2:

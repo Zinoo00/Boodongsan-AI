@@ -39,12 +39,10 @@ def setup_page_config():
 def validate_environment():
     """환경변수 검증"""
     if not KNOWLEDGE_BASE_ID:
-        st.error("❌ KNOWLEDGE_BASE_ID 환경변수가 설정되지 않았습니다. .env 파일을 확인해주세요.")
-        st.stop()
+        st.warning("⚠️ KNOWLEDGE_BASE_ID가 비어 있습니다. 사이드바의 설정을 확인하세요.")
 
     if not BEDROCK_MODEL_ID and not BEDROCK_INFERENCE_PROFILE_ID:
-        st.error("❌ BEDROCK_MODEL_ID 또는 BEDROCK_INFERENCE_PROFILE_ID 환경변수가 설정되지 않았습니다. .env 파일을 확인해주세요.")
-        st.stop()
+        st.info("ℹ️ 환경변수에 모델 ID가 없습니다. 사이드바에서 모델을 선택하세요.")
 
 # 데이터 타입 옵션
 DATA_TYPE_OPTIONS = {

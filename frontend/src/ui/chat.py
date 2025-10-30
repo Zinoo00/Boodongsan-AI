@@ -11,7 +11,7 @@ from ..utils.aws_knowledge_base import format_retrieval_results
 logger = logging.getLogger(__name__)
 
 
-def render_chat_interface(aws_region: str, knowledge_base_id: str, max_results: int, search_type: str = "hybrid"):
+def render_chat_interface(aws_region: str, knowledge_base_id: str, max_results: int, search_type: str = "hybrid", model_or_profile_id: str | None = None):
     """채팅 인터페이스 렌더링"""
     st.header("💬 부동산 AI 어시스턴트와 대화하기")
     
@@ -52,9 +52,9 @@ def render_chat_interface(aws_region: str, knowledge_base_id: str, max_results: 
                         
                         # AI 응답 생성
                         logger.info("Claude 모델로 응답 생성 중...")
-                        # Inference Profile 우선 사용
-                        model_or_profile_id = BEDROCK_INFERENCE_PROFILE_ID or BEDROCK_MODEL_ID
-                        response = assistant.generate_response(prompt, context, model_or_profile_id)
+                        # 사이드바 선택 > 환경변수 우선순위 적용
+                        chosen_model = model_or_profile_id or BEDROCK_INFERENCE_PROFILE_ID or BEDROCK_MODEL_ID
+                        response = assistant.generate_response(prompt, context, chosen_model)
                         
                         # 응답이 에러 메시지인지 확인
                         if response.startswith("AWS Bedrock에 접근할 권한이 없습니다") or \
