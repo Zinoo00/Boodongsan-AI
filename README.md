@@ -18,15 +18,17 @@
 
 ### Backend
 - **Framework**: FastAPI, Uvicorn
-- **AI**: AWS Bedrock (Claude)
-- **RAG**: LightRAG (지식 그래프 기반)
-- **Vector DB**: NanoVectorDB (LightRAG) + OpenSearch
+- **AI**: AWS Bedrock (Claude + Titan Embeddings)
+- **RAG**: LightRAG (Knowledge Graph RAG with default settings)
+  - **Vector DB**: NanoVectorDB (embedded, no external service needed)
+  - **Graph Storage**: NetworkX (local graph storage)
+  - **Document Status**: JSON (local storage)
 - **Cache**: Redis
 - **OpenAPI**: 국토교통부 (MOLIT), Seoul Open Data
 
 ### Frontend
-- **Framework**: Streamlit
-- **UI Components**: Custom Streamlit components
+- **Framework**: Streamlit (minimal chatbot interface)
+- **UI**: Native Streamlit components (st.chat_message, st.chat_input)
 
 ## 🚀 빠른 시작
 
@@ -52,8 +54,8 @@ cp .env.example .env
 # 3. 의존성 설치
 uv sync
 
-# 4. 외부 서비스 시작
-docker-compose up -d redis opensearch
+# 4. 외부 서비스 시작 (Redis only - LightRAG uses embedded storage)
+docker-compose up -d redis
 
 # 5. 백엔드 실행
 uv run uvicorn api.main:app --reload
@@ -115,14 +117,9 @@ uv run pytest --cov
 핵심 환경 변수 (.env 파일):
 
 ```bash
-# LightRAG storage
+# LightRAG (uses default NanoVectorDB, NetworkX, JSON)
 LIGHTRAG_WORKING_DIR=./lightrag_storage
 LIGHTRAG_WORKSPACE=BODA
-
-# OpenSearch (로컬 Docker)
-OPENSEARCH_HOST=localhost
-OPENSEARCH_PORT=9200
-OPENSEARCH_AUTH_MODE=none
 
 # AWS Bedrock (AI)
 AWS_ACCESS_KEY_ID=your_key
@@ -131,6 +128,8 @@ AWS_REGION=ap-northeast-2
 
 # OpenAPI
 MOLIT_API_KEY=your_molit_key
+
+# Note: No OpenSearch configuration needed - LightRAG uses embedded storage!
 ```
 
 전체 설정은 `backend/.env.example` 참고
@@ -138,26 +137,52 @@ MOLIT_API_KEY=your_molit_key
 ## 📊 아키텍처
 
 ```
-사용자
-  ↓
-Streamlit Frontend (Port 8501)
-  ↓
-FastAPI Backend (Port 8000)
-  ↓
-├─ LightRAG (NetworkXStorage + NanoVectorDB)
-├─ OpenSearch (벡터 검색)
-├─ AWS Bedrock (AI 응답)
-└─ Redis (캐싱)
+User Query
+    ↓
+Streamlit Frontend (8501)
+    ↓
+FastAPI Backend (8000)
+    ↓
+LightRAG Service (Unified RAG)
+    ├─→ Knowledge Graph (NetworkX)
+    ├─→ Vector Search (NanoVectorDB)
+    └─→ AWS Bedrock (Embeddings + LLM)
+            ↓
+        Response to User
 ```
+
+### Data Flow
+
+1. User sends message via Streamlit
+2. Backend queries LightRAG with hybrid mode
+3. LightRAG performs:
+   - **Knowledge Graph Reasoning**: NetworkX graph traversal
+   - **Vector Similarity Search**: NanoVectorDB (embedded)
+   - **Entity Extraction**: AWS Bedrock Claude
+   - **Embeddings**: AWS Bedrock Titan
+4. LightRAG generates context-aware response
+5. Response displayed in Streamlit chat
+
+### LightRAG Default Settings
+
+- **Vector DB**: NanoVectorDB (embedded, no external service)
+- **Graph Storage**: NetworkX (local graph storage)
+- **Document Status**: JSON files (local storage)
+- **Chunk Size**: 1200 tokens (default)
+- **Embedding Batch**: 32 (default)
+- **Query Modes**: hybrid, local, global, naive
+
+### Migration from OpenSearch
+
+This project has been migrated from OpenSearch to LightRAG:
+- **Before**: External OpenSearch vector DB + LightRAG knowledge graph
+- **Now**: LightRAG with embedded NanoVectorDB (all-in-one)
+- **Benefits**:
+  - No external vector DB service required
+  - Simplified setup and deployment
+  - Integrated knowledge graph + vector search
+  - Optimized performance with default settings
 
 ## 📝 라이선스
 
 MIT License
-
-## 🤝 기여
-
-Issues와 Pull Requests를 환영합니다!
-
-## 📞 문의
-
-프로젝트 관련 문의사항은 Issues를 통해 남겨주세요.

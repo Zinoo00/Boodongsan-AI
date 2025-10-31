@@ -4,11 +4,12 @@
 
 ## 프로젝트 개요
 
-- **벡터 DB**: OpenSearch (k-NN 검색)
-- **지식 그래프/사용자 데이터**: LightRAG 로컬 스토리지 (NetworkX + JSON)
+- **RAG**: LightRAG (지식 그래프 기반 RAG)
+- **벡터 DB**: NanoVectorDB (LightRAG 기본 내장, 외부 서비스 불필요)
+- **지식 그래프**: NetworkX (LightRAG 기본 내장)
+- **문서 상태**: JSON (LightRAG 기본 내장)
 - **캐시**: Redis
-- **AI**: AWS Bedrock (Claude)
-- **RAG**: LightRAG (지식 그래프 기반)
+- **AI**: AWS Bedrock (Claude + Titan Embeddings)
 - **프론트엔드**: Streamlit
 - **OpenAPI**: 국토교통부 (MOLIT), Seoul Open Data
 
@@ -23,8 +24,8 @@ cp .env.example .env
 # 의존성 설치
 uv sync
 
-# 외부 서비스 시작 (Redis, OpenSearch)
-docker-compose up -d redis opensearch
+# 외부 서비스 시작 (Redis only - LightRAG uses embedded storage)
+docker-compose up -d redis
 
 # 백엔드 실행
 uv run uvicorn api.main:app --reload
@@ -38,14 +39,9 @@ streamlit run app.py
 ## 필수 환경 변수
 
 ```bash
-# LightRAG storage
+# LightRAG (uses default NanoVectorDB, NetworkX, JSON)
 LIGHTRAG_WORKING_DIR=./lightrag_storage
 LIGHTRAG_WORKSPACE=BODA
-
-# OpenSearch (로컬 Docker)
-OPENSEARCH_HOST=localhost
-OPENSEARCH_PORT=9200
-OPENSEARCH_AUTH_MODE=none
 
 # AWS Bedrock (AI)
 AWS_ACCESS_KEY_ID=your_key
@@ -54,6 +50,8 @@ AWS_REGION=ap-northeast-2
 
 # OpenAPI
 MOLIT_API_KEY=your_key
+
+# Note: No OpenSearch configuration needed - LightRAG uses embedded storage!
 ```
 
 ## 주요 명령어
@@ -77,21 +75,30 @@ docker-compose up
 사용자 쿼리
   → Streamlit Frontend
   → FastAPI Backend
-  → LightRAG (로컬 지식 그래프 + NanoVectorDB)
-  → OpenSearch (벡터 유사도 검색)
-  → AWS Bedrock (응답 생성)
+  → LightRAG (지식 그래프 + 벡터 검색 통합)
+    - NanoVectorDB (embedded vector search)
+    - NetworkX (knowledge graph)
+    - AWS Bedrock (embeddings & LLM)
   → JSON Storage (대화 이력 저장)
   → 사용자에게 응답 반환
 ```
 
 ### 주요 서비스
 
-- **AIService**: AWS Bedrock (Claude)
-- **LightRAGService**: LightRAG 기본 스토리지 (NetworkX/NanoVectorDB)
-- **OpenSearchVectorService**: 벡터 검색
+- **AIService**: AWS Bedrock (Claude + Titan Embeddings)
+- **LightRAGService**: LightRAG 통합 서비스 (NanoVectorDB + NetworkX + JSON)
 - **DataService**: 매물/정책 데이터 관리
 - **UserService**: 사용자 프로필 및 대화 이력 (JSON 스토리지)
 - **RAGService**: RAG 파이프라인 오케스트레이션
+
+### LightRAG 기본 설정
+
+- **Vector DB**: NanoVectorDB (embedded, 외부 서비스 불필요)
+- **Graph Storage**: NetworkX (local graph storage)
+- **Document Status**: JSON files (local storage)
+- **Chunk Size**: 1200 tokens (default)
+- **Embedding Batch**: 32 (default)
+- **Query Modes**: hybrid, local, global, naive
 
 ## 개발 가이드
 
@@ -109,7 +116,7 @@ docker-compose up
 
 ## 문제 해결
 
-### OpenSearch 연결 오류
+### AWS Bedrock 연결 오류
 ```bash
 # AWS 자격증명 확인
 aws sts get-caller-identity
@@ -120,6 +127,17 @@ aws sts get-caller-identity
 # 작업 디렉토리 초기화
 rm -rf ./lightrag_storage
 ```
+
+### 마이그레이션 노트
+
+이 프로젝트는 OpenSearch에서 LightRAG로 마이그레이션되었습니다:
+- **이전**: OpenSearch (외부 벡터 DB) + LightRAG (지식 그래프)
+- **현재**: LightRAG만 사용 (NanoVectorDB 내장)
+- **장점**:
+  - 외부 벡터 DB 서비스 불필요
+  - 설정 및 배포 단순화
+  - 지식 그래프와 벡터 검색 통합
+  - 기본 설정으로 최적화된 성능
 
 ## 참고
 

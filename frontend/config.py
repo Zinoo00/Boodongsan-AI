@@ -42,23 +42,6 @@ class FrontendSettings(BaseSettings):
     # Chat Settings
     MAX_MESSAGE_LENGTH: int = Field(default=2000, ge=1, le=10000, description="최대 메시지 길이")
     DEFAULT_MESSAGE_LIMIT: int = Field(default=20, ge=1, le=200, description="기본 메시지 로드 개수")
-    ENABLE_STREAMING: bool = Field(default=True, description="스트리밍 응답 활성화")
-
-    # UI Settings
-    THEME: str = Field(default="light", description="테마 (light/dark)")
-    PRIMARY_COLOR: str = Field(default="#FF4B4B", description="Primary color")
-    BACKGROUND_COLOR: str = Field(default="#FFFFFF", description="배경색")
-    SECONDARY_BACKGROUND_COLOR: str = Field(default="#F0F2F6", description="보조 배경색")
-    TEXT_COLOR: str = Field(default="#262730", description="텍스트 색상")
-
-    # Session
-    SESSION_TIMEOUT_MINUTES: int = Field(default=30, ge=5, le=1440, description="세션 타임아웃 (분)")
-
-    # Feature Flags
-    ENABLE_CONVERSATION_HISTORY: bool = Field(default=True, description="대화 이력 기능 활성화")
-    ENABLE_USER_PROFILE: bool = Field(default=True, description="사용자 프로필 기능 활성화")
-    ENABLE_PROPERTY_CARDS: bool = Field(default=True, description="매물 카드 표시 활성화")
-    ENABLE_POLICY_CARDS: bool = Field(default=True, description="정책 카드 표시 활성화")
 
     # Debug
     DEBUG: bool = Field(default=False, description="디버그 모드")
@@ -72,20 +55,6 @@ class FrontendSettings(BaseSettings):
             prefix = f"/{prefix}"
         return f"{base}{prefix}"
 
-    @property
-    def chat_endpoint(self) -> str:
-        """Chat 엔드포인트 URL"""
-        return f"{self.api_base_url}/chat/send"
-
-    @property
-    def history_endpoint(self) -> str:
-        """History 엔드포인트 URL (conversation_id placeholder)"""
-        return f"{self.api_base_url}/chat/history/{{conversation_id}}"
-
-    @property
-    def user_context_endpoint(self) -> str:
-        """User context 엔드포인트 URL (user_id placeholder)"""
-        return f"{self.api_base_url}/chat/context/{{user_id}}"
 
 
 # Global settings instance

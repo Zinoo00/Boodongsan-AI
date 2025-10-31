@@ -30,7 +30,6 @@ class ChatResponse(BaseModel):
     conversation_id: str
     response: str
     knowledge_mode: str | None = None
-    knowledge_cached: bool = False
     processing_time_ms: float
     vector_results: list[dict[str, Any]] = Field(default_factory=list)
     rag_context: dict[str, Any] = Field(default_factory=dict)
@@ -114,8 +113,10 @@ class BODAAPIClient:
         )
 
         try:
+            url = f"{self.base_url}/chat/send"
+            logger.info(f"Sending message to: {url}")
             response = self.client.post(
-                f"{self.base_url}/chat/send",
+                url,
                 json=request_payload.model_dump(exclude_none=True),
             )
             response.raise_for_status()
