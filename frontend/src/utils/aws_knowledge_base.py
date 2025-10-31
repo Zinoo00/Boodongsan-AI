@@ -8,6 +8,7 @@ import logging
 from typing import List, Dict, Any, Optional
 import os
 from botocore.exceptions import ClientError, NoCredentialsError
+from ..prompts.real_estate_assistant import build_real_estate_prompt
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -182,34 +183,68 @@ class AWSKnowledgeBase:
     
     def retrieve_keyword_search(self, knowledge_base_id: str, query: str, 
                               max_results: int = 5) -> Dict[str, Any]:
-        """키워드 검색 시뮬레이션 (벡터 검색 + 키워드 보너스)"""
+        """키워드 검색 (벡터 검색 + 키워드 점수 가중치 결합)"""
         # 키워드 검색을 위해 더 많은 결과를 가져와서 키워드 매칭으로 필터링
         results = self.retrieve_documents(knowledge_base_id, query, max_results * 2, "vector")
         
         if 'retrievalResults' not in results:
             return results
         
-        # 키워드 매칭 점수로 재정렬
+        # 쿼리 토큰 추출 (길이가 1보다 큰 토큰만 필터링)
+        query_lower = query.lower()
+        query_tokens = {
+            token.strip() for token in query_lower.split() 
+            if len(token.strip()) > 1
+        }
+        
+        # 벡터 점수와 키워드 점수를 가중치로 결합하여 재정렬
         for result in results['retrievalResults']:
+            base_score = result.get('score', 0)  # 벡터 유사도 점수 보존
             text = result.get('content', {}).get('text', '').lower()
-            query_lower = query.lower()
             
-            # 키워드 매칭 점수 계산
-            keyword_score = 0
-            query_words = query_lower.split()
-            for word in query_words:
-                if word in text:
-                    keyword_score += 1
+            # 키워드 점수 계산 (토큰 교집합 비율)
+            keyword_score = 0.0
+            if query_tokens:
+                text_tokens = {
+                    token.strip() for token in text.split() 
+                    if len(token.strip()) > 1
+                }
+                
+                if text_tokens:
+                    # 토큰 교집합 비율로 키워드 점수 계산
+                    intersection = query_tokens.intersection(text_tokens)
+                    keyword_score = len(intersection) / len(query_tokens)
+                    
+                    # 구문 일치 보너스
+                    if query_lower in text:
+                        keyword_score = min(keyword_score + 0.2, 1.0)
+                    
+                    # 메타데이터에서 제목/주소 매칭 보너스 (있는 경우)
+                    location = result.get('location', {})
+                    location_text = str(location).lower() if location else ""
+                    if any(token in location_text for token in query_tokens):
+                        keyword_score = min(keyword_score + 0.1, 1.0)
+            
+            # 적응형 가중치 계산 (벡터 점수가 높을수록 벡터 가중치 증가)
+            vector_weight = 0.7 + (0.2 * base_score) if base_score > 0.8 else 0.7
+            keyword_weight = 1.0 - vector_weight
+            
+            # 결합 점수 계산
+            combined_score = (vector_weight * base_score) + (keyword_weight * keyword_score)
             
             result['keywordScore'] = keyword_score
+            result['vectorScore'] = base_score
+            result['combinedScore'] = combined_score
             result['searchType'] = 'keyword'
         
-        # 키워드 점수로 정렬
+        # 결합 점수로 정렬
         results['retrievalResults'] = sorted(
             results['retrievalResults'], 
-            key=lambda x: x.get('keywordScore', 0), 
+            key=lambda x: x.get('combinedScore', 0), 
             reverse=True
         )[:max_results]
+        
+        logger.info(f"키워드 검색 결과 처리: 벡터+키워드 가중치 결합 방식으로 {len(results['retrievalResults'])}개 결과 반환")
         
         return results
     
@@ -242,24 +277,7 @@ class AWSKnowledgeBase:
         logger.info(f"Claude 모델 응답 생성 시작 - 모델: {model_id}")
         
         try:
-            prompt = f"""
-당신은 부동산 전문 AI 어시스턴트입니다. 
-사용자의 질문에 대해 제공된 부동산 및 정책 데이터를 바탕으로 정확하고 도움이 되는 답변을 제공해주세요.
-
-사용자 질문: {query}
-
-참고 데이터:
-{context}
-
-답변 시 다음 사항을 고려해주세요:
-1. 데이터에 기반한 정확한 정보 제공
-2. 구체적인 수치와 지역 정보 포함
-3. 시장 동향이나 패턴 분석
-4. 추가 조사가 필요한 경우 안내
-5. 한국어로 자연스럽게 답변
-
-답변:
-"""
+            prompt = build_real_estate_prompt(query=query, context=context)
             
             response = self.bedrock_runtime.invoke_model(
                 modelId=model_id,

@@ -37,7 +37,7 @@ cp env_example.txt .env
 
 ### 2. 환경변수 설정
 
-`.env` 파일을 생성하고 다음 내용을 설정하세요:
+`.env` 파일을 생성하고 다음 내용을 설정하세요 (필요한 항목만 채워도 됩니다):
 
 ```env
 # AWS 설정
@@ -46,12 +46,28 @@ AWS_ACCESS_KEY_ID=your_aws_access_key
 AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 
 # AWS Bedrock 설정
+# UI에서 모델을 선택할 수 있으나, 환경변수로 기본값을 정할 수도 있습니다.
 KNOWLEDGE_BASE_ID=your_knowledge_base_id
-BEDROCK_MODEL_ID=anthropic.claude-haiku-4-5-20251001-v1:0
+
+# 1) 모델 ID 사용 (예: 사이드바 옵션과 동일한 apac 접두 모델 ID)
+#   - 예) Claude 3.5 Sonnet v2 (APAC 리전)
+BEDROCK_MODEL_ID=apac.anthropic.claude-3-5-sonnet-20241022-v2:0
+
+# 2) Inference Profile 사용 (모델 ID 대신, 있으면 우선 적용)
+BEDROCK_INFERENCE_PROFILE_ID=your_inference_profile_id_or_arn
 
 # S3 설정 (데이터 소스)
 S3_BUCKET_NAME=bds-collect
 S3_REGION_NAME=ap-northeast-2
+
+# OpenSearch 설정 (지역 옵션 동적 로딩)
+# 예시: 로컬 도커는 http://localhost:9200, 매니지드 도메인은 https://your-domain:9200
+OPENSEARCH_ENDPOINT=http://localhost:9200
+# 보안 미사용 시 비워두세요
+OPENSEARCH_USERNAME=
+OPENSEARCH_PASSWORD=
+# lawd_codes 인덱스명 (batch 서비스에서 생성된 인덱스와 동일해야 함)
+OPENSEARCH_INDEX_LAWD_CODES=lawd_codes
 ```
 
 ### 3. 앱 실행
@@ -186,7 +202,7 @@ streamlit run app.py --server.address 127.0.0.1
 ## 🛠️ 기술 스택
 
 - **Frontend**: Streamlit
-- **AI/ML**: AWS Bedrock (Claude 3 Sonnet)
+- **AI/ML**: AWS Bedrock (Claude 3.x/3.5/4 계열)
 - **Vector Search**: AWS Knowledge Base
 - **Data Storage**: Amazon S3
 - **Visualization**: Plotly
@@ -211,6 +227,7 @@ streamlit run app.py --server.address 127.0.0.1
             "Action": [
                 "bedrock:InvokeModel",
                 "bedrock:Retrieve",
+                "bedrock:GetInvocationLoggingConfiguration",
                 "s3:GetObject",
                 "s3:ListBucket"
             ],
@@ -259,6 +276,20 @@ python run.py --port 8080
 
 # 권한 오류 (Linux/macOS)
 sudo python run.py --port 80
+```
+
+### OpenSearch 연결 오류
+
+```bash
+# 필수 환경변수 확인
+echo $OPENSEARCH_ENDPOINT
+
+# 인증이 필요한 도메인이라면 계정/비밀번호 설정
+export OPENSEARCH_USERNAME=your_username
+export OPENSEARCH_PASSWORD=your_password
+
+# 인덱스명 일치 여부 확인 (기본: lawd_codes)
+export OPENSEARCH_INDEX_LAWD_CODES=lawd_codes
 ```
 
 ### 데이터 로드 오류

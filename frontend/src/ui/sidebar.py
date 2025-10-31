@@ -20,8 +20,6 @@ def render_sidebar():
         # Knowledge Base ID는 환경변수에서 가져옴
         knowledge_base_id = KNOWLEDGE_BASE_ID
 
-        # LLM 모델/프로파일 선택
-        st.subheader("🧠 모델 설정")
         model_options = {
             "Claude 3 Haiku": "apac.anthropic.claude-3-haiku-20240307-v1:0",
             "Claude 3 Sonnet": "apac.anthropic.claude-3-sonnet-20240229-v1:0",
@@ -31,9 +29,9 @@ def render_sidebar():
             "Claude Sonnet 4": "apac.anthropic.claude-sonnet-4-20250514-v1:0",
         }
         selected_model_name = st.selectbox(
-            "🤖 \u00a0모델/프로파일",
+            "🤖 \u00a0모델 선택",
             list(model_options.keys()),
-            help="사용할 LLM 모델 또는 추론 프로파일을 선택하세요"
+            help="사용할 LLM 모델을 선택하세요"
         )
         selected_model_id = model_options[selected_model_name]
         
