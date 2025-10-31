@@ -9,7 +9,7 @@ import json
 import logging
 from typing import Any
 
-import boto3
+from boto3.session import Session
 from botocore.exceptions import BotoCoreError, ClientError
 
 from core.config import settings
@@ -23,17 +23,27 @@ class AIService:
     def __init__(self) -> None:
         self._runtime = None
         self._initialized = False
+        self._session_kwargs = {
+            "aws_access_key_id": settings.AWS_ACCESS_KEY_ID or None,
+            "aws_secret_access_key": settings.AWS_SECRET_ACCESS_KEY or None,
+            "region_name": settings.AWS_REGION,
+        }
 
     async def initialize(self) -> None:
         if self._initialized:
             return
 
-        self._runtime = boto3.client(
-            "bedrock-runtime",
-            region_name=settings.AWS_REGION,
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID or None,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY or None,
-        )
+        session_kwargs = {k: v for k, v in self._session_kwargs.items() if v is not None}
+        session = Session(**session_kwargs)
+
+        self._runtime = session.client("bedrock-runtime")
+
+        if not hasattr(self._runtime, "invoke_model"):
+            raise AttributeError(
+                "Configured Bedrock client does not support invoke_model. "
+                "Confirm that boto3 is up to date and that you are using the Bedrock Runtime endpoint, not Agents for Bedrock."
+            )
+
         self._initialized = True
         logger.info("AIService initialised")
 
