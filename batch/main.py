@@ -353,6 +353,7 @@ def main():
   python main.py --collect_data --data_type apt_rent --lawd_cd 41480 --deal_ym 202412  # 데이터 수집
   python main.py --collect_data --lawd_cd 41480 --deal_ym 202412  # 데이터 수집
   python main.py --collect_data --lawd_cd 41480  # 데이터 수집
+  python main.py --collect_data --lawd_cd 41480 --deal_year 2025  # 2025년 1월부터 현재 월까지 수집
   python main.py --schedule_collect                # 5년간 전체 데이터 수집 (현재 요일)
   python main.py --schedule_collect --weekday 0   # 월요일 데이터 수집
   python main.py --collect_policy --policy_mode md  # 국토부 정책(주거안정) 고정 페이지 → Markdown 업로드
@@ -376,6 +377,12 @@ def main():
         '--deal_ym',
         type=str,
         help='거래 년월 (YYYYMM 형식)'
+    )
+    
+    parser.add_argument(
+        '--deal_year',
+        type=str,
+        help='거래 연도 (YYYY 형식) - 지정 시 해당 연도 1월부터 현재 월까지 수집'
     )
     
     parser.add_argument(
@@ -485,13 +492,52 @@ def main():
             print("  python main.py --collect_data --data_type apt_rent --lawd_cd 41480 --deal_ym 202412")
             print("  python main.py --collect_data --lawd_cd 41480 --deal_ym 202412")
             print("  python main.py --collect_data --lawd_cd 41480  # 이번달 자동 수집")
+            print("  python main.py --collect_data --lawd_cd 41480 --deal_year 2025  # 2025년 1월부터 현재 월까지 수집")
             return 1
         
-        # deal_ym이 없으면 현재 월로 설정
-        if not args.deal_ym:
+        # deal_ym과 deal_year 동시 지정 확인
+        if args.deal_ym and args.deal_year:
+            print("❌ 오류: --deal_ym과 --deal_year는 동시에 지정할 수 없습니다.")
+            return 1
+        
+        # deal_year가 지정된 경우 해당 연도 1월부터 현재 월까지 수집
+        if args.deal_year:
+            from datetime import datetime
+            try:
+                year = int(args.deal_year)
+                current_date = datetime.now()
+                current_year = current_date.year
+                current_month = current_date.month
+                
+                # 연도 유효성 검사
+                if year < 2000 or year > current_year:
+                    print(f"❌ 오류: 유효하지 않은 연도입니다. (2000년부터 {current_year}년까지 가능)")
+                    return 1
+                
+                # 해당 연도 1월부터 현재 월까지 목록 생성
+                deal_ym_list = []
+                if year == current_year:
+                    # 올해인 경우 1월부터 현재 월까지
+                    end_month = current_month
+                else:
+                    # 과거 연도인 경우 12월까지
+                    end_month = 12
+                
+                for month in range(1, end_month + 1):
+                    deal_ym_list.append(f"{year}{month:02d}")
+                
+                print(f"📅 {args.deal_year}년 1월부터 {end_month}월까지 총 {len(deal_ym_list)}개월 수집")
+            except ValueError:
+                print(f"❌ 오류: 올바른 연도 형식이 아닙니다. (YYYY 형식, 예: 2025)")
+                return 1
+        elif args.deal_ym:
+            # deal_ym이 지정된 경우 단일 월 수집
+            deal_ym_list = [args.deal_ym]
+        else:
+            # 둘 다 없으면 현재 월로 설정
             from datetime import datetime
             current_month = datetime.now().strftime("%Y%m")
-            args.deal_ym = current_month
+            deal_ym_list = [current_month]
             print(f"⚠️ 거래 년월이 지정되지 않았습니다. 현재 월({current_month})을 사용합니다.")
         
         # 데이터 타입이 지정되지 않은 경우 기본값 설정
@@ -503,22 +549,25 @@ def main():
         
         print(f"수집할 데이터 타입: {', '.join(data_types)}")
         print(f"법정동 코드: {args.lawd_cd}")
-        print(f"거래 년월: {args.deal_ym}")
+        print(f"거래 년월: {', '.join(deal_ym_list)}")
         print("=" * 60)
         
         try:
             success_count = 0
-            total_count = len(data_types)
+            total_count = len(data_types) * len(deal_ym_list)
             
-            for data_type in data_types:
-                print(f"\n🔄 {data_type} 데이터 수집 시작...")
-                success = collect_data(data_type, args.lawd_cd, args.deal_ym)
-                
-                if success:
-                    print(f"✅ {data_type} 데이터 수집 완료")
-                    success_count += 1
-                else:
-                    print(f"❌ {data_type} 데이터 수집 실패")
+            # 각 년월별로 데이터 수집
+            for deal_ym in deal_ym_list:
+                print(f"\n📅 {deal_ym} 수집 시작...")
+                for data_type in data_types:
+                    print(f"  🔄 {data_type} 데이터 수집 시작...")
+                    success = collect_data(data_type, args.lawd_cd, deal_ym)
+                    
+                    if success:
+                        print(f"  ✅ {data_type} 데이터 수집 완료")
+                        success_count += 1
+                    else:
+                        print(f"  ❌ {data_type} 데이터 수집 실패")
             
             print(f"\n📊 수집 결과: {success_count}/{total_count} 성공")
             
