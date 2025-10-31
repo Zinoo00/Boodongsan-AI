@@ -11,7 +11,6 @@ from fastapi import Request
 if TYPE_CHECKING:
     from services.ai_service import AIService
     from services.lightrag_service import LightRAGService
-    from services.opensearch_service import OpenSearchVectorService
     from services.rag_service import RAGService
     from services.seoul_city_data_service import SeoulCityDataService
     from services.user_service import UserService
@@ -37,16 +36,12 @@ def get_user_service(request: Request) -> "UserService":
     return _get_service(request, "user_service")
 
 
-def get_vector_service(request: Request) -> "OpenSearchVectorService":
-    return _get_service(request, "vector_service")
+def get_lightrag_service(request: Request) -> "LightRAGService":
+    return _get_service(request, "lightrag_service")
 
 
 def get_data_service(request: Request) -> "DataService":
     return _get_service(request, "data_service")
-
-
-def get_lightrag_service(request: Request) -> "LightRAGService | None":
-    return getattr(request.app.state, "lightrag_service", None)
 
 
 def get_citydata_service(request: Request) -> "SeoulCityDataService | None":

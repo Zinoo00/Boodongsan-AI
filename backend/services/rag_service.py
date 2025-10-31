@@ -1,5 +1,5 @@
 """
-Straightforward Retrieval-Augmented Generation service.
+Straightforward Retrieval-Augmented Generation service using LightRAG.
 """
 
 from __future__ import annotations
@@ -12,23 +12,20 @@ from core.config import settings
 if TYPE_CHECKING:
     from services.ai_service import AIService
     from services.lightrag_service import LightRAGService
-    from services.opensearch_service import OpenSearchVectorResult, OpenSearchVectorService
     from services.user_service import UserService
 
 
 class RAGService:
-    """Minimal orchestration layer for the chat flow."""
+    """Minimal orchestration layer for the chat flow using LightRAG."""
 
     def __init__(
         self,
         *,
         ai_service: AIService,
-        vector_service: OpenSearchVectorService,
         user_service: UserService,
-        lightrag_service: LightRAGService | None = None,
+        lightrag_service: LightRAGService,
     ):
         self.ai_service = ai_service
-        self.vector_service = vector_service
         self.user_service = user_service
         self.lightrag_service = lightrag_service
         self.max_results = settings.MAX_SEARCH_RESULTS
@@ -94,16 +91,13 @@ class RAGService:
         }
 
     async def _query_lightrag(self, query: str) -> dict[str, Any] | None:
-        if not self.lightrag_service:
-            return None
-        return await self.lightrag_service.query(query)
+        """Query LightRAG knowledge graph."""
+        return await self.lightrag_service.query(query, mode="hybrid")
 
     async def _search_vectors(self, query: str) -> list[dict[str, Any]]:
-        results = await self.vector_service.search(
-            query_texts=[query],
-            limit=self.max_results,
-        )
-        return [self._format_vector_result(res) for res in results]
+        """Vector search using LightRAG (NanoVectorDB)."""
+        results = await self.lightrag_service.search_vectors(query, limit=self.max_results)
+        return results
 
     async def _persist_conversation(
         self,
@@ -157,21 +151,3 @@ class RAGService:
                 data[field] = getattr(profile, field)
         return data
 
-    def _format_vector_result(self, result: OpenSearchVectorResult) -> dict[str, Any]:
-        metadata = dict(result.metadata) if result.metadata else {}
-        doc_type = (
-            metadata.get("type")
-            or metadata.get("document_type")
-            or metadata.get("data_type")
-            or metadata.get("category")
-        )
-        if doc_type and "type" not in metadata:
-            metadata["type"] = doc_type
-
-        return {
-            "id": result.id,
-            "score": result.score,
-            "metadata": metadata,
-            "document": result.document,
-            "type": doc_type,
-        }

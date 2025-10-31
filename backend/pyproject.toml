@@ -20,12 +20,12 @@ dependencies = [
     "langchain-core==0.3.74",
     "openai==1.91.0",
     
-    # 데이터베이스 - Redis, OpenSearch
+    # 데이터베이스 - Redis, LightRAG
     "redis>=5,<6",  # 캐시
-    "opensearch-py>=2.6.0",  # 벡터 검색
     "numpy==1.26.4",
 
-    # LightRAG - local knowledge graph RAG (NanoVectorDB + NetworkX)
+    # LightRAG - Knowledge Graph RAG with default settings
+    # Uses: NanoVectorDB (embedded vector DB), NetworkX (graph), JSON (doc status)
     "lightrag-hku[api]>=0.1.0",
     "networkx>=3.0",  # 그래프 연산
     

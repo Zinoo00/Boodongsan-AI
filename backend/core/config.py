@@ -35,23 +35,7 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str | None = None
     CACHE_TTL: int = 3600
 
-    # Vector / RAG
-    OPENSEARCH_HOST: str = "localhost"
-    OPENSEARCH_PORT: int = 9200
-    OPENSEARCH_USE_SSL: bool = False
-    OPENSEARCH_VERIFY_CERTS: bool = False
-    OPENSEARCH_AUTH_MODE: str = "none"
-    OPENSEARCH_USERNAME: str | None = None
-    OPENSEARCH_PASSWORD: str | None = None
-    OPENSEARCH_INDEX_NAME: str = "boda_vectors"
-    OPENSEARCH_TEXT_FIELD: str = "text"
-    OPENSEARCH_VECTOR_FIELD: str = "embedding"
-    OPENSEARCH_METADATA_FIELD: str = "metadata"
-    OPENSEARCH_SHARDS: int = 1
-    OPENSEARCH_REPLICAS: int = 0
-    OPENSEARCH_KNN_ENGINE: str = "faiss"
-    OPENSEARCH_KNN_SPACE_TYPE: str = "cosinesimil"
-    VECTOR_SIZE: int = 1536
+    # RAG
     MAX_SEARCH_RESULTS: int = 10
     RESPONSE_MAX_TOKENS: int = 1000
 
@@ -59,7 +43,11 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "ap-northeast-2"
-    BEDROCK_MODEL_ID: str = "anthropic.claude-3-sonnet-20240229-v1:0"
+    # Claude Sonnet 4.5 (released September 2025)
+    # Regional endpoint for APAC region (recommended for ap-northeast-2)
+    BEDROCK_MODEL_ID: str = "anthropic.claude-sonnet-4-5-20250929-v1:0"
+    # Alternative global endpoint: "global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    # Alternative APAC-specific: "apac.anthropic.claude-sonnet-4-5-20250929-v1:0"
     BEDROCK_EMBEDDING_MODEL_ID: str = "amazon.titan-embed-text-v1"
 
     # External APIs
@@ -68,10 +56,18 @@ class Settings(BaseSettings):
     HF_API_KEY: str | None = None
     SEOUL_OPEN_API_KEY: str | None = None
 
-    # LightRAG / Storage
-    USE_LIGHTRAG: bool = False
+    # LightRAG - Knowledge Graph RAG with Default Settings
+    # Uses NanoVectorDB (embedded), NetworkX (graph), JSON (doc status)
     LIGHTRAG_WORKING_DIR: str = "./lightrag_storage"
-    LIGHTRAG_WORKSPACE: str = "boda"
+    LIGHTRAG_WORKSPACE: str = "BODA"
+    LIGHTRAG_EMBEDDING_DIM: int = 1536
+
+    # LightRAG uses default settings:
+    # - Vector DB: NanoVectorDB (embedded, no external service)
+    # - Graph Storage: NetworkX (local graph storage)
+    # - Document Status: JSON files (local storage)
+    # - Chunk size: 1200 tokens
+    # - Embedding batch size: 32
 
     class Config:
         env_file = ".env"

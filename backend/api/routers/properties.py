@@ -1,11 +1,11 @@
 """
-Property router backed by DataService (OpenSearch).
+Property router backed by DataService.
 """
 
 from __future__ import annotations
 
 from collections import Counter
-from typing import Annotated, TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -44,7 +44,7 @@ class PropertyListResponse(BaseModel):
 @router.post("/search", response_model=PropertyListResponse)
 async def search_properties(
     request: PropertySearchRequest,
-    data_service: Annotated["DataService", Depends(get_data_service)],
+    data_service: "DataService" = Depends(get_data_service),
 ) -> PropertyListResponse:
     """Search properties with flexible filters."""
     filters = {k: v for k, v in request.model_dump().items() if v not in (None, "")}
@@ -59,7 +59,7 @@ async def search_properties(
 
 @router.get("/", response_model=PropertyListResponse)
 async def list_properties(
-    data_service: Annotated["DataService", Depends(get_data_service)],
+    data_service: "DataService" = Depends(get_data_service),
     district: str | None = Query(None, description="자치구 필터"),
     property_type: str | None = Query(None, description="부동산 유형"),
     transaction_type: str | None = Query(None, description="거래 유형"),
@@ -86,7 +86,7 @@ async def list_properties(
 @router.get("/{property_id}")
 async def get_property_detail(
     property_id: str,
-    data_service: Annotated["DataService", Depends(get_data_service)],
+    data_service: "DataService" = Depends(get_data_service),
 ) -> dict[str, Any]:
     """Return a single property."""
     property_record = await data_service.get_property(property_id)
@@ -97,7 +97,7 @@ async def get_property_detail(
 
 @router.get("/regions/list")
 async def get_regions(
-    data_service: Annotated["DataService", Depends(get_data_service)],
+    data_service: "DataService" = Depends(get_data_service),
 ) -> dict[str, Any]:
     """Return region summary derived from current properties."""
     properties = await data_service.search_properties(limit=200)
@@ -113,7 +113,7 @@ async def get_regions(
 
 @router.get("/types/list")
 async def get_property_types(
-    data_service: Annotated["DataService", Depends(get_data_service)],
+    data_service: "DataService" = Depends(get_data_service),
 ) -> dict[str, Any]:
     """Return property type distribution."""
     properties = await data_service.search_properties(limit=200)

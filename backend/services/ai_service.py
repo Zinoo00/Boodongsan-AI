@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class AIService:
-    """Straightforward Bedrock runtime wrapper."""
+    """Straightforward Bedrock runtime wrapper with embeddings."""
 
     def __init__(self) -> None:
         self._runtime = None
@@ -43,6 +43,66 @@ class AIService:
 
     def is_ready(self) -> bool:
         return self._runtime is not None
+
+    async def generate_embeddings(self, texts: list[str]) -> list[list[float]]:
+        """Generate embeddings using Bedrock"""
+        await self.initialize()
+
+        if not texts:
+            return []
+
+        try:
+            embeddings = []
+            for text in texts:
+                body = json.dumps({"inputText": text})
+
+                response = await asyncio.to_thread(
+                    self._runtime.invoke_model,
+                    modelId=settings.BEDROCK_EMBEDDING_MODEL_ID,
+                    body=body,
+                    contentType="application/json",
+                    accept="application/json",
+                )
+
+                result = json.loads(response["body"].read())
+                embeddings.append(result["embedding"])
+
+            logger.info(f"Generated {len(embeddings)} embeddings")
+            return embeddings
+
+        except Exception as e:
+            logger.error(f"Embedding generation failed: {e}")
+            raise
+
+    async def generate_text(
+        self,
+        prompt: str,
+        system_prompt: str | None = None,
+        max_tokens: int = 2000,
+    ) -> dict[str, Any]:
+        """
+        Generate text using AWS Bedrock Claude (for LightRAG).
+
+        Args:
+            prompt: User prompt
+            system_prompt: System prompt (optional)
+            max_tokens: Maximum tokens to generate
+
+        Returns:
+            Response dict with "text" key
+        """
+        await self.initialize()
+
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        text = await self._invoke_claude(messages, max_tokens=max_tokens)
+        return {
+            "text": text,
+            "model_used": settings.BEDROCK_MODEL_ID,
+        }
 
     async def generate_rag_response(self, context: dict[str, Any]) -> dict[str, Any]:
         await self.initialize()

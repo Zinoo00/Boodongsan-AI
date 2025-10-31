@@ -5,7 +5,7 @@ User router backed by the lightweight JSON-based UserService.
 from __future__ import annotations
 
 import logging
-from typing import Annotated, TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -38,7 +38,7 @@ class ConversationListResponse(BaseModel):
 @router.get("/{user_id}/profile", response_model=UserProfileResponse)
 async def get_user_profile(
     user_id: str,
-    user_service: Annotated["UserService", Depends(get_user_service)],
+    user_service: "UserService" = Depends(get_user_service),
 ) -> UserProfileResponse:
     """Return the primary user profile."""
     try:
@@ -59,7 +59,7 @@ async def get_user_profile(
 async def get_user_conversation(
     user_id: str,
     conversation_id: str,
-    user_service: Annotated["UserService", Depends(get_user_service)],
+    user_service: "UserService" = Depends(get_user_service),
     limit: int = Query(50, ge=1, le=200, description="조회할 메시지 수"),
 ) -> ConversationListResponse:
     """Return a stored conversation."""

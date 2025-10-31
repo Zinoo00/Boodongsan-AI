@@ -21,7 +21,6 @@ from core.database import cleanup_database, initialize_database
 from services.ai_service import AIService
 from services.data_service import DataService
 from services.lightrag_service import LightRAGService
-from services.opensearch_service import OpenSearchVectorService
 from services.rag_service import RAGService
 from services.seoul_city_data_service import SeoulCityDataService
 from services.user_service import UserService
@@ -37,45 +36,43 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     await initialize_database()
 
+    # Initialize AI service
     ai_service = AIService()
     await ai_service.initialize()
 
-    vector_service = OpenSearchVectorService()
-    await vector_service.initialize()
+    # Initialize LightRAG service (unified RAG with NanoVectorDB)
+    lightrag_service = LightRAGService(ai_service=ai_service)
+    await lightrag_service.initialize()
 
-    lightrag_service = LightRAGService() if settings.USE_LIGHTRAG else None
-    if lightrag_service:
-        await lightrag_service.initialize()
-
+    # Initialize other services
     data_service = DataService()
     user_service = UserService()
 
     city_data_service = SeoulCityDataService()
     await city_data_service.initialize()
 
+    # Initialize RAG service with LightRAG only
     rag_service = RAGService(
         ai_service=ai_service,
-        vector_service=vector_service,
         user_service=user_service,
         lightrag_service=lightrag_service,
     )
 
+    # Store services in app state
     app.state.ai_service = ai_service
-    app.state.vector_service = vector_service
     app.state.data_service = data_service
     app.state.lightrag_service = lightrag_service
     app.state.rag_service = rag_service
     app.state.user_service = user_service
     app.state.citydata_service = city_data_service
 
-    logger.info("Application services initialised")
+    logger.info("Application services initialized (using LightRAG with NanoVectorDB)")
 
     try:
         yield
     finally:
         await ai_service.close()
-        if lightrag_service:
-            await lightrag_service.finalize()
+        await lightrag_service.finalize()
         await city_data_service.close()
         await cleanup_database()
 
