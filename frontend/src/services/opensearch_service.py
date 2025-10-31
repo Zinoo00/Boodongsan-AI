@@ -39,7 +39,7 @@ def _create_client() -> OpenSearch:
 def get_level2_regions(index_name: str | None = None, max_terms: int = 1000) -> List[tuple[str, str]]:
     """lawd_codes 인덱스에서 level_2가 NULL이 아닌 지역 목록 조회
 
-    반환 형식: List[(lawd_code, label)] where label = "level_1 level_2"
+    반환 형식: List[(lawd_code, label)] where label = "level_1 level_2 level_3"
     """
     index = index_name or os.getenv("OPENSEARCH_INDEX_LAWD_CODES", "lawd_codes")
     client = _create_client()
@@ -53,7 +53,7 @@ def get_level2_regions(index_name: str | None = None, max_terms: int = 1000) -> 
                 ]
             }
         },
-        "_source": ["level_1", "level_2", "lawd_cd", "lawd_code"]
+        "_source": ["level_1", "level_2", "level_3", "lawd_cd", "lawd_code"]
     }
 
     try:
@@ -68,9 +68,12 @@ def get_level2_regions(index_name: str | None = None, max_terms: int = 1000) -> 
                 src = h.get("_source", {})
                 lvl2 = src.get("level_2")
                 lvl1 = src.get("level_1")
+                lvl3 = src.get("level_3")
                 code = src.get("lawd_cd") or src.get("lawd_code")
                 if lvl2 and code:
-                    label = f"{lvl1} {lvl2}".strip() if lvl1 else str(lvl2)
+                    # level_1, level_2, level_3를 모두 포함하여 라벨 생성
+                    name_parts = [part for part in [lvl1, lvl2, lvl3] if part]
+                    label = " ".join(name_parts).strip()
                     unique.add((str(code), label))
 
         collect(hits)
