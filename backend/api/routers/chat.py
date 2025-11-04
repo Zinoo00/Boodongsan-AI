@@ -59,7 +59,7 @@ class UserContextResponse(BaseModel):
 @router.post("/send", response_model=ChatResponse)
 async def send_message(
     payload: ChatRequest,
-    rag_service: "RAGService" = Depends(get_rag_service),
+    rag_service: RAGService = Depends(get_rag_service),
 ) -> ChatResponse:
     """Process a chat message through the RAG pipeline."""
     conversation_id = payload.conversation_id or str(uuid.uuid4())
@@ -91,7 +91,7 @@ async def send_message(
 )
 async def get_conversation_history(
     conversation_id: str,
-    user_service: "UserService" = Depends(get_user_service),
+    user_service: UserService = Depends(get_user_service),
     user_id: str = Query(..., description="사용자 ID"),
     limit: int = Query(20, ge=1, le=200, description="가져올 메시지 수"),
 ) -> ConversationHistoryResponse:
@@ -121,7 +121,7 @@ async def get_conversation_history(
 )
 async def get_user_context(
     user_id: str,
-    user_service: "UserService" = Depends(get_user_service),
+    user_service: UserService = Depends(get_user_service),
 ) -> UserContextResponse:
     """Return basic user profile and recent conversation snippets."""
     profile = await user_service.get_primary_profile(user_id)

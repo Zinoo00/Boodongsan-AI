@@ -36,7 +36,9 @@ class DataService:
             items = [item for item in items if item.get(key) == value]
         return items[offset : offset + limit]
 
-    async def update_property(self, property_id: str, updates: dict[str, Any]) -> dict[str, Any] | None:
+    async def update_property(
+        self, property_id: str, updates: dict[str, Any]
+    ) -> dict[str, Any] | None:
         if property_id not in self._properties:
             return None
         self._properties[property_id].update(updates)

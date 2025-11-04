@@ -37,7 +37,9 @@ class RAGService:
         conversation_id: str,
         session_context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        context = await self._build_context(user_query, user_id, conversation_id, session_context or {})
+        context = await self._build_context(
+            user_query, user_id, conversation_id, session_context or {}
+        )
 
         start_time = time.time()
         knowledge = await self._query_lightrag(user_query)
@@ -92,7 +94,7 @@ class RAGService:
 
     async def _query_lightrag(self, query: str) -> dict[str, Any] | None:
         """Query LightRAG knowledge graph."""
-        return await self.lightrag_service.query(query, mode="hybrid")
+        return await self.lightrag_service.query(query, mode="local")
 
     async def _search_vectors(self, query: str) -> list[dict[str, Any]]:
         """Vector search using LightRAG (NanoVectorDB)."""
@@ -150,4 +152,3 @@ class RAGService:
             if hasattr(profile, field):
                 data[field] = getattr(profile, field)
         return data
-

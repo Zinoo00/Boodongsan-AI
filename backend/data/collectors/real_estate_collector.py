@@ -8,12 +8,13 @@ https://github.com/divetocode/budongsan-api
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import time
+import xml.etree.ElementTree as ET
 from collections.abc import AsyncGenerator, Callable
 from datetime import datetime
 from typing import Any
+from urllib.parse import urlencode
 
 import aiohttp
 
@@ -22,7 +23,7 @@ from data.collectors.sigungu_service import SigunguInfo, SigunguServiceSingleton
 
 logger = logging.getLogger(__name__)
 
-MOLIT_BASE_URL = "https://apis.data.go.kr/1613000"
+MOLIT_BASE_URL = "http://apis.data.go.kr/1613000"
 DEFAULT_PAGE_SIZE = 1000
 SUPPORTED_PROPERTY_TYPES = ("apartment_trade", "apartment_rent")
 
@@ -36,7 +37,9 @@ class RealEstateCollector:
         self.request_delay = 0.5
         self.last_request_time = 0.0
 
-        self._property_handlers: dict[str, Callable[[SigunguInfo, str], AsyncGenerator[dict[str, Any], None]]] = {
+        self._property_handlers: dict[
+            str, Callable[[SigunguInfo, str], AsyncGenerator[dict[str, Any], None]]
+        ] = {
             "apartment_trade": self._collect_apartment_trade,
             "apartment_rent": self._collect_apartment_rent,
         }
@@ -119,8 +122,18 @@ class RealEstateCollector:
                 logger.error("시군구 정보가 비어 있습니다.")
                 return False
 
-            async for _ in self._collect_apartment_trade(test_sigungu, datetime.now().strftime("%Y%m")):
-                logger.info("국토교통부 API 연결 테스트 성공")
+            # Test with January 2024 data (known to exist)
+            test_month = "202401"
+            logger.info("테스트 기준월: %s", test_month)
+
+            # Try with rent data first (as working test uses rent endpoint)
+            async for _ in self._iterate_endpoint(
+                service="RTMSDataSvcAptRent",
+                operation="getRTMSDataSvcAptRent",
+                params={"LAWD_CD": "11680", "DEAL_YMD": test_month},
+                page_size=10,
+            ):
+                logger.info("국토교통부 API 연결 테스트 성공 (Rent endpoint)")
                 return True
             return False
         finally:
@@ -208,53 +221,65 @@ class RealEstateCollector:
         if not self.session:
             raise RuntimeError("HTTP session is not initialized")
 
-        query = {
+        query_params = {
             "serviceKey": self.service_key,
             "pageNo": str(page),
             "numOfRows": str(page_size),
-            "_type": "json",
             **params,
         }
 
-        url = f"{MOLIT_BASE_URL}/{service}/{operation}"
+        # Manually construct URL to avoid double-encoding issues with Korean government APIs
+        base_url = f"{MOLIT_BASE_URL}/{service}/{operation}"
+        query_string = urlencode(query_params, safe="=")
+        full_url = f"{base_url}?{query_string}"
 
-        async with self.session.get(url, params=query) as response:
+        async with self.session.get(full_url) as response:
             text = await response.text()
 
             if response.status != 200:
-                logger.error("국토교통부 API 요청 실패 (HTTP %s): %s", response.status, text)
+                logger.error("국토교통부 API 요청 실패 (HTTP %s)", response.status)
+                logger.error("URL: %s", full_url)
+                logger.error("Params: %s", query_params)
+                logger.error("Response: %s", text[:500])
                 return [], None
 
+        # Parse XML response (default format)
         try:
-            payload = json.loads(text)
-        except json.JSONDecodeError as exc:
-            logger.error("국토교통부 응답 JSON 파싱 실패: %s", exc)
+            root = ET.fromstring(text)
+        except ET.ParseError as exc:
+            logger.error("국토교통부 응답 XML 파싱 실패: %s", exc)
+            logger.error("Response: %s", text[:500])
             return [], None
 
-        response_body = payload.get("response", {})
-        header = response_body.get("header", {})
-        result_code = header.get("resultCode")
+        # Check result code
+        result_code_elem = root.find(".//resultCode")
+        result_msg_elem = root.find(".//resultMsg")
 
-        if result_code not in {"00", "000"}:
-            logger.error(
-                "국토교통부 API 오류 (%s): %s",
-                result_code,
-                header.get("resultMsg", "알 수 없는 오류"),
-            )
-            return [], None
+        if result_code_elem is not None:
+            result_code = result_code_elem.text
+            if result_code not in {"00", "000"}:
+                result_msg = (
+                    result_msg_elem.text if result_msg_elem is not None else "알 수 없는 오류"
+                )
+                logger.error("국토교통부 API 오류 (%s): %s", result_code, result_msg)
+                return [], None
 
-        body = response_body.get("body", {}) or {}
-        items = body.get("items") or {}
-        if isinstance(items, dict):
-            items = items.get("item", [])
+        # Extract items
+        items_elements = root.findall(".//item")
+        items = []
+        for item_elem in items_elements:
+            item_dict = {}
+            for child in item_elem:
+                item_dict[child.tag] = child.text
+            items.append(item_dict)
 
-        if isinstance(items, dict):
-            items = [items]
-        elif items is None:
-            items = []
-
-        total_count_raw = body.get("totalCount")
-        total_count = int(total_count_raw) if total_count_raw is not None else None
+        # Extract total count
+        total_count_elem = root.find(".//totalCount")
+        total_count = (
+            int(total_count_elem.text)
+            if total_count_elem is not None and total_count_elem.text
+            else None
+        )
 
         return items, total_count
 
@@ -369,12 +394,7 @@ class RealEstateCollector:
         return " ".join(
             filter(
                 None,
-                (
-                    part.strip()
-                    if isinstance(part, str)
-                    else part
-                    for part in parts
-                ),
+                (part.strip() if isinstance(part, str) else part for part in parts),
             )
         )
 

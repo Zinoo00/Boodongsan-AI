@@ -5,8 +5,9 @@ LightRAG service - 지식 그래프 기반 RAG with default NanoVectorDB storage
 from __future__ import annotations
 
 import logging
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Awaitable, Callable
+from typing import TYPE_CHECKING, Any
 
 from lightrag import LightRAG, QueryParam
 
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def _build_llm_model_func(ai_service: "AIService | None") -> Callable[..., Awaitable[str]]:
+def _build_llm_model_func(ai_service: AIService | None) -> Callable[..., Awaitable[str]]:
     async def llm_model_func(
         prompt: str,
         system_prompt: str | None = None,
@@ -42,23 +43,27 @@ def _build_llm_model_func(ai_service: "AIService | None") -> Callable[..., Await
     return llm_model_func
 
 
-def _build_embedding_func(ai_service: "AIService | None") -> Callable[[list[str]], Awaitable[list[list[float]]]]:
-    async def embedding_func(texts: list[str]) -> list[list[float]]:
+def _build_embedding_func(
+    ai_service: AIService | None,
+) -> Callable[[list[str]], Awaitable[list[list[float]]]]:
+    async def embedding_func(texts: list[str], **kwargs: Any) -> list[list[float]]:
         if not ai_service:
             raise ValueError("AIService not configured")
 
         try:
-            return await ai_service.generate_embeddings(texts)
+            return await ai_service.generate_embeddings(texts, **kwargs)
         except Exception as exc:
             logger.error(f"Embedding function failed: {exc}")
             raise
 
     embedding_dim = None
     if ai_service:
-        embedding_dim = getattr(ai_service, "embedding_dim", None) or getattr(ai_service, "embedding_dimension", None)
+        embedding_dim = getattr(ai_service, "embedding_dim", None) or getattr(
+            ai_service, "embedding_dimension", None
+        )
     if embedding_dim is None:
         embedding_dim = settings.LIGHTRAG_EMBEDDING_DIM
-    setattr(embedding_func, "embedding_dim", embedding_dim)
+    embedding_func.embedding_dim = embedding_dim
 
     return embedding_func
 
@@ -78,7 +83,7 @@ class LightRAGService:
         LightRAG 서비스 초기화.
 
         Args:
-            ai_service: AWS Bedrock AI service for embeddings and LLM
+            ai_service: AI service providing Anthropic Claude responses and embeddings
         """
         self.ai_service = ai_service
         self._rag: LightRAG | None = None
@@ -110,9 +115,9 @@ class LightRAGService:
             # LightRAG 인스턴스 생성 with default settings
             self._rag = LightRAG(
                 working_dir=str(self.working_dir),
-                # LLM 함수 - AWS Bedrock Claude 사용
+                # LLM 함수 - Anthropic Claude 사용
                 llm_model_func=llm_model_func,
-                # Embedding 함수 - AWS Bedrock Titan 사용
+                # Embedding 함수 - 로컬 결정적 임베딩 사용
                 embedding_func=embedding_func,
                 # Default vector DB: NanoVectorDB (embedded)
                 # Default graph storage: NetworkX
@@ -124,15 +129,40 @@ class LightRAGService:
             await self._rag.initialize_storages()
 
             # Pipeline status 초기화 (필수)
-            # Note: 이 메서드는 LightRAG 인스턴스의 메서드가 아닐 수 있음
-            # 필요시 직접 구현하거나 LightRAG 문서 참조
+            try:
+                from lightrag.kg.shared_storage import initialize_pipeline_status
+
+                await initialize_pipeline_status()
+                logger.info("Pipeline status initialized")
+            except (ImportError, AttributeError) as e:
+                logger.warning(f"Could not initialize pipeline status: {e}")
+                # Continue anyway - some versions may not require this
 
             self._initialized = True
-            logger.info("LightRAG initialized successfully with default settings (NanoVectorDB, NetworkX)")
+            logger.info(
+                "LightRAG initialized successfully with default settings (NanoVectorDB, NetworkX)"
+            )
 
         except Exception as e:
             logger.error(f"Failed to initialize LightRAG: {e}")
             raise
+
+    def is_empty(self) -> bool:
+        """
+        LightRAG 스토리지가 비어있는지 확인.
+
+        Returns:
+            True if storage is empty, False otherwise
+        """
+        # Check if any files exist in the working directory
+        if not self.working_dir.exists():
+            return True
+
+        # Check for any data files
+        files = list(self.working_dir.glob("**/*"))
+        data_files = [f for f in files if f.is_file() and f.suffix in {".json", ".pkl", ".db"}]
+
+        return len(data_files) == 0
 
     async def finalize(self) -> None:
         """LightRAG 정리 및 종료."""
@@ -199,7 +229,7 @@ class LightRAGService:
         query: str,
         mode: str = "hybrid",
         only_need_context: bool = False,
-        top_k: int = 60,
+        top_k: int = 20,
     ) -> dict[str, Any] | None:
         """
         LightRAG 쿼리 실행.
@@ -283,13 +313,15 @@ class LightRAGService:
 
             for i, chunk in enumerate(chunks[:limit]):
                 if chunk.strip():
-                    results.append({
-                        "id": f"lightrag_{i}",
-                        "score": 1.0 - (i * 0.05),  # 순위에 따른 점수
-                        "document": chunk.strip(),
-                        "metadata": {"source": "lightrag", "mode": "naive"},
-                        "type": "knowledge_chunk",
-                    })
+                    results.append(
+                        {
+                            "id": f"lightrag_{i}",
+                            "score": 1.0 - (i * 0.05),  # 순위에 따른 점수
+                            "document": chunk.strip(),
+                            "metadata": {"source": "lightrag", "mode": "naive"},
+                            "type": "knowledge_chunk",
+                        }
+                    )
 
             logger.info(f"Vector search found {len(results)} results")
             return results

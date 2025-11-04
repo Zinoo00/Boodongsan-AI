@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
-from datetime import datetime
 from typing import Any
 
 import uvicorn
@@ -15,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from api.routers import chat, citydata, health, policies, properties, users
+from api.routers import admin, chat, citydata, health, policies, properties, users
 from core.config import get_environment_config, settings
 from core.database import cleanup_database, initialize_database
 from services.ai_service import AIService
@@ -43,6 +42,28 @@ async def lifespan(app: FastAPI):
     # Initialize LightRAG service (unified RAG with NanoVectorDB)
     lightrag_service = LightRAGService(ai_service=ai_service)
     await lightrag_service.initialize()
+
+    # Check if LightRAG is empty and optionally load sample data
+    if lightrag_service.is_empty():
+        logger.warning("⚠️  LightRAG 스토리지가 비어 있습니다!")
+        logger.warning(
+            "   샘플 데이터를 로드하려면: uv run python -m scripts.load_data load --mode sample"
+        )
+        logger.warning("   또는 API 사용: POST /api/v1/admin/load-data")
+
+        # Auto-load sample data in development (optional - 환경변수로 제어 가능)
+        auto_load = settings.ENVIRONMENT == "development" and getattr(
+            settings, "AUTO_LOAD_SAMPLE_DATA", False
+        )
+        if auto_load:
+            logger.info("개발 환경: 샘플 데이터 자동 로딩 중...")
+            try:
+                from scripts.load_data import load_sample_data
+
+                await load_sample_data(lightrag_service)
+                logger.info("✅ 샘플 데이터 로딩 완료")
+            except Exception as e:
+                logger.error(f"❌ 샘플 데이터 로딩 실패: {e}")
 
     # Initialize other services
     data_service = DataService()
@@ -99,8 +120,11 @@ app.include_router(chat.router, prefix=f"{settings.API_V1_STR}/chat", tags=["Cha
 app.include_router(health.router, prefix=f"{settings.API_V1_STR}/health", tags=["Health"])
 app.include_router(citydata.router, prefix=f"{settings.API_V1_STR}/citydata", tags=["City Data"])
 app.include_router(policies.router, prefix=f"{settings.API_V1_STR}/policies", tags=["Policies"])
-app.include_router(properties.router, prefix=f"{settings.API_V1_STR}/properties", tags=["Properties"])
+app.include_router(
+    properties.router, prefix=f"{settings.API_V1_STR}/properties", tags=["Properties"]
+)
 app.include_router(users.router, prefix=f"{settings.API_V1_STR}/users", tags=["Users"])
+app.include_router(admin.router, prefix=f"{settings.API_V1_STR}/admin", tags=["Admin"])
 
 
 @app.get("/", response_model=dict[str, Any])

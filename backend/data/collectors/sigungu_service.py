@@ -8,9 +8,9 @@ loads the bundled ``sigungu.json`` dataset to provide convenient lookups.
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Mapping, Optional
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,11 +27,11 @@ class SigunguInfo:
 class SigunguService:
     """Singleton-style helper for sigungu ⇄ code lookups."""
 
-    _instance: "SigunguService | None" = None
+    _instance: SigunguService | None = None
 
     def __init__(self, data_path: Path | None = None) -> None:
         if data_path is None:
-            data_path = Path(__file__).resolve().parent / "data" / "sigungu.json"
+            data_path = Path(__file__).resolve().parent / "sample-data" / "sigungu.json"
 
         if not data_path.exists():
             raise FileNotFoundError(f"sigungu dataset not found: {data_path}")
@@ -66,7 +66,7 @@ class SigunguService:
         self._sigungu_by_name = sigungu_by_name
 
     @classmethod
-    def get_instance(cls) -> "SigunguService":
+    def get_instance(cls) -> SigunguService:
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
@@ -75,11 +75,11 @@ class SigunguService:
         """Return an iterable of all known sigungu entries."""
         return self._sigungu_by_code.values()
 
-    def get_by_code(self, code: str) -> Optional[SigunguInfo]:
+    def get_by_code(self, code: str) -> SigunguInfo | None:
         """Look up sigungu metadata using the 5-digit administrative code."""
         return self._sigungu_by_code.get(str(code).zfill(5))
 
-    def get_by_name(self, name: str, *, sido: str | None = None) -> Optional[SigunguInfo]:
+    def get_by_name(self, name: str, *, sido: str | None = None) -> SigunguInfo | None:
         """Resolve sigungu information by Korean name, optionally filtered by 시/도."""
         candidates = self._sigungu_by_name.get(name)
         if not candidates:

@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8000
-    WORKERS: int = 1
+    WORKERS: int = 2
     RELOAD: bool = True
     LOG_LEVEL: str = "INFO"
     ASGI_SERVER: str = "uvicorn"
@@ -49,6 +49,8 @@ class Settings(BaseSettings):
     # Alternative global endpoint: "global.anthropic.claude-sonnet-4-5-20250929-v1:0"
     # Alternative APAC-specific: "apac.anthropic.claude-sonnet-4-5-20250929-v1:0"
     BEDROCK_EMBEDDING_MODEL_ID: str = "amazon.titan-embed-text-v1"
+    ANTHROPIC_API_KEY: str = ""
+    ANTHROPIC_MODEL_ID: str = "claude-3-5-sonnet-20241022"
 
     # External APIs
     MOLIT_API_KEY: str = ""

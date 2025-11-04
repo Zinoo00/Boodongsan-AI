@@ -1,16 +1,16 @@
 """
-Lightweight AI service for generating responses via AWS Bedrock Claude.
+Lightweight AI service for local embeddings and Anthropic Claude text generation.
 """
 
 from __future__ import annotations
 
 import asyncio
-import json
+import hashlib
 import logging
 from typing import Any
 
-from boto3.session import Session
-from botocore.exceptions import BotoCoreError, ClientError
+import numpy as np
+from anthropic import Anthropic
 
 from core.config import settings
 
@@ -18,71 +18,39 @@ logger = logging.getLogger(__name__)
 
 
 class AIService:
-    """Straightforward Bedrock runtime wrapper with embeddings."""
+    """Straightforward AI service using Anthropic Claude and local embeddings."""
 
     def __init__(self) -> None:
-        self._runtime = None
         self._initialized = False
-        self._session_kwargs = {
-            "aws_access_key_id": settings.AWS_ACCESS_KEY_ID or None,
-            "aws_secret_access_key": settings.AWS_SECRET_ACCESS_KEY or None,
-            "region_name": settings.AWS_REGION,
-        }
+        self._anthropic_client: Anthropic | None = None
+        self._anthropic_model_id = settings.ANTHROPIC_MODEL_ID
+        self._embedding_dim = settings.LIGHTRAG_EMBEDDING_DIM
 
     async def initialize(self) -> None:
         if self._initialized:
             return
 
-        session_kwargs = {k: v for k, v in self._session_kwargs.items() if v is not None}
-        session = Session(**session_kwargs)
-
-        self._runtime = session.client("bedrock-runtime")
-
-        if not hasattr(self._runtime, "invoke_model"):
-            raise AttributeError(
-                "Configured Bedrock client does not support invoke_model. "
-                "Confirm that boto3 is up to date and that you are using the Bedrock Runtime endpoint, not Agents for Bedrock."
-            )
-
         self._initialized = True
         logger.info("AIService initialised")
 
     async def close(self) -> None:
-        self._runtime = None
         self._initialized = False
+        self._anthropic_client = None
 
     def is_ready(self) -> bool:
-        return self._runtime is not None
+        return self._initialized
 
-    async def generate_embeddings(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings using Bedrock"""
-        await self.initialize()
+    @property
+    def embedding_dim(self) -> int:
+        return self._embedding_dim
+
+    async def generate_embeddings(self, texts: list[str], **_: Any) -> list[list[float]]:
+        """Generate lightweight deterministic embeddings (no external dependency)."""
 
         if not texts:
             return []
 
-        try:
-            embeddings = []
-            for text in texts:
-                body = json.dumps({"inputText": text})
-
-                response = await asyncio.to_thread(
-                    self._runtime.invoke_model,
-                    modelId=settings.BEDROCK_EMBEDDING_MODEL_ID,
-                    body=body,
-                    contentType="application/json",
-                    accept="application/json",
-                )
-
-                result = json.loads(response["body"].read())
-                embeddings.append(result["embedding"])
-
-            logger.info(f"Generated {len(embeddings)} embeddings")
-            return embeddings
-
-        except Exception as e:
-            logger.error(f"Embedding generation failed: {e}")
-            raise
+        return [self._text_to_embedding(text) for text in texts]
 
     async def generate_text(
         self,
@@ -91,7 +59,7 @@ class AIService:
         max_tokens: int = 2000,
     ) -> dict[str, Any]:
         """
-        Generate text using AWS Bedrock Claude (for LightRAG).
+        Generate text using Anthropic Claude (direct API).
 
         Args:
             prompt: User prompt
@@ -101,31 +69,36 @@ class AIService:
         Returns:
             Response dict with "text" key
         """
-        await self.initialize()
+        system = system_prompt if system_prompt else None
 
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": prompt})
+        anthropic_messages = [
+            {"role": "user", "content": prompt},
+        ]
 
-        text = await self._invoke_claude(messages, max_tokens=max_tokens)
+        text = await self._invoke_claude(
+            messages=anthropic_messages,
+            system_prompt=system,
+            max_tokens=max_tokens,
+        )
         return {
             "text": text,
-            "model_used": settings.BEDROCK_MODEL_ID,
+            "model_used": self._anthropic_model_id,
         }
 
     async def generate_rag_response(self, context: dict[str, Any]) -> dict[str, Any]:
-        await self.initialize()
-
+        system_prompt = self._system_prompt()
         messages = [
-            {"role": "system", "content": self._system_prompt()},
             {"role": "user", "content": self._user_prompt(context)},
         ]
 
-        text = await self._invoke_claude(messages, max_tokens=settings.RESPONSE_MAX_TOKENS)
+        text = await self._invoke_claude(
+            messages=messages,
+            system_prompt=system_prompt,
+            max_tokens=settings.RESPONSE_MAX_TOKENS,
+        )
         return {
             "text": text,
-            "model_used": settings.BEDROCK_MODEL_ID,
+            "model_used": self._anthropic_model_id,
         }
 
     def _system_prompt(self) -> str:
@@ -157,7 +130,7 @@ class AIService:
             for item in properties[:3]:
                 address = item.get("address") or item.get("title") or "미확인 매물"
                 price = item.get("price")
-                price_str = f"{price:,}원" if isinstance(price, (int, float)) else str(price or "")
+                price_str = f"{price:,}원" if isinstance(price, int | float) else str(price or "")
                 prop_type = item.get("property_type") or ""
                 lines.append(f"- {address} / {prop_type} / {price_str}")
             parts.extend(lines)
@@ -183,28 +156,54 @@ class AIService:
 
         return "\n".join(part for part in parts if part)
 
-    async def _invoke_claude(self, messages: list[dict[str, str]], max_tokens: int) -> str:
-        if self._runtime is None:
-            raise RuntimeError("AIService is not initialised")
+    def _ensure_anthropic_client(self) -> Anthropic:
+        if settings.ANTHROPIC_API_KEY == "":
+            raise RuntimeError("ANTHROPIC_API_KEY is not configured")
+        if self._anthropic_client is None:
+            self._anthropic_client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        return self._anthropic_client
 
-        body = {
-            "anthropic_version": "bedrock-2023-05-31",
-            "messages": messages,
+    async def _invoke_claude(
+        self,
+        messages: list[dict[str, str]],
+        system_prompt: str | None,
+        max_tokens: int,
+    ) -> str:
+        client = self._ensure_anthropic_client()
+
+        request_kwargs: dict[str, Any] = {
+            "model": self._anthropic_model_id,
             "max_tokens": max_tokens,
-            "temperature": 0.7,
-            "top_p": 0.9,
+            "messages": messages,
         }
+        if system_prompt:
+            request_kwargs["system"] = system_prompt
 
         try:
             response = await asyncio.to_thread(
-                self._runtime.invoke_model,
-                modelId=settings.BEDROCK_MODEL_ID,
-                body=json.dumps(body),
-                contentType="application/json",
-                accept="application/json",
+                client.messages.create,
+                **request_kwargs,
             )
-            payload = json.loads(response["body"].read())
-            return payload["content"][0]["text"]
-        except (ClientError, BotoCoreError) as exc:
-            logger.error("Bedrock invocation failed: %s", exc)
+        except Exception as exc:  # Anthropic client raises generic exceptions
+            logger.error("Anthropic invocation failed: %s", exc)
             raise
+
+        text_parts: list[str] = []
+        for block in response.content:
+            if getattr(block, "type", None) == "text":
+                text_parts.append(block.text)
+        return "".join(text_parts)
+
+    def _text_to_embedding(self, text: str) -> list[float]:
+        """Generate a deterministic pseudo-embedding for development use."""
+        if not text:
+            return [0.0] * self._embedding_dim
+
+        digest = hashlib.sha256(text.encode("utf-8")).digest()
+        seed = int.from_bytes(digest[:8], "little", signed=False)
+        rng = np.random.default_rng(seed)
+        vector = rng.standard_normal(self._embedding_dim)
+        norm = np.linalg.norm(vector)
+        if norm > 0:
+            vector = vector / norm
+        return vector.astype(np.float32).tolist()

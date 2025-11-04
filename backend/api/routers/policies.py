@@ -42,7 +42,7 @@ class PolicyListResponse(BaseModel):
 @router.post("/match", response_model=PolicyListResponse)
 async def match_policies(
     request: PolicyMatchRequest,
-    data_service: "DataService" = Depends(get_data_service),
+    data_service: DataService = Depends(get_data_service),
 ) -> PolicyListResponse:
     """Match eligible policies for the given user profile."""
     policies = await data_service.match_policies_for_user(request.user_profile)
@@ -56,7 +56,7 @@ async def match_policies(
 @router.post("/search", response_model=PolicyListResponse)
 async def search_policies(
     request: PolicySearchRequest,
-    data_service: "DataService" = Depends(get_data_service),
+    data_service: DataService = Depends(get_data_service),
 ) -> PolicyListResponse:
     """Search policies using filters."""
     filters = {k: v for k, v in request.model_dump().items() if v}
@@ -70,7 +70,7 @@ async def search_policies(
 
 @router.get("/", response_model=PolicyListResponse)
 async def list_policies(
-    data_service: "DataService" = Depends(get_data_service),
+    data_service: DataService = Depends(get_data_service),
     active_only: bool = Query(True, description="활성 정책만 조회"),
     limit: int = Query(20, ge=1, le=100, description="최대 조회 개수"),
 ) -> PolicyListResponse:
@@ -86,7 +86,7 @@ async def list_policies(
 @router.get("/{policy_id}")
 async def get_policy_detail(
     policy_id: str,
-    data_service: "DataService" = Depends(get_data_service),
+    data_service: DataService = Depends(get_data_service),
 ) -> dict[str, Any]:
     """Return policy detail."""
     policy = await data_service.get_policy(policy_id)

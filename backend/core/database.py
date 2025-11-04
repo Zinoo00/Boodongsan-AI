@@ -4,12 +4,11 @@ Very small Redis helper used during development.
 
 from __future__ import annotations
 
+import fnmatch
 import json
 import logging
 from datetime import datetime
 from typing import Any
-
-import fnmatch
 
 import redis.asyncio as aioredis
 from redis.exceptions import ConnectionError as RedisConnectionError
@@ -39,7 +38,7 @@ class AsyncMemoryRedis:
         return 1 if self._store.pop(key, None) is not None else 0
 
     async def keys(self, pattern: str) -> list[str]:
-        return [key for key in self._store.keys() if fnmatch.fnmatch(key, pattern)]
+        return [key for key in self._store if fnmatch.fnmatch(key, pattern)]
 
     async def incrby(self, key: str, amount: int = 1) -> int:
         new_value = int(self._store.get(key, 0)) + amount
@@ -73,9 +72,7 @@ class DatabaseManager:
             await self._redis.ping()
             logger.info("Connected to Redis at %s", settings.REDIS_URL)
         except (RedisConnectionError, OSError) as exc:
-            logger.warning(
-                "Redis connection failed (%s). Falling back to in-memory cache.", exc
-            )
+            logger.warning("Redis connection failed (%s). Falling back to in-memory cache.", exc)
             self._redis = AsyncMemoryRedis()
 
     async def get_redis(self):
