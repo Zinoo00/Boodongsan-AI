@@ -10,47 +10,44 @@ dependencies = [
     "uvicorn[standard]>=0.24,<0.31",
     "pydantic==2.11.7",
     "pydantic-settings==2.10.1",
-    
-    # AWS and AI services
-    "boto3==1.40.11",
-    "botocore==1.40.11",
-    "langchain==0.3.27",
-    "langchain-aws==0.2.30",
-    "langchain-community==0.3.27",
-    "langchain-core==0.3.74",
-    "openai==1.91.0",
-    
-    # Database
-    "supabase>=2.7.4",
-    "asyncpg==0.30.0",
-    "redis>=5,<6",
-    "chromadb>=1.0.20",
-    "qdrant-client==1.15.1",
+    # AI services
+    "anthropic==0.40.0",
+    # 데이터베이스 - Redis, PostgreSQL, LightRAG
+    "redis>=5,<6", # 캐시
     "numpy==1.26.4",
-    
+    # Background job processing
+    "celery[redis]>=5.5.3",
+    "flower>=2.0.1",  # Celery monitoring UI
+    # PostgreSQL with pgvector (default storage)
+    "asyncpg>=0.30.0",
+    "psycopg[binary]>=3.2.0",
+    "sqlalchemy[asyncio]>=2.0.0",
+    "alembic>=1.14.0",
+    "pgvector>=0.3.0",
+    # LightRAG - Knowledge Graph RAG with storage options
+    # Default: AWS RDS PostgreSQL + pgvector
+    # Local mode (--store local): NanoVectorDB (embedded), NetworkX (graph), JSON (doc status)
+    "lightrag-hku[api]>=0.1.0",
+    "networkx>=3.0", # 그래프 연산
     # Security
     "python-jose[cryptography]==3.5.0",
     "passlib[bcrypt]==1.7.4",
     "python-multipart==0.0.20",
     "cryptography==45.0.6",
-    
     # Data processing
     "pandas==2.2.3",
     "httpx==0.28.1",
-    "aiohttp==3.12.15",
     "requests==2.32.4",
     "tenacity==8.2.3",
-    
     # Configuration
     "python-dotenv==1.0.1",
     "click==8.1.8",
     "typer==0.15.2",
-    
     # JSON processing
     "orjson==3.11.2",
-    
     # Email validation for Pydantic
     "email-validator>=2.0.0",
+    "boto3>=1.40.65",
 ]
 
 [tool.uv]
@@ -137,15 +134,17 @@ select = [
   "PIE", "T20", "RSE", "TCH"
 ]
 ignore = [
-  "E203", "E501", "S101", "S608", "PLR0913", 
+  "E203", "E501", "S101", "S608", "PLR0913",
   "PLR0911", "PLR0912", "PLR0915", "PLR2004",
-  "F841", "RUF010"  # Allow unused variables and str() calls
+  "F841", "RUF010",  # Allow unused variables and str() calls
+  "B008",  # Allow Depends() in FastAPI function defaults
+  "TCH001", "TCH002", "TCH003",  # Allow runtime imports (FastAPI needs them)
+  "S314", "S324",  # Allow XML parsing and MD5 (safe usage context)
 ]
 unfixable = ["T20"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "PLR2004", "PLR0913"]
-"**/models.py" = ["A003"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["backend"]

@@ -3,17 +3,17 @@ Services module for Korean Real Estate RAG AI Chatbot
 """
 
 from services.ai_service import AIService
-from services.policy_service import PolicyService
-from services.property_service import PropertyService
+from services.data_service import DataService
+from services.lightrag_service import LightRAGService
 from services.rag_service import RAGService
+from services.seoul_city_data_service import SeoulCityDataService
 from services.user_service import UserService
-from services.vector_service import VectorService
 
 __all__ = [
     "RAGService",
-    "VectorService",
     "AIService",
-    "PropertyService",
-    "PolicyService",
+    "DataService",
+    "LightRAGService",
+    "SeoulCityDataService",
     "UserService",
 ]

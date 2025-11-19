@@ -1,0 +1,12 @@
+# BODA Streamlit Frontend Dependencies
+# Python 3.11+ required
+
+# Core Framework
+streamlit>=1.31.0
+
+# HTTP Client
+httpx>=0.27.0
+
+# Data Validation
+pydantic>=2.6.0
+pydantic-settings>=2.1.0

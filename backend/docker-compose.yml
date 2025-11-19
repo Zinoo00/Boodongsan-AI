@@ -10,42 +10,24 @@ services:
     networks:
       - boodongsan_network
 
-  # Chromadb (shared vector DB)
-  chroma:
-    image: ghcr.io/chroma-core/chroma:latest
-    container_name: boodongsan_chroma
-    ports:
-      - "8001:8000"
-    volumes:
-      - chroma_data:/chroma
-    networks:
-      - boodongsan_network
-
-  # FastAPI 백엔드
+  # FastAPI 백엔드 (LightRAG with NanoVectorDB - no external vector DB required)
   backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: boodongsan_backend
+    env_file:
+      - .env
     environment:
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - SUPABASE_DB_PASSWORD=${SUPABASE_DB_PASSWORD}
       - REDIS_URL=redis://redis:6379/0
-      - CHROMADB_HOST=chroma
-      - CHROMADB_PORT=8000
-      - AWS_REGION=ap-northeast-2
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     ports:
       - "8000:8000"
     depends_on:
       - redis
-      - chroma
     volumes:
       - .:/app
       - venv_data:/app/.venv
+      - lightrag_storage:/app/lightrag_storage
     networks:
       - boodongsan_network
     command: uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
@@ -72,8 +54,8 @@ services:
 
 volumes:
   redis_data:
-  chroma_data:
   venv_data:
+  lightrag_storage:
 
 networks:
   boodongsan_network:

@@ -1,0 +1,32 @@
+# Docker Compose for BODA Frontend
+# 프론트엔드만 실행 (백엔드는 별도 실행 필요)
+
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boda-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      # 백엔드 URL (Docker 네트워크에서 접근)
+      - BACKEND_URL=${BACKEND_URL:-http://host.docker.internal:8000}
+      - API_V1_STR=/api/v1
+      - API_TIMEOUT=30
+      - DEBUG=false
+    volumes:
+      # 개발 시 코드 변경 반영 (선택)
+      - ./app.py:/app/app.py
+      - ./api_client.py:/app/api_client.py
+      - ./config.py:/app/config.py
+      - ./components:/app/components
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
