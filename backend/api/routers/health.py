@@ -29,11 +29,29 @@ async def health_check(ai_service: AIService = Depends(get_ai_service)) -> Healt
     redis_status = await database_health_check()
     await ai_service.initialize()
 
+    # Determine which model is being used based on provider
+    provider = ai_service.provider
+    if provider == "anthropic":
+        model_info = {
+            "provider": "anthropic",
+            "model": settings.ANTHROPIC_MODEL_ID,
+        }
+    elif provider == "bedrock":
+        model_info = {
+            "provider": "bedrock",
+            "model": settings.BEDROCK_MODEL_ID,
+        }
+    else:
+        model_info = {
+            "provider": "none",
+            "model": "N/A",
+        }
+
     services = {
         "database": redis_status["redis"],
         "ai_service": {
             "status": ai_service.is_ready(),
-            "model": settings.BEDROCK_MODEL_ID,
+            **model_info,
         },
     }
 
@@ -54,8 +72,18 @@ async def database_health() -> dict[str, Any]:
 @router.get("/ai", response_model=dict[str, Any])
 async def ai_health(ai_service: AIService = Depends(get_ai_service)) -> dict[str, Any]:
     await ai_service.initialize()
+    
+    provider = ai_service.provider
+    if provider == "anthropic":
+        model = settings.ANTHROPIC_MODEL_ID
+    elif provider == "bedrock":
+        model = settings.BEDROCK_MODEL_ID
+    else:
+        model = "N/A"
+    
     return {
         "status": ai_service.is_ready(),
         "timestamp": datetime.utcnow().isoformat(),
-        "model": settings.BEDROCK_MODEL_ID,
+        "provider": provider,
+        "model": model,
     }

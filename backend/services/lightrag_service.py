@@ -1,5 +1,9 @@
 """
-LightRAG service - 지식 그래프 기반 RAG with default NanoVectorDB storage.
+LightRAG service - 지식 그래프 기반 RAG with configurable storage backend.
+
+Storage backends:
+- PostgreSQL (default): AWS RDS PostgreSQL + pgvector
+- Local: NanoVectorDB + NetworkX + JSON
 """
 
 from __future__ import annotations
@@ -12,9 +16,11 @@ from typing import TYPE_CHECKING, Any
 from lightrag import LightRAG, QueryParam
 
 from core.config import settings
+from services.storage.factory import create_storage_backend
 
 if TYPE_CHECKING:
     from services.ai_service import AIService
+    from services.storage.base import StorageBackend
 
 logger = logging.getLogger(__name__)
 
@@ -72,35 +78,46 @@ class LightRAGService:
     """
     LightRAG 지식 그래프 RAG 서비스.
 
-    Default 설정:
-    - Vector DB: NanoVectorDB (embedded, no external service required)
-    - Graph Storage: NetworkX (local graph storage)
-    - Document Status: JSON files (local storage)
+    Storage backends:
+    - PostgreSQL (default): AWS RDS PostgreSQL + pgvector
+    - Local: NanoVectorDB + NetworkX + JSON
     """
 
-    def __init__(self, ai_service: AIService | None = None) -> None:
+    def __init__(
+        self, ai_service: AIService | None = None, storage_backend: str | None = None
+    ) -> None:
         """
         LightRAG 서비스 초기화.
 
         Args:
             ai_service: AI service providing Anthropic Claude responses and embeddings
+            storage_backend: Storage backend type ("postgresql" or "local")
+                           If None, uses settings.STORAGE_BACKEND
         """
         self.ai_service = ai_service
         self._rag: LightRAG | None = None
         self._initialized = False
 
-        # Working directory 설정
+        # Storage backend 설정
+        self.storage_backend_type = storage_backend or settings.STORAGE_BACKEND
+        self.storage: StorageBackend = create_storage_backend(self.storage_backend_type)
+        logger.info(f"Using storage backend: {self.storage_backend_type}")
+
+        # Working directory 설정 (local backend용)
         self.working_dir = Path(settings.LIGHTRAG_WORKING_DIR) / settings.LIGHTRAG_WORKSPACE
-        self.working_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"LightRAG working directory: {self.working_dir}")
+        if self.storage_backend_type == "local":
+            self.working_dir.mkdir(parents=True, exist_ok=True)
+            logger.info(f"LightRAG working directory: {self.working_dir}")
 
     async def initialize(self) -> None:
         """
-        LightRAG 초기화 with default settings.
+        LightRAG 초기화 with configurable storage backend.
 
-        Default 설정:
-        - NanoVectorDB for vector storage
-        - NetworkX for knowledge graph
+        Storage backends:
+        - PostgreSQL: AWS RDS PostgreSQL + pgvector
+        - Local: NanoVectorDB + NetworkX + JSON
+
+        Settings:
         - Chunk size: 1200 tokens
         - Embedding batch size: 32
         """
@@ -109,38 +126,52 @@ class LightRAGService:
             return
 
         try:
+            # Storage backend 초기화
+            await self.storage.initialize()
+            logger.info(f"Storage backend initialized: {self.storage_backend_type}")
+
             llm_model_func = _build_llm_model_func(self.ai_service)
             embedding_func = _build_embedding_func(self.ai_service)
 
-            # LightRAG 인스턴스 생성 with default settings
-            self._rag = LightRAG(
-                working_dir=str(self.working_dir),
-                # LLM 함수 - Anthropic Claude 사용
-                llm_model_func=llm_model_func,
-                # Embedding 함수 - 로컬 결정적 임베딩 사용
-                embedding_func=embedding_func,
-                # Default vector DB: NanoVectorDB (embedded)
-                # Default graph storage: NetworkX
-                # Default doc status: JSON
-                # 기타 모든 설정은 LightRAG default 사용
-            )
+            # LightRAG 인스턴스 생성
+            # For local backend, use default LightRAG storage
+            # For PostgreSQL backend, LightRAG handles query logic while storage handles persistence
+            if self.storage_backend_type == "local":
+                self._rag = LightRAG(
+                    working_dir=str(self.working_dir),
+                    llm_model_func=llm_model_func,
+                    embedding_func=embedding_func,
+                    # Default vector DB: NanoVectorDB (embedded)
+                    # Default graph storage: NetworkX
+                    # Default doc status: JSON
+                )
 
-            # Storage 초기화 (필수)
-            await self._rag.initialize_storages()
+                # Storage 초기화 (필수)
+                await self._rag.initialize_storages()
 
-            # Pipeline status 초기화 (필수)
-            try:
-                from lightrag.kg.shared_storage import initialize_pipeline_status
+                # Pipeline status 초기화 (필수)
+                try:
+                    from lightrag.kg.shared_storage import initialize_pipeline_status
 
-                await initialize_pipeline_status()
-                logger.info("Pipeline status initialized")
-            except (ImportError, AttributeError) as e:
-                logger.warning(f"Could not initialize pipeline status: {e}")
-                # Continue anyway - some versions may not require this
+                    await initialize_pipeline_status()
+                    logger.info("Pipeline status initialized")
+                except (ImportError, AttributeError) as e:
+                    logger.warning(f"Could not initialize pipeline status: {e}")
+                    # Continue anyway - some versions may not require this
+
+            else:
+                # PostgreSQL backend: Create minimal LightRAG for query logic only
+                # Storage persistence is handled by PostgreSQL backend
+                self._rag = LightRAG(
+                    working_dir=str(self.working_dir),
+                    llm_model_func=llm_model_func,
+                    embedding_func=embedding_func,
+                )
+                await self._rag.initialize_storages()
 
             self._initialized = True
             logger.info(
-                "LightRAG initialized successfully with default settings (NanoVectorDB, NetworkX)"
+                f"LightRAG initialized successfully with {self.storage_backend_type} backend"
             )
 
         except Exception as e:
@@ -154,22 +185,19 @@ class LightRAGService:
         Returns:
             True if storage is empty, False otherwise
         """
-        # Check if any files exist in the working directory
-        if not self.working_dir.exists():
-            return True
-
-        # Check for any data files
-        files = list(self.working_dir.glob("**/*"))
-        data_files = [f for f in files if f.is_file() and f.suffix in {".json", ".pkl", ".db"}]
-
-        return len(data_files) == 0
+        return self.storage.is_empty()
 
     async def finalize(self) -> None:
         """LightRAG 정리 및 종료."""
         if self._rag and self._initialized:
             try:
-                # Storage 정리
-                await self._rag.finalize_storages()
+                # LightRAG storage 정리
+                if self.storage_backend_type == "local":
+                    await self._rag.finalize_storages()
+
+                # Storage backend 정리
+                await self.storage.finalize()
+
                 self._initialized = False
                 logger.info("LightRAG finalized")
             except Exception as e:

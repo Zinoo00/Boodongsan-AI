@@ -7,8 +7,8 @@
 
 Usage:
     uv run python -m scripts.load_data --help
-    uv run python -m scripts.load_data load --mode sample
-    uv run python -m scripts.load_data load --mode full --districts 강남구,서초구
+    uv run python -m scripts.load_data --mode sample
+    uv run python -m scripts.load_data --mode full --districts 강남구,서초구
 """
 
 from __future__ import annotations
@@ -302,7 +302,7 @@ async def load_full_data(
 def load(
     mode: str = typer.Option(
         "sample",
-        "load --mode",
+        "--mode",
         "-m",
         help="데이터 로딩 모드: 'sample' (테스트용) 또는 'full' (전체)",
     ),
@@ -330,19 +330,19 @@ def load(
 
     Examples:
         # 샘플 데이터 로딩 (테스트용)
-        uv run python -m scripts.load_data load --mode sample
+        uv run python -m scripts.load_data --mode sample
 
         # 소량 테스트 (10개만)
-        uv run python -m scripts.load_data load --mode full --districts 강남구 --limit 10
+        uv run python -m scripts.load_data --mode full --districts 강남구 --limit 10
 
         # 전체 데이터 로딩 (매우 느림: 수 시간 소요)
-        uv run python -m scripts.load_data load --mode full
+        uv run python -m scripts.load_data --mode full
 
         # 특정 자치구만 로딩
-        uv run python -m scripts.load_data load --mode full --districts 강남구,서초구
+        uv run python -m scripts.load_data --mode full --districts 강남구,서초구
 
         # 특정 연월 데이터 로딩
-        uv run python -m scripts.load_data load --mode full --year-month 202410
+        uv run python -m scripts.load_data --mode full --year-month 202410
     """
 
     async def _run():

@@ -47,7 +47,7 @@ async def lifespan(app: FastAPI):
     if lightrag_service.is_empty():
         logger.warning("⚠️  LightRAG 스토리지가 비어 있습니다!")
         logger.warning(
-            "   샘플 데이터를 로드하려면: uv run python -m scripts.load_data load --mode sample"
+            "   샘플 데이터를 로드하려면: uv run python -m scripts.load_data --mode sample"
         )
         logger.warning("   또는 API 사용: POST /api/v1/admin/load-data")
 

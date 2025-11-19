@@ -1,21 +1,24 @@
 # Streamlit Configuration for BODA Chatbot
+# Theme inspired by demo-ai-assistant design
 # https://docs.streamlit.io/library/advanced-features/configuration
 
 [theme]
-# Primary theme color (red for BODA branding)
-primaryColor = "#FF4B4B"
+base = "light"
+
+# Primary theme color (blue like demo-ai-assistant)
+primaryColor = "#60a5fa"
 
 # Background color
-backgroundColor = "#FFFFFF"
+backgroundColor = "#fafafa"
 
 # Secondary background color (for sidebar, etc.)
-secondaryBackgroundColor = "#F0F2F6"
+secondaryBackgroundColor = "#ffffff"
 
 # Text color
-textColor = "#262730"
+textColor = "#3f3f46"
 
-# Font family
-font = "sans serif"
+# Font family (Inter font for modern look)
+font = "Inter"
 
 [server]
 # Server port (default: 8501)

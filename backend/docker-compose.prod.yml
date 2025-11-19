@@ -1,0 +1,141 @@
+# Production Docker Compose Configuration for BODA
+# 프로덕션 배포용 Docker Compose 설정
+
+version: '3.8'
+
+services:
+  # Redis - 캐시 및 Celery 브로커
+  redis:
+    image: redis:7-alpine
+    container_name: boda_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - boda_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boda_backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - STORAGE_BACKEND=${STORAGE_BACKEND:-postgresql}
+      - DATABASE_URL=${DATABASE_URL}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-ap-northeast-2}
+      - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID}
+      - MOLIT_API_KEY=${MOLIT_API_KEY}
+      - ENVIRONMENT=production
+      - DEBUG=false
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - lightrag_storage:/app/lightrag_storage
+      - checkpoints:/app/checkpoints
+    networks:
+      - boda_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Production mode: no --reload
+    command: uv run uvicorn api.main:app --host 0.0.0.0 --port 8000
+
+  # Celery Worker - Background job processing
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boda_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - STORAGE_BACKEND=${STORAGE_BACKEND:-postgresql}
+      - DATABASE_URL=${DATABASE_URL}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-ap-northeast-2}
+      - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID}
+      - MOLIT_API_KEY=${MOLIT_API_KEY}
+      - ENVIRONMENT=production
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - lightrag_storage:/app/lightrag_storage
+      - checkpoints:/app/checkpoints
+    networks:
+      - boda_network
+    command: uv run celery -A jobs.celery_app worker --loglevel=info --concurrency=2 --queues=celery,data_loading,maintenance
+
+  # Celery Beat - Periodic tasks (선택사항)
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boda_beat
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - boda_network
+    command: uv run celery -A jobs.celery_app beat --loglevel=info
+
+  # Flower - Celery monitoring UI (선택사항)
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boda_flower
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - boda_network
+    command: uv run celery -A jobs.celery_app flower --port=5555
+
+volumes:
+  redis_data:
+    driver: local
+  lightrag_storage:
+    driver: local
+  checkpoints:
+    driver: local
+
+networks:
+  boda_network:
+    driver: bridge

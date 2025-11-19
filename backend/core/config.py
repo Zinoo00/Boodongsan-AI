@@ -44,10 +44,15 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "ap-northeast-2"
     # Claude Sonnet 4.5 (released September 2025)
-    # Regional endpoint for APAC region (recommended for ap-northeast-2)
-    BEDROCK_MODEL_ID: str = "anthropic.claude-sonnet-4-5-20250929-v1:0"
-    # Alternative global endpoint: "global.anthropic.claude-sonnet-4-5-20250929-v1:0"
-    # Alternative APAC-specific: "apac.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    # IMPORTANT: Must use inference profile ID (not direct model ID)
+    # Global inference profile (recommended - routes across all AWS regions)
+    BEDROCK_MODEL_ID: str = "global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    # Alternative inference profiles:
+    # - APAC only: "apac.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    # - US only: "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    # - EU only: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    # - Japan only: "jp.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    # - Australia only: "au.anthropic.claude-sonnet-4-5-20250929-v1:0"
     BEDROCK_EMBEDDING_MODEL_ID: str = "amazon.titan-embed-text-v1"
     ANTHROPIC_API_KEY: str = ""
     ANTHROPIC_MODEL_ID: str = "claude-3-5-sonnet-20241022"
@@ -58,16 +63,33 @@ class Settings(BaseSettings):
     HF_API_KEY: str | None = None
     SEOUL_OPEN_API_KEY: str | None = None
 
-    # LightRAG - Knowledge Graph RAG with Default Settings
-    # Uses NanoVectorDB (embedded), NetworkX (graph), JSON (doc status)
+    # Storage Backend Selection
+    # Default: "postgresql" (AWS RDS PostgreSQL + pgvector)
+    # Local: "local" (NanoVectorDB embedded + NetworkX + JSON)
+    STORAGE_BACKEND: str = "postgresql"
+
+    # PostgreSQL Configuration (Default Storage)
+    # AWS RDS PostgreSQL with pgvector extension
+    DATABASE_URL: str = ""  # Format: postgresql+asyncpg://user:pass@host:port/dbname
+    DATABASE_POOL_SIZE: int = 10
+    DATABASE_MAX_OVERFLOW: int = 20
+    DATABASE_POOL_TIMEOUT: int = 30
+    DATABASE_ECHO: bool = False
+
+    # LightRAG - Knowledge Graph RAG
     LIGHTRAG_WORKING_DIR: str = "./lightrag_storage"
     LIGHTRAG_WORKSPACE: str = "BODA"
     LIGHTRAG_EMBEDDING_DIM: int = 1536
 
-    # LightRAG uses default settings:
-    # - Vector DB: NanoVectorDB (embedded, no external service)
-    # - Graph Storage: NetworkX (local graph storage)
-    # - Document Status: JSON files (local storage)
+    # Storage Backend Modes:
+    # - "postgresql": AWS RDS PostgreSQL + pgvector (default, production)
+    #   - Vector search: pgvector extension
+    #   - Graph storage: PostgreSQL JSONB + recursive queries
+    #   - Document status: PostgreSQL tables
+    # - "local": Embedded storage (development, testing)
+    #   - Vector DB: NanoVectorDB (embedded, no external service)
+    #   - Graph Storage: NetworkX (local graph storage)
+    #   - Document Status: JSON files (local storage)
     # - Chunk size: 1200 tokens
     # - Embedding batch size: 32
 

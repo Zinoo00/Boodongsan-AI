@@ -7,11 +7,14 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
+from celery.result import AsyncResult
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from api.dependencies import get_lightrag_service
 from data.collectors.sigungu_service import SigunguServiceSingleton
+from jobs.celery_app import celery_app
+from jobs.tasks import load_data_task, test_task
 
 if TYPE_CHECKING:
     from services.lightrag_service import LightRAGService
@@ -200,3 +203,180 @@ async def clear_lightrag_data(
             status_code=500,
             detail=f"데이터 삭제 중 오류 발생: {e}",
         )
+
+
+# ============================================================================
+# Background Job Management (Celery)
+# ============================================================================
+
+
+class JobStartRequest(BaseModel):
+    """백그라운드 작업 시작 요청."""
+
+    mode: str = Field("sample", description="로딩 모드: 'sample' 또는 'full'")
+    districts: list[str] | None = Field(None, description="수집할 자치구 리스트")
+    year_month: str | None = Field(None, description="수집 기준 연월 (YYYYMM)")
+    property_types: list[str] | None = Field(None, description="수집할 부동산 유형")
+    max_records: int | None = Field(None, description="최대 수집 레코드 수")
+
+
+class JobStatusResponse(BaseModel):
+    """작업 상태 응답."""
+
+    job_id: str
+    state: str
+    status: str | None = None
+    current: int | None = None
+    total: int | None = None
+    rate_per_minute: float | None = None
+    errors: int | None = None
+    elapsed_seconds: int | None = None
+    result: dict[str, Any] | None = None
+    error: str | None = None
+
+
+@router.post("/jobs/load-data", response_model=dict[str, Any])
+async def start_data_loading_job(request: JobStartRequest) -> dict[str, Any]:
+    """
+    백그라운드 데이터 로딩 작업 시작 (Celery).
+
+    장점:
+    - 재개 가능: 중단되어도 체크포인트에서 재시작
+    - 진행 상황 추적: /jobs/{job_id} 엔드포인트로 실시간 확인
+    - 안정성: 컨테이너 재시작 시에도 작업 유지
+
+    Returns:
+        작업 ID 및 시작 상태
+    """
+    # Celery task 시작
+    task = load_data_task.delay(
+        mode=request.mode,
+        districts=request.districts,
+        year_month=request.year_month,
+        property_types=request.property_types,
+        max_records=request.max_records,
+    )
+
+    return {
+        "job_id": task.id,
+        "status": "started",
+        "message": f"데이터 로딩 작업이 시작되었습니다 (모드: {request.mode})",
+        "check_progress": f"/api/v1/admin/jobs/{task.id}",
+    }
+
+
+@router.get("/jobs/{job_id}", response_model=JobStatusResponse)
+async def get_job_status(job_id: str) -> JobStatusResponse:
+    """
+    백그라운드 작업 상태 조회.
+
+    작업 상태:
+    - PENDING: 대기 중
+    - PROGRESS: 진행 중 (진행률 포함)
+    - SUCCESS: 완료
+    - FAILURE: 실패
+    """
+    task = AsyncResult(job_id, app=celery_app)
+
+    if task.state == "PENDING":
+        return JobStatusResponse(
+            job_id=job_id,
+            state=task.state,
+            status="작업 대기 중...",
+        )
+
+    elif task.state == "PROGRESS":
+        info = task.info or {}
+        return JobStatusResponse(
+            job_id=job_id,
+            state=task.state,
+            status="진행 중",
+            current=info.get("current"),
+            total=info.get("total"),
+            rate_per_minute=info.get("rate_per_minute"),
+            errors=info.get("errors"),
+            elapsed_seconds=info.get("elapsed_seconds"),
+        )
+
+    elif task.state == "SUCCESS":
+        return JobStatusResponse(
+            job_id=job_id,
+            state=task.state,
+            status="완료",
+            result=task.result,
+        )
+
+    else:  # FAILURE or other states
+        return JobStatusResponse(
+            job_id=job_id,
+            state=task.state,
+            status="실패",
+            error=str(task.info) if task.info else None,
+        )
+
+
+@router.delete("/jobs/{job_id}")
+async def cancel_job(job_id: str) -> dict[str, Any]:
+    """
+    실행 중인 작업 취소.
+
+    주의: 이미 시작된 작업은 즉시 중단되지 않을 수 있습니다.
+    """
+    task = AsyncResult(job_id, app=celery_app)
+
+    if task.state in ["PENDING", "PROGRESS"]:
+        task.revoke(terminate=True)
+        return {
+            "job_id": job_id,
+            "status": "cancelled",
+            "message": "작업 취소 요청이 전송되었습니다.",
+        }
+    else:
+        return {
+            "job_id": job_id,
+            "status": "cannot_cancel",
+            "message": f"작업 상태가 '{task.state}'이므로 취소할 수 없습니다.",
+        }
+
+
+@router.get("/jobs")
+async def list_jobs() -> dict[str, Any]:
+    """
+    현재 실행 중인 모든 작업 목록 조회.
+
+    Note: Celery는 기본적으로 완료된 작업을 자동으로 추적하지 않습니다.
+    실행 중인 작업만 확인할 수 있습니다.
+    """
+    # Celery inspect API 사용
+    inspect = celery_app.control.inspect()
+
+    active_tasks = inspect.active() or {}
+    scheduled_tasks = inspect.scheduled() or {}
+    reserved_tasks = inspect.reserved() or {}
+
+    return {
+        "active": active_tasks,
+        "scheduled": scheduled_tasks,
+        "reserved": reserved_tasks,
+    }
+
+
+@router.post("/jobs/test")
+async def start_test_job(duration: int = 10) -> dict[str, Any]:
+    """
+    테스트용 작업 시작 (진행 상황 업데이트 데모).
+
+    Args:
+        duration: 실행 시간 (초)
+
+    Returns:
+        작업 ID
+    """
+    task = test_task.delay(duration=duration)
+
+    return {
+        "job_id": task.id,
+        "status": "started",
+        "message": f"테스트 작업 시작 (실행 시간: {duration}초)",
+        "check_progress": f"/api/v1/admin/jobs/{task.id}",
+    }

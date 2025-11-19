@@ -12,11 +12,21 @@ dependencies = [
     "pydantic-settings==2.10.1",
     # AI services
     "anthropic==0.40.0",
-    # 데이터베이스 - Redis, LightRAG
+    # 데이터베이스 - Redis, PostgreSQL, LightRAG
     "redis>=5,<6", # 캐시
     "numpy==1.26.4",
-    # LightRAG - Knowledge Graph RAG with default settings
-    # Uses: NanoVectorDB (embedded vector DB), NetworkX (graph), JSON (doc status)
+    # Background job processing
+    "celery[redis]>=5.5.3",
+    "flower>=2.0.1",  # Celery monitoring UI
+    # PostgreSQL with pgvector (default storage)
+    "asyncpg>=0.30.0",
+    "psycopg[binary]>=3.2.0",
+    "sqlalchemy[asyncio]>=2.0.0",
+    "alembic>=1.14.0",
+    "pgvector>=0.3.0",
+    # LightRAG - Knowledge Graph RAG with storage options
+    # Default: AWS RDS PostgreSQL + pgvector
+    # Local mode (--store local): NanoVectorDB (embedded), NetworkX (graph), JSON (doc status)
     "lightrag-hku[api]>=0.1.0",
     "networkx>=3.0", # 그래프 연산
     # Security
@@ -37,6 +47,7 @@ dependencies = [
     "orjson==3.11.2",
     # Email validation for Pydantic
     "email-validator>=2.0.0",
+    "boto3>=1.40.65",
 ]
 
 [tool.uv]
