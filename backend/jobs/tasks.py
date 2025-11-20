@@ -217,9 +217,9 @@ def load_data_task(
                     max_records = 500
 
             logger.info(f"  - Mode: {mode}")
-            logger.info(f"  - Districts: {districts or '전체'}")
-            logger.info(f"  - Property types: {property_types or '전체'}")
-            logger.info(f"  - Max records: {max_records or '무제한'}")
+            logger.info(f"  - Districts: {districts if districts is not None else '전체'}")
+            logger.info(f"  - Property types: {property_types if property_types is not None else '전체'}")
+            logger.info(f"  - Max records: {max_records if max_records is not None else '무제한'}")
 
             collector = RealEstateCollector()
             property_count = 0
