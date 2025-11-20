@@ -209,9 +209,12 @@ def load_data_task(
 
             # 샘플 모드 설정
             if mode == "sample":
-                districts = districts or ["강남구", "서초구", "송파구"]
-                property_types = property_types or ["apartment_rent"]
-                max_records = max_records or 500
+                if districts is None:
+                    districts = ["강남구", "서초구", "송파구"]
+                if property_types is None:
+                    property_types = ["apartment_rent"]
+                if max_records is None:
+                    max_records = 500
 
             logger.info(f"  - Mode: {mode}")
             logger.info(f"  - Districts: {districts or '전체'}")
