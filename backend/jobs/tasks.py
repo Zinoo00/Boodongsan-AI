@@ -144,6 +144,7 @@ def load_data_task(
     """
 
     async def _run_data_loading():
+        nonlocal districts, property_types, max_records
         task_id = self.request.id
         checkpoint_service = CheckpointService()
 
