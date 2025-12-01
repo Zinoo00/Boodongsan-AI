@@ -109,12 +109,64 @@ class AIService:
             raise
 
     async def generate_embeddings(self, texts: list[str], **_: Any) -> list[list[float]]:
-        """Generate lightweight deterministic embeddings (no external dependency)."""
+        """
+        Generate embeddings using AWS Bedrock Titan or fallback to deterministic hash.
 
+        AWS Bedrock Titan Embeddings v1: 1536 dimensions
+        """
         if not texts:
             return []
 
+        # Use real Titan embeddings if Bedrock is available and enabled
+        if (
+            self._provider == "bedrock"
+            and self._bedrock_client
+            and settings.LIGHTRAG_USE_REAL_EMBEDDINGS
+        ):
+            return await self._generate_titan_embeddings(texts)
+
+        # Fallback to hash-based embeddings for development
+        logger.warning("Using hash-based embeddings (not semantic). Set LIGHTRAG_USE_REAL_EMBEDDINGS=true for production.")
         return [self._text_to_embedding(text) for text in texts]
+
+    async def _generate_titan_embeddings(self, texts: list[str]) -> list[list[float]]:
+        """
+        Generate real embeddings using AWS Bedrock Titan Embeddings.
+
+        Model: amazon.titan-embed-text-v1
+        Dimensions: 1536
+        Max input: 8192 tokens
+        """
+        embeddings = []
+
+        for text in texts:
+            try:
+                # Titan embedding request body
+                request_body = {
+                    "inputText": text[:8000],  # Truncate to avoid token limit
+                }
+
+                response = await asyncio.to_thread(
+                    self._bedrock_client.invoke_model,
+                    modelId=settings.BEDROCK_EMBEDDING_MODEL_ID,
+                    body=json.dumps(request_body),
+                )
+
+                response_body = json.loads(response["body"].read())
+                embedding = response_body.get("embedding", [])
+
+                if embedding:
+                    embeddings.append(embedding)
+                else:
+                    logger.warning(f"Empty embedding returned for text: {text[:50]}...")
+                    embeddings.append(self._text_to_embedding(text))
+
+            except Exception as e:
+                logger.error(f"Titan embedding failed: {e}")
+                # Fallback to hash-based embedding
+                embeddings.append(self._text_to_embedding(text))
+
+        return embeddings
 
     async def generate_text(
         self,

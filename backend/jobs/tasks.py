@@ -1,6 +1,12 @@
 """
 Celery tasks for background job processing.
 백그라운드 작업 처리를 위한 Celery 태스크
+
+설계 목표:
+- EC2에서 장시간(수십 시간) 독립 실행 가능
+- 노트북 연결 불필요
+- 체크포인트 기반 재개 지원
+- Redis 기반 분산 체크포인트 (EC2 인스턴스 간 공유)
 """
 
 from __future__ import annotations
@@ -18,10 +24,70 @@ from data.collectors.real_estate_collector import RealEstateCollector
 from data.collectors.sigungu_service import SigunguServiceSingleton
 from jobs.celery_app import celery_app
 from services.ai_service import AIService
-from services.checkpoint_service import CheckpointService
 from services.lightrag_service import LightRAGService
 
 logger = logging.getLogger(__name__)
+
+
+# Redis 기반 체크포인트 서비스 (분산 환경 지원)
+class RedisCheckpointService:
+    """
+    Redis 기반 체크포인트 서비스.
+
+    분산 환경 (다중 EC2 인스턴스)에서도 체크포인트를 공유하여
+    작업 재개가 가능하도록 함.
+    """
+
+    def __init__(self) -> None:
+        import redis
+
+        self._redis = redis.from_url(settings.REDIS_URL, decode_responses=True)
+        self._prefix = "checkpoint:"
+
+    def save_checkpoint(self, job_id: str, data: dict[str, Any]) -> bool:
+        """체크포인트 저장."""
+        import json
+
+        try:
+            key = f"{self._prefix}{job_id}"
+            data["checkpoint_timestamp"] = datetime.utcnow().isoformat()
+            self._redis.set(key, json.dumps(data), ex=86400 * 7)  # 7일 TTL
+            logger.info(f"Checkpoint saved to Redis: {job_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to save checkpoint: {e}")
+            return False
+
+    def load_checkpoint(self, job_id: str) -> dict[str, Any] | None:
+        """체크포인트 로드."""
+        import json
+
+        try:
+            key = f"{self._prefix}{job_id}"
+            data = self._redis.get(key)
+            if data:
+                logger.info(f"Checkpoint loaded from Redis: {job_id}")
+                return json.loads(data)
+            return None
+        except Exception as e:
+            logger.error(f"Failed to load checkpoint: {e}")
+            return None
+
+    def clear_checkpoint(self, job_id: str) -> bool:
+        """체크포인트 삭제."""
+        try:
+            key = f"{self._prefix}{job_id}"
+            self._redis.delete(key)
+            logger.info(f"Checkpoint cleared: {job_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to clear checkpoint: {e}")
+            return False
+
+    def cleanup_old_checkpoints(self, max_age_hours: int = 168) -> int:
+        """오래된 체크포인트 정리."""
+        # Redis TTL이 자동으로 처리하므로 여기서는 패스
+        return 0
 
 
 class CallbackTask(Task):
@@ -39,7 +105,7 @@ class CallbackTask(Task):
         """Task 성공 시 호출"""
         logger.info(f"Task {task_id} completed successfully")
         # 체크포인트 삭제
-        checkpoint_service = CheckpointService()
+        checkpoint_service = RedisCheckpointService()
         checkpoint_service.clear_checkpoint(task_id)
 
 
@@ -120,7 +186,34 @@ def format_district_document(sigungu_info: Any) -> str:
     return "\n".join(parts)
 
 
-@celery_app.task(bind=True, base=CallbackTask, name="jobs.tasks.load_data_task")
+def get_event_loop() -> asyncio.AbstractEventLoop:
+    """
+    이벤트 루프 가져오기 또는 생성.
+
+    Celery worker에서는 기존 루프가 없을 수 있으므로 새로 생성.
+    """
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop
+
+
+@celery_app.task(
+    bind=True,
+    base=CallbackTask,
+    name="jobs.tasks.load_data_task",
+    # EC2 장시간 실행을 위한 설정
+    soft_time_limit=86400,  # 24시간 soft limit
+    time_limit=86400 + 3600,  # 25시간 hard limit
+    acks_late=True,  # 작업 완료 후 ack (실패 시 재시도 가능)
+    reject_on_worker_lost=True,  # Worker 종료 시 다른 worker로 재할당
+)
 def load_data_task(
     self,
     mode: str = "sample",
@@ -131,6 +224,11 @@ def load_data_task(
 ) -> dict[str, Any]:
     """
     데이터 로딩 백그라운드 작업 (재개 가능).
+
+    EC2에서 장시간 실행을 위해 설계:
+    - Redis 기반 체크포인트로 분산 환경 지원
+    - 작업 실패 시 자동 재시도
+    - 진행 상황 실시간 추적 (Flower UI)
 
     Args:
         mode: 로딩 모드 ('sample' 또는 'full')
@@ -144,17 +242,20 @@ def load_data_task(
     """
 
     async def _run_data_loading():
+        nonlocal districts, property_types, max_records
         task_id = self.request.id
-        checkpoint_service = CheckpointService()
+        checkpoint_service = RedisCheckpointService()
 
         # 체크포인트 로드 (이전 실행이 있으면 재개)
         checkpoint = checkpoint_service.load_checkpoint(task_id)
         start_count = 0
         processed_ids = set()
+        districts_complete = False
 
         if checkpoint:
             start_count = checkpoint.get("documents_loaded", 0)
             processed_ids = set(checkpoint.get("processed_ids", []))
+            districts_complete = checkpoint.get("districts_complete", False)
             logger.info(f"Resuming from checkpoint: {start_count} documents already processed")
 
         # 서비스 초기화
@@ -171,7 +272,7 @@ def load_data_task(
 
         try:
             # Phase 1: 행정구역 데이터 (체크포인트에서 완료되지 않았으면)
-            if not checkpoint or not checkpoint.get("districts_complete"):
+            if not districts_complete:
                 logger.info("Loading district data...")
                 district_count = 0
 
@@ -217,9 +318,13 @@ def load_data_task(
                     max_records = 500
 
             logger.info(f"  - Mode: {mode}")
-            logger.info(f"  - Districts: {districts or '전체'}")
-            logger.info(f"  - Property types: {property_types or '전체'}")
-            logger.info(f"  - Max records: {max_records or '무제한'}")
+            logger.info(f"  - Districts: {districts if districts is not None else '전체'}")
+            logger.info(
+                f"  - Property types: {property_types if property_types is not None else '전체'}"
+            )
+            logger.info(
+                f"  - Max records: {max_records if max_records is not None else '무제한'}"
+            )
 
             collector = RealEstateCollector()
             property_count = 0
@@ -250,12 +355,12 @@ def load_data_task(
                     else:
                         errors += 1
 
-                    # 진행 상황 업데이트
+                    # 진행 상황 업데이트 (매 10개마다)
                     if property_count % 10 == 0:
                         elapsed = time.time() - start_time
                         rate = property_count / elapsed * 60 if elapsed > 0 else 0
 
-                        # Celery task state 업데이트
+                        # Celery task state 업데이트 (Flower UI에서 확인 가능)
                         self.update_state(
                             state="PROGRESS",
                             meta={
@@ -264,6 +369,7 @@ def load_data_task(
                                 "rate_per_minute": round(rate, 1),
                                 "errors": errors,
                                 "elapsed_seconds": int(elapsed),
+                                "status": f"Processing... {total_loaded} documents",
                             },
                         )
 
@@ -316,6 +422,7 @@ def load_data_task(
             checkpoint_service.save_checkpoint(
                 task_id,
                 {
+                    "districts_complete": districts_complete,
                     "documents_loaded": total_loaded,
                     "processed_ids": list(processed_ids),
                     "errors": errors + 1,
@@ -330,7 +437,8 @@ def load_data_task(
             await ai_service.close()
 
     # asyncio 이벤트 루프에서 실행
-    return asyncio.run(_run_data_loading())
+    loop = get_event_loop()
+    return loop.run_until_complete(_run_data_loading())
 
 
 @celery_app.task(name="jobs.tasks.cleanup_old_jobs")
@@ -343,7 +451,7 @@ def cleanup_old_jobs() -> dict[str, Any]:
     """
     logger.info("Cleaning up old job checkpoints...")
 
-    checkpoint_service = CheckpointService()
+    checkpoint_service = RedisCheckpointService()
     deleted_count = checkpoint_service.cleanup_old_checkpoints(max_age_hours=168)  # 7 days
 
     return {
@@ -385,4 +493,21 @@ def test_task(self, duration: int = 10) -> dict[str, Any]:
         "status": "success",
         "duration": duration,
         "timestamp": datetime.utcnow().isoformat(),
+    }
+
+
+@celery_app.task(bind=True, name="jobs.tasks.health_check")
+def health_check(self) -> dict[str, Any]:
+    """
+    Worker health check task.
+
+    Flower UI나 모니터링 시스템에서 worker 상태를 확인하는데 사용.
+    """
+    import socket
+
+    return {
+        "status": "healthy",
+        "hostname": socket.gethostname(),
+        "timestamp": datetime.utcnow().isoformat(),
+        "task_id": self.request.id,
     }
