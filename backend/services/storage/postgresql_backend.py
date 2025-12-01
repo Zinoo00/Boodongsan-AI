@@ -8,7 +8,6 @@ import logging
 from typing import Any
 
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import Document, Entity, GraphRelation
 from database.session import get_session_maker, init_db
@@ -31,6 +30,7 @@ class PostgreSQLBackend(StorageBackend):
         """PostgreSQL backend 초기화."""
         self._initialized = False
         self._session_maker = None
+        self._is_empty_cache: bool | None = None
 
     async def initialize(self) -> None:
         """PostgreSQL 연결 및 테이블 초기화."""
@@ -43,6 +43,10 @@ class PostgreSQLBackend(StorageBackend):
             await init_db()
             self._session_maker = get_session_maker()
             self._initialized = True
+
+            # 초기화 시점에 is_empty 상태 캐싱
+            await self._update_empty_cache()
+
             logger.info("PostgreSQL backend initialized successfully")
 
         except Exception as e:
@@ -324,6 +328,42 @@ class PostgreSQLBackend(StorageBackend):
             logger.error(f"Failed to get relations for entity {entity_id}: {e}")
             return []
 
+    async def _update_empty_cache(self) -> None:
+        """
+        테이블 데이터 존재 여부 캐시 업데이트.
+
+        초기화 시점 및 데이터 삽입 후 호출.
+        """
+        if not self._session_maker:
+            self._is_empty_cache = True
+            return
+
+        try:
+            async with self._session_maker() as session:
+                # documents, entities, relations 중 하나라도 데이터가 있으면 not empty
+                doc_count = await session.execute(select(func.count()).select_from(Document))
+                if doc_count.scalar() > 0:
+                    self._is_empty_cache = False
+                    return
+
+                entity_count = await session.execute(select(func.count()).select_from(Entity))
+                if entity_count.scalar() > 0:
+                    self._is_empty_cache = False
+                    return
+
+                relation_count = await session.execute(
+                    select(func.count()).select_from(GraphRelation)
+                )
+                if relation_count.scalar() > 0:
+                    self._is_empty_cache = False
+                    return
+
+                self._is_empty_cache = True
+
+        except Exception as e:
+            logger.warning(f"Failed to check if storage is empty: {e}")
+            self._is_empty_cache = False  # Conservative: assume not empty on error
+
     def is_empty(self) -> bool:
         """
         Storage가 비어있는지 확인.
@@ -331,7 +371,20 @@ class PostgreSQLBackend(StorageBackend):
         Returns:
             True if empty, False otherwise
         """
-        # For PostgreSQL, we need to check if tables have any rows
-        # This is a synchronous method, so we'll return a conservative estimate
-        # Real implementation would require async check
-        return False  # Assume not empty for now
+        # 캐시된 값 반환 (동기 메서드이므로 초기화 시점에 캐싱된 값 사용)
+        if self._is_empty_cache is None:
+            # 초기화 전에는 True 반환 (데이터 없음으로 가정)
+            return True
+        return self._is_empty_cache
+
+    async def check_is_empty(self) -> bool:
+        """
+        Storage가 비어있는지 비동기로 확인.
+
+        캐시를 업데이트하고 결과 반환.
+
+        Returns:
+            True if empty, False otherwise
+        """
+        await self._update_empty_cache()
+        return self._is_empty_cache if self._is_empty_cache is not None else True

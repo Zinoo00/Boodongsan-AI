@@ -76,10 +76,24 @@ class Settings(BaseSettings):
     DATABASE_POOL_TIMEOUT: int = 30
     DATABASE_ECHO: bool = False
 
+    # LightRAG PostgreSQL Configuration
+    # These are used by LightRAG's native PostgreSQL storage classes
+    POSTGRES_HOST: str = ""
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str = ""
+    POSTGRES_PASSWORD: str = ""
+    POSTGRES_DB: str = ""
+
     # LightRAG - Knowledge Graph RAG
     LIGHTRAG_WORKING_DIR: str = "./lightrag_storage"
     LIGHTRAG_WORKSPACE: str = "BODA"
     LIGHTRAG_EMBEDDING_DIM: int = 1536
+
+    # LightRAG Storage Configuration
+    # Storage options: "postgresql" (production) or "local" (development)
+    # PostgreSQL uses: PGKVStorage, PGVectorStorage, PGGraphStorage, PGDocStatusStorage
+    # Local uses: JsonKVStorage, NanoVectorDBStorage, NetworkXStorage, JsonDocStatusStorage
+    LIGHTRAG_USE_REAL_EMBEDDINGS: bool = True  # Use real Titan embeddings vs hash-based
 
     # Storage Backend Modes:
     # - "postgresql": AWS RDS PostgreSQL + pgvector (default, production)

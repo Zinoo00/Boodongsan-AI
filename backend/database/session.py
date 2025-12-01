@@ -8,6 +8,7 @@ import logging
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from core.config import settings
@@ -96,7 +97,7 @@ async def init_db() -> None:
 
     async with engine.begin() as conn:
         # pgvector 확장 설치
-        await conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         logger.info("pgvector extension created")
 
         # 테이블 생성

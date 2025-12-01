@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime, timezone
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import JSON, DateTime, Integer, String, Text, text
+from sqlalchemy import JSON, DateTime, Float, String, Text, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -98,7 +98,7 @@ class GraphRelation(Base):
     target_entity: Mapped[str] = mapped_column(String(500), nullable=False, index=True)
     relation_type: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
-    weight: Mapped[float] = mapped_column(Integer, nullable=True, default=1.0)
+    weight: Mapped[float] = mapped_column(Float, nullable=True, default=1.0)
     properties: Mapped[dict] = mapped_column(JSON, nullable=True, default=dict)
     source_chunks: Mapped[list] = mapped_column(JSON, nullable=True, default=list)
     created_at: Mapped[datetime] = mapped_column(
