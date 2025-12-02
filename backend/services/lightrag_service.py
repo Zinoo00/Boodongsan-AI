@@ -1,13 +1,14 @@
 """
-LightRAG service - 지식 그래프 기반 RAG with native PostgreSQL storage.
+LightRAG service - 지식 그래프 기반 RAG with hybrid storage.
 
 Storage backends:
-- PostgreSQL (default): Native LightRAG PostgreSQL storage classes
-  - PGKVStorage: Key-value storage
-  - PGVectorStorage: Vector storage with pgvector
-  - PGGraphStorage: Graph storage
-  - PGDocStatusStorage: Document status storage
-- Local: Default LightRAG embedded storage
+- PostgreSQL (default): Hybrid storage for AWS RDS compatibility
+  - PGKVStorage: Key-value storage (PostgreSQL)
+  - PGVectorStorage: Vector storage with pgvector (PostgreSQL)
+  - NetworkXStorage: Graph storage (local, no AGE extension needed)
+  - PGDocStatusStorage: Document status storage (PostgreSQL)
+  - 멀티 워커 동시 접근 안전 (Vector/KV/DocStatus는 PostgreSQL)
+- Local: Embedded storage for development/testing
   - JsonKVStorage, NanoVectorDBStorage, NetworkXStorage, JsonDocStatusStorage
 """
 
@@ -205,15 +206,17 @@ class LightRAGService:
                     working_dir=str(self.working_dir),
                     llm_model_func=llm_model_func,
                     embedding_func=embedding_func,
-                    # Native PostgreSQL storage classes
+                    # Hybrid storage: PostgreSQL + NetworkX (AWS RDS compatible)
+                    # PostgreSQL: KV, Vector, DocStatus (concurrent-safe)
+                    # NetworkX: Graph (no AGE extension needed)
                     kv_storage="PGKVStorage",
                     vector_storage="PGVectorStorage",
-                    graph_storage="PGGraphStorage",
+                    graph_storage="NetworkXStorage",
                     doc_status_storage="PGDocStatusStorage",
                     # Workspace for logical data isolation
                     workspace=settings.LIGHTRAG_WORKSPACE,
                 )
-                logger.info("Initialized LightRAG with PostgreSQL storage")
+                logger.info("Initialized LightRAG with hybrid storage (PostgreSQL + NetworkX)")
 
             else:
                 # Local backend: Default embedded storage
