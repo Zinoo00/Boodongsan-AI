@@ -96,11 +96,21 @@ async def migrate_to_1024():
         await conn.execute(text("ALTER TABLE entities ADD COLUMN embedding vector(1024)"))
         print("   OK")
 
-        # 3. LightRAG tables
-        lightrag_tables = ["BODA_chunks", "BODA_entities", "BODA_relationships"]
+        # 3. LightRAG tables (check actual table names)
+        # Tables could be named: BODA_*, lightrag_vdb_*, or other patterns
+        lightrag_tables = [
+            # Pattern 1: BODA_* (workspace prefix)
+            ("BODA_chunks", "__vector__"),
+            ("BODA_entities", "__vector__"),
+            ("BODA_relationships", "__vector__"),
+            # Pattern 2: lightrag_vdb_* (library default)
+            ("lightrag_vdb_chunks", "content_vector"),
+            ("lightrag_vdb_entity", "content_vector"),
+            ("lightrag_vdb_relation", "content_vector"),
+        ]
 
-        for table in lightrag_tables:
-            print(f"3. Checking {table}...")
+        for table, column in lightrag_tables:
+            print(f"3. Checking {table}.{column}...")
             result = await conn.execute(text(f"""
                 SELECT EXISTS (
                     SELECT FROM pg_tables
@@ -110,11 +120,23 @@ async def migrate_to_1024():
             exists = result.scalar()
 
             if exists:
-                await conn.execute(text(f'ALTER TABLE "{table}" DROP COLUMN IF EXISTS "__vector__"'))
-                await conn.execute(text(f'ALTER TABLE "{table}" ADD COLUMN "__vector__" vector(1024)'))
-                print(f"   Updated {table}")
+                # Check current dimension
+                dim_result = await conn.execute(text(f"""
+                    SELECT pg_catalog.format_type(a.atttypid, a.atttypmod)
+                    FROM pg_attribute a
+                    JOIN pg_class c ON a.attrelid = c.oid
+                    WHERE c.relname = '{table}' AND a.attname = '{column}'
+                """))
+                current_dim = dim_result.scalar()
+
+                if current_dim and '1024' in str(current_dim):
+                    print(f"   {table}.{column} already at 1024 - skipping")
+                else:
+                    await conn.execute(text(f'ALTER TABLE "{table}" DROP COLUMN IF EXISTS "{column}"'))
+                    await conn.execute(text(f'ALTER TABLE "{table}" ADD COLUMN "{column}" vector(1024)'))
+                    print(f"   Updated {table}.{column}")
             else:
-                print(f"   {table} doesn't exist (will be created on first insert)")
+                print(f"   {table} doesn't exist - skipping")
 
         # 4. Update alembic version
         print("4. Updating alembic version...")
