@@ -1,7 +1,7 @@
 """Change vector dimension from 1536 to 1024 for Titan Embed v2.
 
 Revision ID: a1b2c3d4e5f6
-Revises: 826ddedd5b20
+Revises: None (standalone migration)
 Create Date: 2025-12-02 17:42:00.000000
 
 """
@@ -12,7 +12,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "a1b2c3d4e5f6"
-down_revision: str | None = "826ddedd5b20"
+down_revision: str | None = None  # Standalone - works with any existing schema
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
