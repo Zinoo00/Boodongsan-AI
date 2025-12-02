@@ -64,8 +64,8 @@ class Entity(Base):
     properties: Mapped[dict] = mapped_column(JSON, nullable=True, default=dict)
     source_chunks: Mapped[list] = mapped_column(JSON, nullable=True, default=list)
     embedding: Mapped[list[float]] = mapped_column(
-        Vector(1536), nullable=True
-    )  # AWS Titan embedding dimension
+        Vector(1024), nullable=True
+    )  # AWS Titan Embed v2 (1024 dimensions)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
