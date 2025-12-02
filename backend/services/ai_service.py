@@ -110,9 +110,10 @@ class AIService:
 
     async def generate_embeddings(self, texts: list[str], **_: Any) -> list[list[float]]:
         """
-        Generate embeddings using AWS Bedrock Titan or fallback to deterministic hash.
+        Generate embeddings using AWS Bedrock Titan v2 or fallback to deterministic hash.
 
-        AWS Bedrock Titan Embeddings v1: 1536 dimensions
+        AWS Bedrock Titan Embeddings v2: configurable dimensions (256, 512, 1024)
+        Default: 1024 dimensions (set via LIGHTRAG_EMBEDDING_DIM)
         """
         if not texts:
             return []
@@ -131,19 +132,21 @@ class AIService:
 
     async def _generate_titan_embeddings(self, texts: list[str]) -> list[list[float]]:
         """
-        Generate real embeddings using AWS Bedrock Titan Embeddings.
+        Generate real embeddings using AWS Bedrock Titan Embeddings v2.
 
-        Model: amazon.titan-embed-text-v1
-        Dimensions: 1536
+        Model: amazon.titan-embed-text-v2:0
+        Dimensions: 1024 (configurable: 256, 512, 1024)
         Max input: 8192 tokens
         """
         embeddings = []
 
         for text in texts:
             try:
-                # Titan embedding request body
+                # Titan v2 embedding request body with configurable dimensions
                 request_body = {
                     "inputText": text[:8000],  # Truncate to avoid token limit
+                    "dimensions": self._embedding_dim,  # Titan v2: 256, 512, or 1024
+                    "normalize": True,  # Return normalized embeddings
                 }
 
                 response = await asyncio.to_thread(

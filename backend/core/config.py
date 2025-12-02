@@ -53,7 +53,8 @@ class Settings(BaseSettings):
     # - EU only: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
     # - Japan only: "jp.anthropic.claude-sonnet-4-5-20250929-v1:0"
     # - Australia only: "au.anthropic.claude-sonnet-4-5-20250929-v1:0"
-    BEDROCK_EMBEDDING_MODEL_ID: str = "amazon.titan-embed-text-v1"
+    # Titan Embed v2 supports configurable dimensions: 256, 512, 1024
+    BEDROCK_EMBEDDING_MODEL_ID: str = "amazon.titan-embed-text-v2:0"
     ANTHROPIC_API_KEY: str = ""
     ANTHROPIC_MODEL_ID: str = "claude-3-5-sonnet-20241022"
 
@@ -87,7 +88,7 @@ class Settings(BaseSettings):
     # LightRAG - Knowledge Graph RAG
     LIGHTRAG_WORKING_DIR: str = "./lightrag_storage"
     LIGHTRAG_WORKSPACE: str = "BODA"
-    LIGHTRAG_EMBEDDING_DIM: int = 1536
+    LIGHTRAG_EMBEDDING_DIM: int = 1024  # Titan Embed v2 supports: 256, 512, 1024
 
     # LightRAG Storage Configuration
     # Storage options: "postgresql" (production) or "local" (development)

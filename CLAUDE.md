@@ -9,7 +9,7 @@
   - **PostgreSQL** (기본값): AWS RDS PostgreSQL + pgvector (프로덕션)
   - **Local**: NanoVectorDB + NetworkX + JSON (개발/테스트)
 - **캐시**: Redis
-- **AI**: AWS Bedrock (Claude Sonnet 4.5 + Titan Embeddings)
+- **AI**: AWS Bedrock (Claude Sonnet 4.5 + Titan Embed v2, 1024 dim)
 - **프론트엔드**: Streamlit
 - **OpenAPI**: 국토교통부 (MOLIT), Seoul Open Data
 
@@ -174,7 +174,7 @@ docker-compose up
 
 ### 주요 서비스
 
-- **AIService**: AWS Bedrock (Claude Sonnet 4.5 + Titan Embeddings)
+- **AIService**: AWS Bedrock (Claude Sonnet 4.5 + Titan Embed v2)
 - **LightRAGService**: LightRAG 통합 서비스 (Storage Backend 선택 가능)
 - **StorageBackend**: Storage 추상화 레이어
   - **PostgreSQLBackend**: AWS RDS PostgreSQL + pgvector
