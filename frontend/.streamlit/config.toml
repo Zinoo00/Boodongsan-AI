@@ -3,19 +3,19 @@
 # https://docs.streamlit.io/library/advanced-features/configuration
 
 [theme]
-base = "light"
+base = "dark"
 
-# Primary theme color (blue like demo-ai-assistant)
-primaryColor = "#60a5fa"
+# Primary theme color
+primaryColor = "#ECEDEF"
 
-# Background color
-backgroundColor = "#fafafa"
+# Background color (Deep Charcoal UI Background)
+backgroundColor = "#202123"
 
-# Secondary background color (for sidebar, etc.)
-secondaryBackgroundColor = "#ffffff"
+# Secondary background color (Mid Gray Panel)
+secondaryBackgroundColor = "#40414F"
 
-# Text color
-textColor = "#3f3f46"
+# Text color (Soft Light Gray for Highlights/Text)
+textColor = "#ECEDEF"
 
 # Font family (Inter font for modern look)
 font = "Inter"
