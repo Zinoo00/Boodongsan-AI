@@ -86,7 +86,7 @@ class UserService:
 
             store.setdefault("profiles", {})[user_id] = profile
             await self._write_store(store)
-            logger.info("✅ 사용자 프로필 저장 성공: %s", user_id)
+            logger.info("사용자 프로필 저장 성공: %s", user_id)
             return profile
 
     # ==================== 대화 이력 관리 ====================
@@ -142,7 +142,7 @@ class UserService:
             convo.setdefault("messages", []).append(message)
             await self._write_store(store)
 
-        logger.info("✅ 대화 메시지 저장 성공: %s", message["message_id"])
+        logger.info("대화 메시지 저장 성공: %s", message["message_id"])
         return True
 
     # ==================== 사용자 분석 ====================
@@ -199,7 +199,7 @@ class UserService:
             )
             await self._write_store(store)
 
-        logger.info("✅ 대화 세션 생성 완료: %s", conversation_id)
+        logger.info("대화 세션 생성 완료: %s", conversation_id)
         return conversation_id
 
     async def get_user_conversations(

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class AIService:
     """
     AI service supporting both Anthropic Direct API and AWS Bedrock.
-    
+
     Automatically selects provider based on configuration:
     - If ANTHROPIC_API_KEY is set: uses Anthropic Direct API
     - If AWS credentials are set: uses AWS Bedrock
@@ -44,14 +44,16 @@ class AIService:
 
         # Detect which provider is configured
         self._provider = self._detect_provider()
-        
+
         if self._provider == "anthropic":
             logger.info("✓ Using Anthropic Direct API")
         elif self._provider == "bedrock":
             logger.info("✓ Using AWS Bedrock")
             await self._initialize_bedrock()
         else:
-            logger.warning("⚠️  No AI provider configured (neither ANTHROPIC_API_KEY nor AWS credentials)")
+            logger.warning(
+                "No AI provider configured (neither ANTHROPIC_API_KEY nor AWS credentials)"
+            )
 
         self._initialized = True
         logger.info("AIService initialized")
@@ -63,7 +65,7 @@ class AIService:
 
     def is_ready(self) -> bool:
         return self._initialized and self._provider != "none"
-    
+
     @property
     def provider(self) -> str:
         """Current AI provider: 'anthropic', 'bedrock', or 'none'"""
@@ -78,7 +80,7 @@ class AIService:
         # Priority: Anthropic Direct API > AWS Bedrock
         if settings.ANTHROPIC_API_KEY and settings.ANTHROPIC_API_KEY.strip():
             return "anthropic"
-        
+
         if (
             settings.AWS_ACCESS_KEY_ID
             and settings.AWS_ACCESS_KEY_ID.strip()
@@ -86,14 +88,14 @@ class AIService:
             and settings.AWS_SECRET_ACCESS_KEY.strip()
         ):
             return "bedrock"
-        
+
         return "none"
 
     async def _initialize_bedrock(self) -> None:
         """Initialize AWS Bedrock client."""
         try:
             import boto3
-            
+
             self._bedrock_client = boto3.client(
                 service_name="bedrock-runtime",
                 region_name=settings.AWS_REGION,
@@ -127,7 +129,9 @@ class AIService:
             return await self._generate_titan_embeddings(texts)
 
         # Fallback to hash-based embeddings for development
-        logger.warning("Using hash-based embeddings (not semantic). Set LIGHTRAG_USE_REAL_EMBEDDINGS=true for production.")
+        logger.warning(
+            "Using hash-based embeddings (not semantic). Set LIGHTRAG_USE_REAL_EMBEDDINGS=true for production."
+        )
         return [self._text_to_embedding(text) for text in texts]
 
     async def _generate_titan_embeddings(self, texts: list[str]) -> list[list[float]]:
@@ -199,7 +203,7 @@ class AIService:
                 "model_used": self._anthropic_model_id,
                 "provider": "anthropic",
             }
-        
+
         elif self._provider == "bedrock":
             text = await self._invoke_bedrock(
                 messages=[{"role": "user", "content": prompt}],
@@ -211,7 +215,7 @@ class AIService:
                 "model_used": self._bedrock_model_id,
                 "provider": "bedrock",
             }
-        
+
         else:
             raise RuntimeError("No AI provider configured")
 
@@ -232,7 +236,7 @@ class AIService:
                 "model_used": self._anthropic_model_id,
                 "provider": "anthropic",
             }
-        
+
         elif self._provider == "bedrock":
             text = await self._invoke_bedrock(
                 messages=messages,
@@ -244,7 +248,7 @@ class AIService:
                 "model_used": self._bedrock_model_id,
                 "provider": "bedrock",
             }
-        
+
         else:
             raise RuntimeError("No AI provider configured")
 
@@ -359,7 +363,7 @@ class AIService:
             "max_tokens": max_tokens,
             "messages": messages,
         }
-        
+
         if system_prompt:
             request_body["system"] = system_prompt
 
@@ -369,17 +373,17 @@ class AIService:
                 modelId=self._bedrock_model_id,
                 body=json.dumps(request_body),
             )
-            
+
             response_body = json.loads(response["body"].read())
-            
+
             # Extract text from response
             text_parts: list[str] = []
             for content_block in response_body.get("content", []):
                 if content_block.get("type") == "text":
                     text_parts.append(content_block.get("text", ""))
-            
+
             return "".join(text_parts)
-            
+
         except Exception as exc:
             logger.error(f"AWS Bedrock invocation failed: {exc}")
             raise

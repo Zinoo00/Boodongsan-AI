@@ -306,16 +306,9 @@ BODA는 유연한 storage backend 시스템을 제공합니다:
 ./scripts/switch_storage.sh local
 ```
 
-### 상세 문서
-
-- [Storage Backend 가이드](backend/STORAGE.md) - 전체 가이드
-- [구현 요약](backend/IMPLEMENTATION_SUMMARY.md) - 기술 세부사항
-- [빠른 참조](backend/QUICK_REFERENCE.md) - 치트시트
-
 ### 시스템 요구사항 확인
 
 ```bash
-# 현재 시스템 요구사항 확인
 uv run python scripts/check_requirements.py
 ```
 
@@ -323,4 +316,3 @@ uv run python scripts/check_requirements.py
 
 - Backend API Docs: http://localhost:8000/docs
 - Frontend: http://localhost:8501
-- Storage Documentation: backend/STORAGE.md

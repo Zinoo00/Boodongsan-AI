@@ -24,29 +24,24 @@ class HealthResponse(BaseModel):
     services: dict[str, Any] = Field(default_factory=dict)
 
 
+def _get_model_info(provider: str) -> dict[str, str]:
+    """AI 프로바이더 기반 모델 정보 반환."""
+    model_map = {
+        "anthropic": settings.ANTHROPIC_MODEL_ID,
+        "bedrock": settings.BEDROCK_MODEL_ID,
+    }
+    return {
+        "provider": provider,
+        "model": model_map.get(provider, "N/A"),
+    }
+
+
 @router.get("/", response_model=HealthResponse)
 async def health_check(ai_service: AIService = Depends(get_ai_service)) -> HealthResponse:
     redis_status = await database_health_check()
     await ai_service.initialize()
 
-    # Determine which model is being used based on provider
-    provider = ai_service.provider
-    if provider == "anthropic":
-        model_info = {
-            "provider": "anthropic",
-            "model": settings.ANTHROPIC_MODEL_ID,
-        }
-    elif provider == "bedrock":
-        model_info = {
-            "provider": "bedrock",
-            "model": settings.BEDROCK_MODEL_ID,
-        }
-    else:
-        model_info = {
-            "provider": "none",
-            "model": "N/A",
-        }
-
+    model_info = _get_model_info(ai_service.provider)
     services = {
         "database": redis_status["redis"],
         "ai_service": {
@@ -72,18 +67,9 @@ async def database_health() -> dict[str, Any]:
 @router.get("/ai", response_model=dict[str, Any])
 async def ai_health(ai_service: AIService = Depends(get_ai_service)) -> dict[str, Any]:
     await ai_service.initialize()
-    
-    provider = ai_service.provider
-    if provider == "anthropic":
-        model = settings.ANTHROPIC_MODEL_ID
-    elif provider == "bedrock":
-        model = settings.BEDROCK_MODEL_ID
-    else:
-        model = "N/A"
-    
+    model_info = _get_model_info(ai_service.provider)
     return {
         "status": ai_service.is_ready(),
         "timestamp": datetime.utcnow().isoformat(),
-        "provider": provider,
-        "model": model,
+        **model_info,
     }

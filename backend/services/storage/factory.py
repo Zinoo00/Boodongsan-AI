@@ -44,6 +44,5 @@ def create_storage_backend(backend_type: str | None = None) -> StorageBackend:
 
     else:
         raise ValueError(
-            f"Unknown storage backend: {backend}. "
-            f"Supported backends: postgresql, local"
+            f"Unknown storage backend: {backend}. " f"Supported backends: postgresql, local"
         )

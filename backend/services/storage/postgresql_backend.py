@@ -118,9 +118,7 @@ class PostgreSQLBackend(StorageBackend):
         try:
             async with self._session_maker() as session:
                 # Check if entity exists
-                result = await session.execute(
-                    select(Entity).where(Entity.entity_id == entity_id)
-                )
+                result = await session.execute(select(Entity).where(Entity.entity_id == entity_id))
                 existing_entity = result.scalar_one_or_none()
 
                 if existing_entity:
@@ -263,9 +261,7 @@ class PostgreSQLBackend(StorageBackend):
 
         try:
             async with self._session_maker() as session:
-                result = await session.execute(
-                    select(Entity).where(Entity.entity_id == entity_id)
-                )
+                result = await session.execute(select(Entity).where(Entity.entity_id == entity_id))
                 entity = result.scalar_one_or_none()
 
                 if not entity:

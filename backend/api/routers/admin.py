@@ -202,7 +202,7 @@ async def clear_lightrag_data(
         raise HTTPException(
             status_code=500,
             detail=f"데이터 삭제 중 오류 발생: {e}",
-        )
+        ) from e
 
 
 # ============================================================================

@@ -18,12 +18,12 @@ class StorageBackend(ABC):
     @abstractmethod
     async def initialize(self) -> None:
         """Storage 초기화."""
-        pass
+        ...
 
     @abstractmethod
     async def finalize(self) -> None:
         """Storage 정리 및 종료."""
-        pass
+        ...
 
     @abstractmethod
     async def insert_document(self, text: str, metadata: dict[str, Any] | None = None) -> bool:
@@ -37,7 +37,7 @@ class StorageBackend(ABC):
         Returns:
             성공 여부
         """
-        pass
+        ...
 
     @abstractmethod
     async def insert_entity(
@@ -61,7 +61,7 @@ class StorageBackend(ABC):
         Returns:
             성공 여부
         """
-        pass
+        ...
 
     @abstractmethod
     async def insert_relation(
@@ -87,7 +87,7 @@ class StorageBackend(ABC):
         Returns:
             성공 여부
         """
-        pass
+        ...
 
     @abstractmethod
     async def search_similar_vectors(
@@ -103,7 +103,7 @@ class StorageBackend(ABC):
         Returns:
             검색 결과 리스트
         """
-        pass
+        ...
 
     @abstractmethod
     async def get_entity(self, entity_id: str) -> dict[str, Any] | None:
@@ -116,7 +116,7 @@ class StorageBackend(ABC):
         Returns:
             엔티티 정보 또는 None
         """
-        pass
+        ...
 
     @abstractmethod
     async def get_entity_relations(
@@ -132,7 +132,7 @@ class StorageBackend(ABC):
         Returns:
             관계 리스트
         """
-        pass
+        ...
 
     @abstractmethod
     def is_empty(self) -> bool:
@@ -142,4 +142,4 @@ class StorageBackend(ABC):
         Returns:
             True if empty, False otherwise
         """
-        pass
+        ...

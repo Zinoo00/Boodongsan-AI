@@ -24,9 +24,7 @@ class Document(Base):
 
     __tablename__ = "documents"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     doc_metadata: Mapped[dict] = mapped_column(JSON, nullable=True, default=dict)
     chunk_ids: Mapped[list] = mapped_column(JSON, nullable=True, default=list)
@@ -55,9 +53,7 @@ class Entity(Base):
 
     __tablename__ = "entities"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     entity_id: Mapped[str] = mapped_column(String(500), unique=True, nullable=False, index=True)
     entity_type: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
@@ -91,9 +87,7 @@ class GraphRelation(Base):
 
     __tablename__ = "graph_relations"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     source_entity: Mapped[str] = mapped_column(String(500), nullable=False, index=True)
     target_entity: Mapped[str] = mapped_column(String(500), nullable=False, index=True)
     relation_type: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
@@ -114,4 +108,6 @@ class GraphRelation(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<GraphRelation({self.source_entity} -[{self.relation_type}]-> {self.target_entity})>"
+        return (
+            f"<GraphRelation({self.source_entity} -[{self.relation_type}]-> {self.target_entity})>"
+        )

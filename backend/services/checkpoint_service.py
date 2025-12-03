@@ -125,11 +125,13 @@ class CheckpointService:
                 with open(checkpoint_file) as f:
                     data = json.load(f)
 
-                checkpoints.append({
-                    "job_id": checkpoint_file.stem,
-                    "timestamp": data.get("checkpoint_timestamp"),
-                    "data": data,
-                })
+                checkpoints.append(
+                    {
+                        "job_id": checkpoint_file.stem,
+                        "timestamp": data.get("checkpoint_timestamp"),
+                        "data": data,
+                    }
+                )
             except Exception as e:
                 logger.error(f"Failed to read checkpoint {checkpoint_file}: {e}")
 

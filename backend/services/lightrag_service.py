@@ -261,13 +261,9 @@ class LightRAGService:
             True if storage is empty, False otherwise
         """
         if self.storage_backend_type == "postgresql":
-            # PostgreSQL: 데이터베이스 테이블 확인 필요
-            # LightRAG가 초기화되면 기본적으로 비어있지 않다고 가정
-            # 실제로는 쿼리를 통해 확인해야 함
-            if not self._initialized:
-                return True
+            # PostgreSQL: 초기화되지 않았으면 비어있음으로 처리
             # Conservative: assume not empty if initialized
-            return False
+            return not self._initialized
 
         # Local backend: 파일 존재 여부 확인
         if not self.working_dir.exists():

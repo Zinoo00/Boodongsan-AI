@@ -104,9 +104,7 @@ class CloudWatchMetrics:
         dimensions = {"JobId": job_id} if job_id else None
         return self.put_metric("DocumentsProcessed", count, "Count", dimensions)
 
-    def track_processing_rate(
-        self, docs_per_minute: float, job_id: str | None = None
-    ) -> bool:
+    def track_processing_rate(self, docs_per_minute: float, job_id: str | None = None) -> bool:
         """
         처리 속도 추적 (분당 문서 수).
 
@@ -148,9 +146,7 @@ class CloudWatchMetrics:
         dimensions = {"JobId": job_id} if job_id else None
         return self.put_metric("JobDuration", duration_seconds, "Seconds", dimensions)
 
-    def track_api_response_time(
-        self, response_time_ms: float, endpoint: str | None = None
-    ) -> bool:
+    def track_api_response_time(self, response_time_ms: float, endpoint: str | None = None) -> bool:
         """
         API 응답 시간 추적.
 
@@ -238,16 +234,16 @@ class MetricsAggregator:
         }
 
         if dimensions:
-            metric["Dimensions"] = [
-                {"Name": key, "Value": val} for key, val in dimensions.items()
-            ]
+            metric["Dimensions"] = [{"Name": key, "Value": val} for key, val in dimensions.items()]
 
         self._metrics_buffer.append(metric)
 
         # 자동 플러시 (배치 크기 또는 시간 간격 도달 시)
-        if len(self._metrics_buffer) >= self.batch_size:
-            self.flush()
-        elif (datetime.utcnow() - self._last_flush).seconds >= self.flush_interval:
+        should_flush = (
+            len(self._metrics_buffer) >= self.batch_size
+            or (datetime.utcnow() - self._last_flush).seconds >= self.flush_interval
+        )
+        if should_flush:
             self.flush()
 
     def flush(self) -> bool:
