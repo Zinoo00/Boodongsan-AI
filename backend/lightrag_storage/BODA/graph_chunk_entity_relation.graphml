@@ -164,12 +164,14 @@
       <data key="d1">location</data>
       <data key="d2">Seoul is the capital city of South Korea and holds the administrative status of a special city, also referred to as a special metropolitan city. This designation reflects Seoul's unique status within South Korea's administrative hierarchy, distinguishing it from other cities and provinces. As the nation's capital, Seoul serves as a major administrative region that exercises direct administrative control over numerous autonomous districts within its jurisdiction, functioning both as a city and a higher-level administrative division.
 
-Seoul's administrative structure is organized into various autonomous districts that operate under its authority as a special city. These districts function as subordinate administrative divisions within Seoul's governance framework, with Seoul maintaining administrative authority and serving as their administrative parent region. The autonomous districts that comprise Seoul include Gangnam-gu, Jongno-gu, Seongbuk-gu, Nowon-gu, Eunpyeong-gu, Mapo-gu, Gangseo-gu, Guro-gu, and Seocho-gu, among others. Each of these districts operates within Seoul's coordinated governance system.
+Seoul's administrative structure is organized into various autonomous districts that operate under its authority as a special city. These districts function as subordinate administrative divisions within Seoul's governance framework, with Seoul maintaining administrative authority and serving as their administrative parent region. The autonomous districts that comprise Seoul include Gangnam-gu, Jongno-gu, Seongbuk-gu, Nowon-gu, Eunpyeong-gu, Mapo-gu, Gangseo-gu, Guro-gu, and Seocho-gu, among others. Each of these districts operates within Seoul's coordinated governance system. Through this special city structure, Seoul coordinates governance and urban management across its metropolitan area, serving as the administrative region to which its various constituent districts belong.
 
-Through this special city structure, Seoul coordinates governance and urban management across its metropolitan area, serving as the administrative region to which its various constituent districts belong. This organizational framework enables Seoul to effectively manage its role as both the national capital and a complex metropolitan administrative entity.&lt;SEP&gt;Seoul is a special city in South Korea that serves as the administrative parent region of Gangnam-gu.&lt;SEP&gt;Seoul is a special metropolitan city that contains multiple autonomous districts.&lt;SEP&gt;Seoul is a special city that serves as the administrative parent region for multiple districts.</data>
-      <data key="d3">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b&lt;SEP&gt;chunk-73c9d7a70ce525b4e57fa371d9b90f53&lt;SEP&gt;chunk-48c028f3004b35c16f57482f5741c5d7&lt;SEP&gt;chunk-0b64ffc75148f235760d93f0b7d2e0e5&lt;SEP&gt;chunk-ea1e3f14dd430e90040d8f01e5fc5bb4&lt;SEP&gt;chunk-6e0848b1b119121dd5a60b5cf3c301ef&lt;SEP&gt;chunk-2ff67ac67cc9eeac45a0205b35dd39f1&lt;SEP&gt;chunk-e4634cc4eba25b66d38b04ecc11cd7da&lt;SEP&gt;chunk-5891f3364a5bfdd86b9a4c8052cfa3b9&lt;SEP&gt;chunk-09d75c5313df1318db9ef4ffaa364562&lt;SEP&gt;chunk-3f6f80a23c789323038b051e370b122d&lt;SEP&gt;chunk-c0bbc84bdc3d0142ced9bccd29033ddf&lt;SEP&gt;chunk-36504f5106c2785a957ce01e0ec2a6a0&lt;SEP&gt;chunk-9df2cb01e9dcae684eda36c3f419e9af&lt;SEP&gt;chunk-6d24b1ba5974ca3013ef835560acdfae&lt;SEP&gt;chunk-c4bd1b7c722f7d709f934e273cc5be3f&lt;SEP&gt;chunk-8aac7537227c4daf63ed401fb51bb0ae&lt;SEP&gt;chunk-c86aede000cfd461b40f495155982ca9</data>
+Seoul operates a metropolitan subway system that serves the capital city and its surrounding areas. This subway system functions as a critical component of the city's transportation infrastructure. Additionally, Seoul serves as the geographic area covered by traffic data monitoring and collection within South Korea, reflecting its importance as a center for urban planning and management.
+
+This organizational framework enables Seoul to effectively manage its role as both the national capital and a complex metropolitan administrative entity, coordinating services, infrastructure, and governance across the entire special metropolitan city area.&lt;SEP&gt;Seoul is the capital city of South Korea and the location where the bus stop data originates.</data>
+      <data key="d3">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b&lt;SEP&gt;chunk-73c9d7a70ce525b4e57fa371d9b90f53&lt;SEP&gt;chunk-48c028f3004b35c16f57482f5741c5d7&lt;SEP&gt;chunk-0b64ffc75148f235760d93f0b7d2e0e5&lt;SEP&gt;chunk-ea1e3f14dd430e90040d8f01e5fc5bb4&lt;SEP&gt;chunk-6e0848b1b119121dd5a60b5cf3c301ef&lt;SEP&gt;chunk-2ff67ac67cc9eeac45a0205b35dd39f1&lt;SEP&gt;chunk-e4634cc4eba25b66d38b04ecc11cd7da&lt;SEP&gt;chunk-5891f3364a5bfdd86b9a4c8052cfa3b9&lt;SEP&gt;chunk-09d75c5313df1318db9ef4ffaa364562&lt;SEP&gt;chunk-3f6f80a23c789323038b051e370b122d&lt;SEP&gt;chunk-c0bbc84bdc3d0142ced9bccd29033ddf&lt;SEP&gt;chunk-36504f5106c2785a957ce01e0ec2a6a0&lt;SEP&gt;chunk-9df2cb01e9dcae684eda36c3f419e9af&lt;SEP&gt;chunk-6d24b1ba5974ca3013ef835560acdfae&lt;SEP&gt;chunk-c4bd1b7c722f7d709f934e273cc5be3f&lt;SEP&gt;chunk-8aac7537227c4daf63ed401fb51bb0ae&lt;SEP&gt;chunk-c86aede000cfd461b40f495155982ca9&lt;SEP&gt;chunk-12101b45b93642849b8533dd23ecc192&lt;SEP&gt;chunk-b194c2c915343f128aacd9883130b77c&lt;SEP&gt;chunk-1b7269b562f9c76dc2b27db3c2c25323&lt;SEP&gt;chunk-9e9ecec649adfea83f83301759b88d65&lt;SEP&gt;chunk-f51cb065cdebc3428c9d8c434c070c60</data>
       <data key="d4">unknown_source</data>
-      <data key="d5">1765771749</data>
+      <data key="d5">1765789475</data>
       <data key="d6" />
     </node>
     <node id="Jongno-gu">
@@ -1140,6 +1142,334 @@ Beyond apartment-specific metrics, R-ONE provides broader housing market statist
       <data key="d5">1765775512</data>
       <data key="d6" />
     </node>
+    <node id="Bugae">
+      <data key="d0">Bugae</data>
+      <data key="d1">location</data>
+      <data key="d2">Bugae is a subway station on Line 01 in the Seoul metropolitan area.</data>
+      <data key="d3">chunk-e3a4e88cdf49b13288b5124c9b1297b7</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789299</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Metropolitan Subway">
+      <data key="d0">Seoul Metropolitan Subway</data>
+      <data key="d1">organization</data>
+      <data key="d2">Seoul Metropolitan Subway is the public transportation system operating subway lines in Seoul.&lt;SEP&gt;Seoul Metropolitan Subway is the rapid transit system serving Seoul and its surrounding areas.&lt;SEP&gt;Seoul Metropolitan Subway is the rapid transit system serving Seoul and its surrounding metropolitan area.&lt;SEP&gt;Seoul Metropolitan Subway is the public transportation system providing subway services in Seoul.&lt;SEP&gt;Seoul Metropolitan Subway is the rapid transit system serving Seoul and surrounding metropolitan areas.&lt;SEP&gt;Seoul Metropolitan Subway is the rapid transit system serving Seoul and its metropolitan area.&lt;SEP&gt;Seoul Metropolitan Subway is the rapid transit system serving the Seoul metropolitan area.</data>
+      <data key="d3">chunk-e3a4e88cdf49b13288b5124c9b1297b7&lt;SEP&gt;chunk-3d42181dd114f56c9024b28a28d21737&lt;SEP&gt;chunk-1b7269b562f9c76dc2b27db3c2c25323&lt;SEP&gt;chunk-98894275b80b8957be673cf3cc5a4174&lt;SEP&gt;chunk-33b5c187dc443a4f6912e6fcc2854a01&lt;SEP&gt;chunk-0f7a2f7eacd5cbba27032da729465a9c&lt;SEP&gt;chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789438</data>
+      <data key="d6" />
+    </node>
+    <node id="Line 01">
+      <data key="d0">Line 01</data>
+      <data key="d1">artifact</data>
+      <data key="d2">Line 01 is a subway line that serves the Seoul metropolitan area, connecting various stations including Bugae Station.&lt;SEP&gt;Line 01 is a subway line in the Seoul Metropolitan Subway system that serves Ganseok Station.&lt;SEP&gt;Line 01 is a subway line in Seoul's metro network that serves Dowon station.&lt;SEP&gt;Line 01 is a subway line in Seoul's metro system that includes Onsu Station.&lt;SEP&gt;Line 01 is a subway line that is part of the Seoul metropolitan subway system.&lt;SEP&gt;Line 01 is a subway line in the Seoul metropolitan area transit system.&lt;SEP&gt;Line 01 is a subway line in the Seoul Metropolitan Subway system that serves Tangjeong Station.</data>
+      <data key="d3">chunk-e3a4e88cdf49b13288b5124c9b1297b7&lt;SEP&gt;chunk-3d42181dd114f56c9024b28a28d21737&lt;SEP&gt;chunk-12101b45b93642849b8533dd23ecc192&lt;SEP&gt;chunk-b194c2c915343f128aacd9883130b77c&lt;SEP&gt;chunk-1b7269b562f9c76dc2b27db3c2c25323&lt;SEP&gt;chunk-98894275b80b8957be673cf3cc5a4174&lt;SEP&gt;chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789420</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Open Data Plaza">
+      <data key="d0">Seoul Open Data Plaza</data>
+      <data key="d1">organization</data>
+      <data key="d2">Seoul Open Data Plaza (서울 열린 데이터 광장) is the official open data platform of Seoul city that serves as a comprehensive public data source for information about the city. This platform provides extensive public information about Seoul's infrastructure and services, making municipal data accessible to citizens, researchers, and other stakeholders.
+
+The Seoul Open Data Plaza functions as a centralized data source platform offering detailed information across various aspects of Seoul's urban systems. Among its key offerings, the platform provides specific data about Seoul's subway stations and transportation infrastructure. Additionally, it encompasses broader information about city services and infrastructure across multiple domains, supporting transparency and data-driven decision-making for Seoul's metropolitan area.
+
+As an official municipal data platform, Seoul Open Data Plaza plays a crucial role in Seoul's open government initiatives by making public information readily available and accessible to users who need data about the city's operations, facilities, and services.&lt;SEP&gt;Seoul Open Data Plaza is the official data source providing information about Seoul subway stations.&lt;SEP&gt;Seoul Open Data Plaza is a public data platform that provides information about Seoul city services and infrastructure.&lt;SEP&gt;Seoul Open Data Plaza is a public data platform that provides open datasets about Seoul City.&lt;SEP&gt;Seoul Open Data Plaza is a government data platform that provides public datasets for Seoul city.</data>
+      <data key="d3">chunk-e3a4e88cdf49b13288b5124c9b1297b7&lt;SEP&gt;chunk-3d42181dd114f56c9024b28a28d21737&lt;SEP&gt;chunk-12101b45b93642849b8533dd23ecc192&lt;SEP&gt;chunk-b194c2c915343f128aacd9883130b77c&lt;SEP&gt;chunk-1b7269b562f9c76dc2b27db3c2c25323&lt;SEP&gt;chunk-98894275b80b8957be673cf3cc5a4174&lt;SEP&gt;chunk-33b5c187dc443a4f6912e6fcc2854a01&lt;SEP&gt;chunk-6d407f1bc3b87433ab80250e4e99de62&lt;SEP&gt;chunk-0f7a2f7eacd5cbba27032da729465a9c&lt;SEP&gt;chunk-06f67745b5029df412d239c6bf8f4460&lt;SEP&gt;chunk-9e9ecec649adfea83f83301759b88d65&lt;SEP&gt;chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789475</data>
+      <data key="d6" />
+    </node>
+    <node id="Bugae Station">
+      <data key="d0">Bugae Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Bugae Station is a subway station located on Line 01 in the Seoul metropolitan area.</data>
+      <data key="d3">chunk-e3a4e88cdf49b13288b5124c9b1297b7</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789299</data>
+      <data key="d6" />
+    </node>
+    <node id="Ganseok Station">
+      <data key="d0">Ganseok Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Ganseok Station is a subway station on Line 01 in the Seoul Metropolitan Subway system.</data>
+      <data key="d3">chunk-3d42181dd114f56c9024b28a28d21737</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789313</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Metropolitan Subway System">
+      <data key="d0">Seoul Metropolitan Subway System</data>
+      <data key="d1">organization</data>
+      <data key="d2">Seoul Metropolitan Subway System is the public transportation network that operates subway lines in Seoul.</data>
+      <data key="d3">chunk-3d42181dd114f56c9024b28a28d21737</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789313</data>
+      <data key="d6" />
+    </node>
+    <node id="Dowon">
+      <data key="d0">Dowon</data>
+      <data key="d1">location</data>
+      <data key="d2">Dowon is a subway station in Seoul's subway system.</data>
+      <data key="d3">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789328</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Subway System">
+      <data key="d0">Seoul Subway System</data>
+      <data key="d1">concept</data>
+      <data key="d2">Seoul Subway System is the metropolitan rapid transit system serving Seoul.</data>
+      <data key="d3">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789328</data>
+      <data key="d6" />
+    </node>
+    <node id="Dowon Station">
+      <data key="d0">Dowon Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Dowon Station is a subway station in Seoul located on Line 01.</data>
+      <data key="d3">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789328</data>
+      <data key="d6" />
+    </node>
+    <node id="Onsu Station">
+      <data key="d0">Onsu Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Onsu Station is a subway station on Line 01 in Seoul.</data>
+      <data key="d3">chunk-b194c2c915343f128aacd9883130b77c</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789341</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Metro System">
+      <data key="d0">Seoul Metro System</data>
+      <data key="d1">artifact</data>
+      <data key="d2">Seoul Metro System is the public transportation network that operates subway lines in Seoul.</data>
+      <data key="d3">chunk-b194c2c915343f128aacd9883130b77c</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789341</data>
+      <data key="d6" />
+    </node>
+    <node id="Jungdong">
+      <data key="d0">Jungdong</data>
+      <data key="d1">location</data>
+      <data key="d2">Jungdong is a subway station in the Seoul metropolitan subway system.</data>
+      <data key="d3">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789357</data>
+      <data key="d6" />
+    </node>
+    <node id="Subway Station Information">
+      <data key="d0">Subway Station Information</data>
+      <data key="d1">data</data>
+      <data key="d2">Subway Station Information refers to the data and details about subway stations in Seoul, including their locations and line connections.&lt;SEP&gt;Subway Station Information refers to data about Seoul metropolitan subway stations including their locations and line assignments.</data>
+      <data key="d3">chunk-1b7269b562f9c76dc2b27db3c2c25323&lt;SEP&gt;chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789438</data>
+      <data key="d6" />
+    </node>
+    <node id="Jungdong Station">
+      <data key="d0">Jungdong Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Jungdong Station is a subway station on Line 1 in Seoul.</data>
+      <data key="d3">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789357</data>
+      <data key="d6" />
+    </node>
+    <node id="Line 1">
+      <data key="d0">Line 1</data>
+      <data key="d1">concept</data>
+      <data key="d2">Line 1 is a subway line that serves Seoul and connects multiple stations including Jungdong Station.&lt;SEP&gt;Line 1 is a subway line in the Seoul metropolitan transit system, designated as 01호선.&lt;SEP&gt;Line 1 is a subway line in the Seoul Metropolitan Subway system, identified as route 01.&lt;SEP&gt;Line 1 (01호선) is a subway line in the Seoul metropolitan railway system.&lt;SEP&gt;Line 1 is a subway line in the Seoul metropolitan subway system, designated as 01호선.</data>
+      <data key="d3">chunk-1b7269b562f9c76dc2b27db3c2c25323&lt;SEP&gt;chunk-98894275b80b8957be673cf3cc5a4174&lt;SEP&gt;chunk-33b5c187dc443a4f6912e6fcc2854a01&lt;SEP&gt;chunk-6d407f1bc3b87433ab80250e4e99de62&lt;SEP&gt;chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789438</data>
+      <data key="d6" />
+    </node>
+    <node id="Sinchang">
+      <data key="d0">Sinchang</data>
+      <data key="d1">location</data>
+      <data key="d2">Sinchang is a subway station on Line 01 in Seoul.</data>
+      <data key="d3">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789373</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Metro Station">
+      <data key="d0">Seoul Metro Station</data>
+      <data key="d1">concept</data>
+      <data key="d2">Seoul Metro Station refers to subway station information system in Seoul.</data>
+      <data key="d3">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789373</data>
+      <data key="d6" />
+    </node>
+    <node id="Sinchang Station">
+      <data key="d0">Sinchang Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Sinchang Station is a subway station on Line 1 in the Seoul metropolitan area.</data>
+      <data key="d3">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789373</data>
+      <data key="d6" />
+    </node>
+    <node id="Onyang Oncheon Station">
+      <data key="d0">Onyang Oncheon Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Onyang Oncheon Station is a subway station on Line 1 of the Seoul Metropolitan Subway system.</data>
+      <data key="d3">chunk-33b5c187dc443a4f6912e6fcc2854a01</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789387</data>
+      <data key="d6" />
+    </node>
+    <node id="Onyang Hot Spring Station">
+      <data key="d0">Onyang Hot Spring Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Onyang Hot Spring Station is a subway station on Line 1 in the Seoul metropolitan area subway system.</data>
+      <data key="d3">chunk-33b5c187dc443a4f6912e6fcc2854a01</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789387</data>
+      <data key="d6" />
+    </node>
+    <node id="Baebang">
+      <data key="d0">Baebang</data>
+      <data key="d1">location</data>
+      <data key="d2">Baebang is a subway station in Seoul's metro system.</data>
+      <data key="d3">chunk-6d407f1bc3b87433ab80250e4e99de62</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789400</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Metro">
+      <data key="d0">Seoul Metro</data>
+      <data key="d1">organization</data>
+      <data key="d2">Seoul Metro operates the subway system in Seoul, including Line 1.</data>
+      <data key="d3">chunk-6d407f1bc3b87433ab80250e4e99de62</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789400</data>
+      <data key="d6" />
+    </node>
+    <node id="Baebang Station">
+      <data key="d0">Baebang Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Baebang Station is a subway station on Line 1 in the Seoul metropolitan area.</data>
+      <data key="d3">chunk-6d407f1bc3b87433ab80250e4e99de62</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789400</data>
+      <data key="d6" />
+    </node>
+    <node id="Tangjeong">
+      <data key="d0">Tangjeong</data>
+      <data key="d1">location</data>
+      <data key="d2">Tangjeong is a subway station on Line 01 in the Seoul Metropolitan Subway system.</data>
+      <data key="d3">chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789420</data>
+      <data key="d6" />
+    </node>
+    <node id="Tangjeong Station">
+      <data key="d0">Tangjeong Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Tangjeong Station is a subway station on Line 01 in the Seoul Metropolitan Subway system.</data>
+      <data key="d3">chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789420</data>
+      <data key="d6" />
+    </node>
+    <node id="Asan Station">
+      <data key="d0">Asan Station</data>
+      <data key="d1">location</data>
+      <data key="d2">Asan Station is a subway station located on Line 1 of the Seoul Metropolitan Subway system.</data>
+      <data key="d3">chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789438</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul City Traffic Information">
+      <data key="d0">Seoul City Traffic Information</data>
+      <data key="d1">data</data>
+      <data key="d2">Seoul City Traffic Information refers to transportation-related data about Seoul, specifically focusing on subway information.</data>
+      <data key="d3">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789453</data>
+      <data key="d6" />
+    </node>
+    <node id="subway_info">
+      <data key="d0">subway_info</data>
+      <data key="d1">data</data>
+      <data key="d2">subway_info is a dataset containing information about Seoul's subway system.</data>
+      <data key="d3">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789453</data>
+      <data key="d6" />
+    </node>
+    <node id="서울 열린 데이터 광장">
+      <data key="d0">서울 열린 데이터 광장</data>
+      <data key="d1">organization</data>
+      <data key="d2">서울 열린 데이터 광장 (Seoul Open Data Plaza) is a public data platform that provides open access to various datasets about Seoul.&lt;SEP&gt;서울 열린 데이터 광장 is an open data platform operated by Seoul that provides public datasets.</data>
+      <data key="d3">chunk-9e9ecec649adfea83f83301759b88d65&lt;SEP&gt;chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789475</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul City">
+      <data key="d0">Seoul City</data>
+      <data key="d1">location</data>
+      <data key="d2">Seoul City is the capital of South Korea and the source of transportation information.</data>
+      <data key="d3">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789453</data>
+      <data key="d6" />
+    </node>
+    <node id="Subway_info">
+      <data key="d0">Subway_info</data>
+      <data key="d1">data</data>
+      <data key="d2">Subway_info is a dataset containing transportation information about Seoul's subway system.</data>
+      <data key="d3">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789453</data>
+      <data key="d6" />
+    </node>
+    <node id="서울시 버스정류소 정보">
+      <data key="d0">서울시 버스정류소 정보</data>
+      <data key="d1">data</data>
+      <data key="d2">서울시 버스정류소 정보 is a dataset containing information about bus stops in Seoul.</data>
+      <data key="d3">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789475</data>
+      <data key="d6" />
+    </node>
+    <node id="버스정류소">
+      <data key="d0">버스정류소</data>
+      <data key="d1">location</data>
+      <data key="d2">버스정류소 refers to bus stops, which are locations where buses pick up and drop off passengers.</data>
+      <data key="d3">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789475</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Bus Stop Information">
+      <data key="d0">Seoul Bus Stop Information</data>
+      <data key="d1">data</data>
+      <data key="d2">Seoul Bus Stop Information is a dataset containing information about bus stops in Seoul.</data>
+      <data key="d3">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789475</data>
+      <data key="d6" />
+    </node>
+    <node id="Bus Stop">
+      <data key="d0">Bus Stop</data>
+      <data key="d1">location</data>
+      <data key="d2">Bus Stop refers to designated locations where buses pick up and drop off passengers in Seoul.</data>
+      <data key="d3">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765789475</data>
+      <data key="d6" />
+    </node>
     <edge source="삼성동" target="강남구">
       <data key="d7">1.0</data>
       <data key="d8">삼성동 is a neighborhood within 강남구 district.</data>
@@ -1453,6 +1783,105 @@ Beyond apartment-specific metrics, R-ONE provides broader housing market statist
       <data key="d10">chunk-c86aede000cfd461b40f495155982ca9</data>
       <data key="d11">unknown_source</data>
       <data key="d12">1765771749</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Dowon">
+      <data key="d7">1.0</data>
+      <data key="d8">Dowon station is located within Seoul city.</data>
+      <data key="d9">administrative jurisdiction,geographic location</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789328</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Line 01">
+      <data key="d7">2.0</data>
+      <data key="d8">Line 01 operates as part of Seoul's subway network.&lt;SEP&gt;Line 01 is part of Seoul's metropolitan subway network.</data>
+      <data key="d9">city infrastructure,transit network,transportation system,urban infrastructure</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192&lt;SEP&gt;chunk-b194c2c915343f128aacd9883130b77c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789341</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Dowon Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Dowon Station is located in Seoul.</data>
+      <data key="d9">geographical location,urban infrastructure</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789328</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Onsu Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Onsu Station is a subway station located in Seoul.</data>
+      <data key="d9">geographic location,urban infrastructure</data>
+      <data key="d10">chunk-b194c2c915343f128aacd9883130b77c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789342</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Line 1">
+      <data key="d7">1.0</data>
+      <data key="d8">Line 1 operates as part of Seoul's subway transportation network.</data>
+      <data key="d9">transit network,urban transportation</data>
+      <data key="d10">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789359</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Jungdong Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Jungdong Station is located within the city of Seoul.</data>
+      <data key="d9">geographic location,urban infrastructure</data>
+      <data key="d10">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789359</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Seoul City Traffic Information">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul City Traffic Information pertains to and covers the Seoul metropolitan area.</data>
+      <data key="d9">data coverage,geographic scope</data>
+      <data key="d10">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789459</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="서울 열린 데이터 광장">
+      <data key="d7">2.0</data>
+      <data key="d8">서울 열린 데이터 광장 is a Seoul-based organization that provides data about the city.&lt;SEP&gt;서울 열린 데이터 광장 is operated by and provides data related to Seoul.</data>
+      <data key="d9">data jurisdiction,geographic association,organizational location</data>
+      <data key="d10">chunk-9e9ecec649adfea83f83301759b88d65&lt;SEP&gt;chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789476</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="버스정류소">
+      <data key="d7">1.0</data>
+      <data key="d8">버스정류소 are located throughout Seoul.</data>
+      <data key="d9">geographic location,spatial distribution</data>
+      <data key="d10">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789476</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Seoul Open Data Plaza">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza operates in Seoul as a municipal data service provider.</data>
+      <data key="d9">government service,organizational location</data>
+      <data key="d10">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789476</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Bus Stop">
+      <data key="d7">1.0</data>
+      <data key="d8">Bus stops are located within Seoul city as part of its public transportation infrastructure.</data>
+      <data key="d9">geographic location,infrastructure</data>
+      <data key="d10">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789476</data>
       <data key="d13" />
     </edge>
     <edge source="Jongno-gu" target="Administrative Code 11110">
@@ -2641,6 +3070,555 @@ Beyond apartment-specific metrics, R-ONE provides broader housing market statist
       <data key="d10">chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
       <data key="d11">unknown_source</data>
       <data key="d12">1765775512</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Bugae" target="Line 01">
+      <data key="d7">1.0</data>
+      <data key="d8">Bugae is located on Line 01 of the Seoul subway system.</data>
+      <data key="d9">station location,transportation infrastructure</data>
+      <data key="d10">chunk-e3a4e88cdf49b13288b5124c9b1297b7</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789299</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Bugae" target="Seoul Open Data Plaza">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides the data information about Bugae station.</data>
+      <data key="d9">data source,information provider</data>
+      <data key="d10">chunk-e3a4e88cdf49b13288b5124c9b1297b7</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789299</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Metropolitan Subway" target="Line 01">
+      <data key="d7">4.0</data>
+      <data key="d8">Line 01 is part of the Seoul Metropolitan Subway system.&lt;SEP&gt;Line 01 is one of the subway lines operated within the Seoul Metropolitan Subway system.&lt;SEP&gt;Line 01 is one of the operational lines in the Seoul Metropolitan Subway system.&lt;SEP&gt;Line 01 is a subway line within the Seoul Metropolitan Subway system.</data>
+      <data key="d9">network component,operational system,system component,transit line,transportation infrastructure,transportation network</data>
+      <data key="d10">chunk-e3a4e88cdf49b13288b5124c9b1297b7&lt;SEP&gt;chunk-3d42181dd114f56c9024b28a28d21737&lt;SEP&gt;chunk-1b7269b562f9c76dc2b27db3c2c25323&lt;SEP&gt;chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789420</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Metropolitan Subway" target="Ganseok Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Ganseok Station is part of the Seoul Metropolitan Subway system.</data>
+      <data key="d9">infrastructure component,public transportation</data>
+      <data key="d10">chunk-3d42181dd114f56c9024b28a28d21737</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789313</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Metropolitan Subway" target="Jungdong">
+      <data key="d7">1.0</data>
+      <data key="d8">Jungdong is a station within the Seoul Metropolitan Subway network.</data>
+      <data key="d9">infrastructure component,transit system</data>
+      <data key="d10">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789359</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Metropolitan Subway" target="Sinchang Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Sinchang Station is part of the Seoul Metropolitan Subway network.</data>
+      <data key="d9">infrastructure component,public transit</data>
+      <data key="d10">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789374</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Metropolitan Subway" target="Line 1">
+      <data key="d7">3.0</data>
+      <data key="d8">Line 1 is one of the operational lines within the Seoul Metropolitan Subway system.&lt;SEP&gt;Line 1 is a component route of the Seoul Metropolitan Subway system.&lt;SEP&gt;Line 1 is a component line of the Seoul Metropolitan Subway system.</data>
+      <data key="d9">network component,route component,system component,transit line,transit network,transit system</data>
+      <data key="d10">chunk-98894275b80b8957be673cf3cc5a4174&lt;SEP&gt;chunk-33b5c187dc443a4f6912e6fcc2854a01&lt;SEP&gt;chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789438</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Metropolitan Subway" target="Onyang Oncheon Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Onyang Oncheon Station is part of the Seoul Metropolitan Subway network.</data>
+      <data key="d9">station membership,transit network</data>
+      <data key="d10">chunk-33b5c187dc443a4f6912e6fcc2854a01</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789387</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Metropolitan Subway" target="Tangjeong Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Tangjeong Station is part of the Seoul Metropolitan Subway system.</data>
+      <data key="d9">infrastructure component,transit network</data>
+      <data key="d10">chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789420</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Metropolitan Subway" target="Asan Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Asan Station is part of the Seoul Metropolitan Subway system.</data>
+      <data key="d9">infrastructure component,transit network</data>
+      <data key="d10">chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789438</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Bugae Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Bugae Station is located on and served by Line 01 of the Seoul subway system.</data>
+      <data key="d9">subway connection,transportation infrastructure</data>
+      <data key="d10">chunk-e3a4e88cdf49b13288b5124c9b1297b7</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789299</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Ganseok Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Ganseok Station is located on and serviced by Line 01 of the Seoul Metropolitan Subway.</data>
+      <data key="d9">station connection,transit infrastructure</data>
+      <data key="d10">chunk-3d42181dd114f56c9024b28a28d21737</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789313</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Seoul Metropolitan Subway System">
+      <data key="d7">1.0</data>
+      <data key="d8">Line 01 is part of the Seoul Metropolitan Subway System.</data>
+      <data key="d9">infrastructure component,transit network</data>
+      <data key="d10">chunk-3d42181dd114f56c9024b28a28d21737</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789313</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Seoul Subway System">
+      <data key="d7">1.0</data>
+      <data key="d8">Line 01 is part of the Seoul Subway System network.</data>
+      <data key="d9">network component,transit line</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789328</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Dowon Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Dowon Station is located on Line 01 of the Seoul subway system.</data>
+      <data key="d9">subway network,transportation infrastructure</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789328</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Dowon">
+      <data key="d7">1.0</data>
+      <data key="d8">Dowon station is served by Line 01 of the Seoul subway system.</data>
+      <data key="d9">station connectivity,transit infrastructure</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789328</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Onsu Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Onsu Station is located on Line 01 of the Seoul metro system.</data>
+      <data key="d9">station location,transit infrastructure</data>
+      <data key="d10">chunk-b194c2c915343f128aacd9883130b77c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789341</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Seoul Metro System">
+      <data key="d7">1.0</data>
+      <data key="d8">Line 01 is part of the Seoul Metro System.</data>
+      <data key="d9">infrastructure component,transit network</data>
+      <data key="d10">chunk-b194c2c915343f128aacd9883130b77c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789341</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Jungdong">
+      <data key="d7">1.0</data>
+      <data key="d8">Jungdong station is located on Line 01 of the Seoul metropolitan subway system.</data>
+      <data key="d9">station connectivity,transportation network</data>
+      <data key="d10">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789359</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Sinchang">
+      <data key="d7">1.0</data>
+      <data key="d8">Sinchang station is located on and served by Line 01 of the Seoul subway system.</data>
+      <data key="d9">transit infrastructure,transportation connection</data>
+      <data key="d10">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789373</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Tangjeong">
+      <data key="d7">1.0</data>
+      <data key="d8">Tangjeong station is located on Line 01 of the Seoul Metropolitan Subway.</data>
+      <data key="d9">infrastructure,transit connection</data>
+      <data key="d10">chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789420</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 01" target="Tangjeong Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Tangjeong Station is located on and served by Line 01 of the Seoul Metropolitan Subway.</data>
+      <data key="d9">service connection,transit infrastructure</data>
+      <data key="d10">chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789420</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Bugae Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides data and information about Bugae Station.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-e3a4e88cdf49b13288b5124c9b1297b7</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789299</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Seoul Metropolitan Subway System">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides public data about the Seoul Metropolitan Subway System.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-3d42181dd114f56c9024b28a28d21737</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789313</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Ganseok Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides publicly accessible information about Ganseok Station.</data>
+      <data key="d9">data source,information provision</data>
+      <data key="d10">chunk-3d42181dd114f56c9024b28a28d21737</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789313</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Dowon Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides information about Dowon Station.</data>
+      <data key="d9">data provision,public information</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789328</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Dowon">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides the official data about Dowon station.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789328</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Onsu Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides public data information about Onsu Station.</data>
+      <data key="d9">data source,information provider</data>
+      <data key="d10">chunk-b194c2c915343f128aacd9883130b77c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789341</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Subway Station Information">
+      <data key="d7">2.0</data>
+      <data key="d8">Seoul Open Data Plaza provides the subway station information data for public access.&lt;SEP&gt;The subway station information is sourced from Seoul Open Data Plaza.</data>
+      <data key="d9">data source,information provision</data>
+      <data key="d10">chunk-1b7269b562f9c76dc2b27db3c2c25323&lt;SEP&gt;chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789438</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Jungdong Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides official information about Jungdong Station.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789359</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Seoul Metro Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Metro Station information is provided by Seoul Open Data Plaza.</data>
+      <data key="d9">data source,public information</data>
+      <data key="d10">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789373</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Sinchang">
+      <data key="d7">1.0</data>
+      <data key="d8">Information about Sinchang station is available through Seoul Open Data Plaza.</data>
+      <data key="d9">data availability,public records</data>
+      <data key="d10">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789374</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Sinchang Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides official data and information about Sinchang Station.</data>
+      <data key="d9">data provision,public information</data>
+      <data key="d10">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789374</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Onyang Hot Spring Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides the data and information about Onyang Hot Spring Station.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-33b5c187dc443a4f6912e6fcc2854a01</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789387</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Onyang Oncheon Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides information about Onyang Oncheon Station as part of its public data services.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-33b5c187dc443a4f6912e6fcc2854a01</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789387</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Baebang">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides the data information about Baebang station.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-6d407f1bc3b87433ab80250e4e99de62</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789406</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Baebang Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides the data and information about Baebang Station.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-6d407f1bc3b87433ab80250e4e99de62</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789406</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Tangjeong">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides the station information for Tangjeong.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789420</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Tangjeong Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza provides official information about Tangjeong Station.</data>
+      <data key="d9">data provision,information source</data>
+      <data key="d10">chunk-0f7a2f7eacd5cbba27032da729465a9c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789420</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Asan Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Information about Asan Station is provided through Seoul Open Data Plaza.</data>
+      <data key="d9">data source,information provision</data>
+      <data key="d10">chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789438</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Subway_info">
+      <data key="d7">1.0</data>
+      <data key="d8">The subway_info data is sourced from and available through Seoul Open Data Plaza.</data>
+      <data key="d9">data origin,public access</data>
+      <data key="d10">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789459</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Seoul City">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Open Data Plaza is operated by Seoul City to provide public access to city data.</data>
+      <data key="d9">data provider,government service</data>
+      <data key="d10">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789460</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Open Data Plaza" target="Seoul Bus Stop Information">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Bus Stop Information is sourced from and provided by Seoul Open Data Plaza.</data>
+      <data key="d9">data provision,data source</data>
+      <data key="d10">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789476</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dowon" target="Seoul Subway System">
+      <data key="d7">1.0</data>
+      <data key="d8">Dowon is a station within the Seoul Subway System.</data>
+      <data key="d9">infrastructure component,transit network</data>
+      <data key="d10">chunk-12101b45b93642849b8533dd23ecc192</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789328</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Onsu Station" target="Seoul Metro System">
+      <data key="d7">1.0</data>
+      <data key="d8">Onsu Station is part of the Seoul Metro System.</data>
+      <data key="d9">network component,transit infrastructure</data>
+      <data key="d10">chunk-b194c2c915343f128aacd9883130b77c</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789341</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jungdong" target="Subway Station Information">
+      <data key="d7">1.0</data>
+      <data key="d8">The subway station information includes details about Jungdong station.</data>
+      <data key="d9">data content,station details</data>
+      <data key="d10">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789359</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Subway Station Information" target="Asan Station">
+      <data key="d7">1.0</data>
+      <data key="d8">The subway station information includes details about Asan Station.</data>
+      <data key="d9">data subject,information content</data>
+      <data key="d10">chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789438</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jungdong Station" target="Line 1">
+      <data key="d7">1.0</data>
+      <data key="d8">Jungdong Station is a stop on Line 1 of the Seoul subway system.</data>
+      <data key="d9">connectivity,transit infrastructure</data>
+      <data key="d10">chunk-1b7269b562f9c76dc2b27db3c2c25323</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789359</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 1" target="Sinchang Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Sinchang Station is located on and served by Line 1 of the Seoul subway system.</data>
+      <data key="d9">network connection,transit infrastructure</data>
+      <data key="d10">chunk-98894275b80b8957be673cf3cc5a4174</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789373</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 1" target="Onyang Oncheon Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Onyang Oncheon Station is located on Line 1 of the subway system.</data>
+      <data key="d9">station connectivity,transit infrastructure</data>
+      <data key="d10">chunk-33b5c187dc443a4f6912e6fcc2854a01</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789387</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 1" target="Onyang Hot Spring Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Onyang Hot Spring Station is located on Line 1 of the Seoul metropolitan subway system.</data>
+      <data key="d9">subway network,transit infrastructure</data>
+      <data key="d10">chunk-33b5c187dc443a4f6912e6fcc2854a01</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789388</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 1" target="Baebang">
+      <data key="d7">1.0</data>
+      <data key="d8">Baebang station is located on Line 1 of the Seoul metro system.</data>
+      <data key="d9">station location,transit infrastructure</data>
+      <data key="d10">chunk-6d407f1bc3b87433ab80250e4e99de62</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789406</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 1" target="Seoul Metro">
+      <data key="d7">1.0</data>
+      <data key="d8">Line 1 is operated as part of the Seoul Metro network.</data>
+      <data key="d9">network component,transit operation</data>
+      <data key="d10">chunk-6d407f1bc3b87433ab80250e4e99de62</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789406</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 1" target="Baebang Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Baebang Station is located on Line 1 of the Seoul subway system.</data>
+      <data key="d9">railway connection,transit infrastructure</data>
+      <data key="d10">chunk-6d407f1bc3b87433ab80250e4e99de62</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789406</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Line 1" target="Asan Station">
+      <data key="d7">1.0</data>
+      <data key="d8">Asan Station is located on Line 1 of the Seoul metropolitan subway system.</data>
+      <data key="d9">station assignment,transit infrastructure</data>
+      <data key="d10">chunk-06f67745b5029df412d239c6bf8f4460</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789438</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul City Traffic Information" target="subway_info">
+      <data key="d7">1.0</data>
+      <data key="d8">subway_info is a specific component or subset of Seoul City Traffic Information.</data>
+      <data key="d9">data classification,information type</data>
+      <data key="d10">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789459</data>
+      <data key="d13" />
+    </edge>
+    <edge source="subway_info" target="서울 열린 데이터 광장">
+      <data key="d7">1.0</data>
+      <data key="d8">subway_info data is sourced from 서울 열린 데이터 광장.</data>
+      <data key="d9">data provision,data source</data>
+      <data key="d10">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789459</data>
+      <data key="d13" />
+    </edge>
+    <edge source="서울 열린 데이터 광장" target="서울시 버스정류소 정보">
+      <data key="d7">1.0</data>
+      <data key="d8">서울시 버스정류소 정보 is provided by 서울 열린 데이터 광장.</data>
+      <data key="d9">data provision,data source</data>
+      <data key="d10">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789476</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul City" target="Subway_info">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul City provides subway transportation information through the subway_info dataset.</data>
+      <data key="d9">data source,transportation information</data>
+      <data key="d10">chunk-9e9ecec649adfea83f83301759b88d65</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789459</data>
+      <data key="d13" />
+    </edge>
+    <edge source="서울시 버스정류소 정보" target="버스정류소">
+      <data key="d7">1.0</data>
+      <data key="d8">서울시 버스정류소 정보 contains information about 버스정류소.</data>
+      <data key="d9">data content,information subject</data>
+      <data key="d10">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789475</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Bus Stop Information" target="Bus Stop">
+      <data key="d7">1.0</data>
+      <data key="d8">Seoul Bus Stop Information contains data specifically about bus stops in Seoul.</data>
+      <data key="d9">data content,information subject</data>
+      <data key="d10">chunk-f51cb065cdebc3428c9d8c434c070c60</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765789475</data>
       <data key="d13" />
     </edge>
   </graph>

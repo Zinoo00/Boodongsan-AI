@@ -1157,15 +1157,15 @@ def seoul_transport(
         None,
         "--services",
         "-s",
-        help="수집할 서비스 (쉼표로 구분: subway_station,subway_address,bus_stop). 미지정 시 전체",
+        help="수집할 서비스 (쉼표로 구분: subway_station,subway_info,bus_stop). 미지정 시 전체",
     ),
 ) -> None:
     """
     서울시 교통/인프라 데이터를 LightRAG에 로딩합니다.
 
-    수집 가능한 데이터:
-    - subway_station: 지하철역 정보 (역코드, 역명, 노선)
-    - subway_address: 지하철역 주소 및 전화번호
+    수집 가능한 데이터 (2024.12 작동 확인):
+    - subway_station: 지하철역 정보 (역코드로 조회)
+    - subway_info: 지하철역 정보 (역명으로 조회)
     - bus_stop: 버스정류소 위치정보 (좌표 포함)
 
     Examples:
@@ -1173,7 +1173,7 @@ def seoul_transport(
         uv run python -m scripts.load_data seoul-transport
 
         # 지하철 데이터만
-        uv run python -m scripts.load_data seoul-transport -s subway_station,subway_address
+        uv run python -m scripts.load_data seoul-transport -s subway_station,subway_info
 
         # 테스트 (서비스당 100개)
         uv run python -m scripts.load_data seoul-transport --limit 100
@@ -1229,38 +1229,29 @@ def seoul_real_estate(
         None,
         "--limit",
         "-l",
-        help="서비스당 최대 수집 레코드 수",
-    ),
-    services: str = typer.Option(
-        None,
-        "--services",
-        "-s",
-        help="수집할 서비스 (쉼표로 구분). 미지정 시 전체",
+        help="최대 수집 레코드 수",
     ),
 ) -> None:
     """
-    서울시 부동산 가격/거래 데이터를 LightRAG에 로딩합니다.
+    서울시 부동산 실거래가 데이터를 LightRAG에 로딩합니다.
 
-    수집 가능한 데이터:
-    - real_transaction: 부동산 실거래가 정보 (OA-21275)
-    - rent_price: 부동산 전월세가 정보 (OA-21276)
-    - apartment_trade: 공동주택 아파트 정보 (OA-15818)
-    - land_price: 개별공시지가 정보 (OA-1180)
+    수집 가능한 데이터 (2024.12 작동 확인):
+    - real_transaction: 부동산 실거래가 정보 (OA-21275) - 277만건+
+      (매매/전월세 통합, 아파트/연립다세대/오피스텔 등)
+
+    NOTE: 전월세가(OA-21276), 공시지가(OA-1180) 등은 현재 서울시 API 오류로 미제공
 
     Examples:
-        # 모든 부동산 가격 데이터 수집
+        # 실거래가 데이터 수집
         uv run python -m scripts.load_data seoul-real-estate
 
-        # 실거래가와 전월세가만
-        uv run python -m scripts.load_data seoul-real-estate -s real_transaction,rent_price
-
-        # 테스트 (서비스당 100개)
+        # 테스트 (100개만)
         uv run python -m scripts.load_data seoul-real-estate --limit 100
     """
 
     async def _run():
         logger.info("=" * 60)
-        logger.info("🏠 서울시 부동산 가격/거래 데이터 로딩 시작")
+        logger.info("🏠 서울시 부동산 실거래가 데이터 로딩 시작")
         logger.info("=" * 60)
 
         logger.info("서비스 초기화 중...")
@@ -1271,19 +1262,15 @@ def seoul_real_estate(
         await lightrag_service.initialize()
 
         try:
-            service_list = None
-            if services:
-                service_list = [s.strip() for s in services.split(",")]
-
+            # real_transaction 서비스만 수집 (현재 작동하는 유일한 real_estate 카테고리 서비스)
             count = await load_seoul_data_by_category(
                 lightrag_service,
-                category=DataCategory.REAL_ESTATE if not service_list else None,
-                service_keys=service_list,
+                service_keys=["real_transaction"],
                 max_records_per_service=limit,
             )
 
             logger.info("=" * 60)
-            logger.info(f"✅ 총 {count}개 부동산 문서가 LightRAG에 삽입되었습니다.")
+            logger.info(f"✅ 총 {count}개 실거래가 문서가 LightRAG에 삽입되었습니다.")
             logger.info("=" * 60)
 
         except Exception as e:
@@ -1296,8 +1283,10 @@ def seoul_real_estate(
     asyncio.run(_run())
 
 
-@app.command()
-def seoul_land_use(
+# NOTE: seoul_land_use 명령어는 현재 서울시 API에서 해당 서비스들이 ERROR-500 반환으로 주석 처리
+# 향후 서비스 재개 시 활성화 가능
+# @app.command()
+def _seoul_land_use_disabled(
     api_key: str = typer.Option(
         None,
         "--api-key",
@@ -1392,24 +1381,23 @@ def seoul_all(
         None,
         "--categories",
         "-c",
-        help="수집할 카테고리 (쉼표로 구분: real_estate,redevelopment,transport,land_use,agency). 미지정 시 전체",
+        help="수집할 카테고리 (쉼표로 구분: real_estate,redevelopment,transport,population,agency). 미지정 시 전체",
     ),
 ) -> None:
     """
     서울 열린 데이터 광장의 모든 부동산 관련 데이터를 수집합니다.
 
-    카테고리별 데이터:
-    - real_estate: 실거래가, 전월세가, 아파트, 공시지가 (4개)
-    - redevelopment: 정비사업, 재개발, 지구단위계획 등 (7개)
+    현재 작동하는 서비스 (2024.12 기준, 총 7개):
+    - real_estate: 실거래가 (1개) - 277만건+
+    - redevelopment: 정비사업 현황 (1개)
     - transport: 지하철역, 버스정류소 (3개)
-    - land_use: 용도지역, 개발제한구역 등 (3개)
-    - agency: 부동산 중개업소 (1개)
     - population: 생활인구 (1개)
+    - agency: 부동산 중개업소 (1개)
 
-    총 19개 데이터셋
+    NOTE: land_use(용도지역), 전월세가, 공시지가 등 일부 서비스는 서울시 API 오류로 미제공
 
     Examples:
-        # 모든 서울 데이터 수집 (시간 오래 걸림)
+        # 모든 서울 데이터 수집
         uv run python -m scripts.load_data seoul-all
 
         # 특정 카테고리만
