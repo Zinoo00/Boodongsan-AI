@@ -21,7 +21,28 @@ from typing import Any
 import typer
 
 from core.config import settings
-from data.collectors.real_estate_collector import RealEstateCollector
+from data.collectors.pdr_collector import (
+    CollectionConfig,
+    PublicDataReaderCollector,
+    SEOUL_DISTRICTS,
+)
+from data.collectors.reb_collector import (
+    CollectionConfig as REBCollectionConfig,
+    REBCollector,
+    STATISTICS_TABLES,
+    format_statistics_document,
+)
+from data.collectors.real_estate_collector import (
+    RealEstateCollector,
+    SUPPORTED_PROPERTY_TYPES,
+)
+from data.collectors.seoul_opendata_collector import (
+    DataCategory,
+    SEOUL_SERVICES,
+    SeoulOpenDataCollector,
+    format_document,
+    format_redevelopment_document,
+)
 from data.collectors.sigungu_service import SigunguServiceSingleton
 from services.ai_service import AIService
 from services.lightrag_service import LightRAGService
@@ -298,6 +319,152 @@ async def load_full_data(
     return stats
 
 
+async def load_pdr_data(
+    lightrag_service: LightRAGService,
+    districts: list[str] | None = None,
+    property_types: list[str] | None = None,
+    trade_types: list[str] | None = None,
+    start_year_month: str = "202401",
+    end_year_month: str | None = None,
+    max_records: int | None = None,
+) -> int:
+    """
+    PublicDataReader를 사용하여 포괄적인 실거래가 데이터를 LightRAG에 삽입.
+
+    Args:
+        lightrag_service: LightRAG 서비스 인스턴스
+        districts: 수집할 자치구 리스트 (None이면 서울시 전체 25개)
+        property_types: 수집할 부동산 유형 (None이면 전체: 아파트, 오피스텔, 연립다세대, 단독다가구)
+        trade_types: 수집할 거래 유형 (None이면 전체: 매매, 전월세)
+        start_year_month: 시작 연월 (YYYYMM 형식)
+        end_year_month: 종료 연월 (None이면 현재월)
+        max_records: 최대 수집 레코드 수 (None이면 무제한)
+
+    Returns:
+        삽입된 문서 수
+    """
+    logger.info("=" * 60)
+    logger.info("PublicDataReader 포괄적 데이터 로딩 시작")
+    logger.info("=" * 60)
+    logger.info(f"  - 자치구: {districts or '서울시 전체 (25개 구)'}")
+    logger.info(f"  - 부동산 유형: {property_types or '전체 (아파트, 오피스텔, 연립다세대, 단독다가구)'}")
+    logger.info(f"  - 거래 유형: {trade_types or '전체 (매매, 전월세)'}")
+    logger.info(f"  - 기간: {start_year_month} ~ {end_year_month or '현재'}")
+    logger.info(f"  - 최대 레코드: {max_records or '무제한'}")
+    logger.info("")
+    logger.info("⚠️  LightRAG는 각 문서를 깊이 분석합니다 (엔티티 추출, 관계 그래프 구축)")
+    logger.info("   예상 처리 속도: 분당 4-6개 문서 (API 및 LLM 속도에 따라 다름)")
+    logger.info("   대량 데이터의 경우 수 시간 ~ 수일 소요 가능")
+    logger.info("=" * 60)
+
+    collector = PublicDataReaderCollector()
+    config = CollectionConfig(
+        districts=districts,
+        property_types=property_types,
+        trade_types=trade_types,
+        start_year_month=start_year_month,
+        end_year_month=end_year_month,
+        max_records=max_records,
+    )
+
+    count = 0
+    import time
+
+    start_time = time.time()
+    last_log_time = start_time
+
+    try:
+        async for property_record in collector.collect_all_data(config):
+            document = format_property_document(property_record)
+            success = await lightrag_service.insert(document)
+
+            if success:
+                count += 1
+
+                # 진행률 로깅 (30초마다 또는 100개마다)
+                current_time = time.time()
+                if count % 100 == 0 or (current_time - last_log_time) > 30:
+                    elapsed = current_time - start_time
+                    rate = count / elapsed * 60 if elapsed > 0 else 0
+                    logger.info(
+                        "📊 진행 중: %d개 삽입 완료 | 처리 속도: %.1f개/분 | 경과 시간: %.1f분",
+                        count,
+                        rate,
+                        elapsed / 60,
+                    )
+                    last_log_time = current_time
+
+                # Rate limiting (LightRAG에 과부하 방지)
+                if count % 50 == 0:
+                    await asyncio.sleep(1.0)
+
+    except KeyboardInterrupt:
+        logger.warning("\n⚠️ 사용자 중단 요청 - 현재까지 수집된 데이터는 저장됨")
+    except Exception as e:
+        logger.error(f"데이터 수집 중 오류 발생: {e}")
+        raise
+    finally:
+        collector.close()
+
+    total_time = time.time() - start_time
+    logger.info("=" * 60)
+    logger.info("✅ PublicDataReader 데이터 로딩 완료!")
+    logger.info(f"   - 총 삽입 문서: {count}개")
+    logger.info(f"   - 총 소요 시간: {total_time / 60:.1f}분")
+    logger.info(f"   - 평균 처리 속도: {count / total_time * 60:.1f}개/분")
+    logger.info("=" * 60)
+
+    return count
+
+
+async def load_comprehensive_data(
+    lightrag_service: LightRAGService,
+    start_year_month: str = "202401",
+    end_year_month: str | None = None,
+    max_records: int | None = None,
+) -> dict[str, int]:
+    """
+    서울시 전체 25개 자치구의 모든 부동산 유형 데이터를 로딩.
+
+    이 함수는 다음 데이터를 모두 수집합니다:
+    - 25개 자치구
+    - 4개 부동산 유형 (아파트, 오피스텔, 연립다세대, 단독다가구)
+    - 2개 거래 유형 (매매, 전월세)
+    - 지정된 기간의 월별 데이터
+    """
+    logger.info("=" * 70)
+    logger.info("🏠 서울시 전체 부동산 데이터 포괄적 로딩 시작")
+    logger.info("=" * 70)
+
+    stats = {
+        "districts": 0,
+        "properties": 0,
+    }
+
+    # 1. 행정구역 데이터
+    stats["districts"] = await load_district_data(lightrag_service)
+
+    # 2. PublicDataReader로 전체 실거래가 데이터 수집
+    stats["properties"] = await load_pdr_data(
+        lightrag_service,
+        districts=None,  # 서울시 전체
+        property_types=None,  # 모든 유형
+        trade_types=None,  # 매매 + 전월세
+        start_year_month=start_year_month,
+        end_year_month=end_year_month,
+        max_records=max_records,
+    )
+
+    logger.info("=" * 70)
+    logger.info("🎉 서울시 전체 부동산 데이터 포괄적 로딩 완료!")
+    logger.info(f"   - 행정구역: {stats['districts']}개")
+    logger.info(f"   - 부동산 거래: {stats['properties']}개")
+    logger.info(f"   - 총 문서: {stats['districts'] + stats['properties']}개")
+    logger.info("=" * 70)
+
+    return stats
+
+
 @app.command()
 def load(
     mode: str = typer.Option(
@@ -442,6 +609,949 @@ def check() -> None:
         logger.info(f"LightRAG 워크스페이스: {settings.LIGHTRAG_WORKSPACE}")
 
     asyncio.run(_check())
+
+
+@app.command()
+def comprehensive(
+    districts: str = typer.Option(
+        None,
+        "--districts",
+        "-d",
+        help="수집할 자치구 (쉼표로 구분, 예: '강남구,서초구'). 미지정 시 서울 전체 25개 구",
+    ),
+    property_types: str = typer.Option(
+        None,
+        "--property-types",
+        "-pt",
+        help="수집할 부동산 유형 (쉼표로 구분: 아파트,오피스텔,연립다세대,단독다가구). 미지정 시 전체",
+    ),
+    trade_types: str = typer.Option(
+        None,
+        "--trade-types",
+        "-tt",
+        help="수집할 거래 유형 (쉼표로 구분: 매매,전월세). 미지정 시 전체",
+    ),
+    start_month: str = typer.Option(
+        "202401",
+        "--start",
+        "-s",
+        help="시작 연월 (YYYYMM 형식, 예: '202401')",
+    ),
+    end_month: str = typer.Option(
+        None,
+        "--end",
+        "-e",
+        help="종료 연월 (YYYYMM 형식). 미지정 시 현재월",
+    ),
+    limit: int = typer.Option(
+        None,
+        "--limit",
+        "-l",
+        help="최대 수집 레코드 수 (테스트용)",
+    ),
+) -> None:
+    """
+    PublicDataReader를 사용하여 포괄적인 부동산 데이터를 수집합니다.
+
+    이 명령어는 서울시 전체 25개 자치구의 모든 부동산 유형 데이터를 수집합니다:
+    - 4개 부동산 유형: 아파트, 오피스텔, 연립다세대, 단독다가구
+    - 2개 거래 유형: 매매, 전월세
+    - 지정된 기간의 월별 데이터
+
+    Examples:
+        # 소량 테스트 (100개만)
+        uv run python -m scripts.load_data comprehensive --limit 100
+
+        # 강남구만, 2024년 데이터
+        uv run python -m scripts.load_data comprehensive -d 강남구 -s 202401 -e 202412
+
+        # 아파트 매매만, 전체 서울
+        uv run python -m scripts.load_data comprehensive -pt 아파트 -tt 매매
+
+        # 전체 데이터 수집 (매우 느림: 수 시간 ~ 수일 소요)
+        uv run python -m scripts.load_data comprehensive
+    """
+
+    async def _run():
+        # Initialize services
+        logger.info("서비스 초기화 중...")
+        ai_service = AIService()
+        await ai_service.initialize()
+
+        lightrag_service = LightRAGService(ai_service=ai_service)
+        await lightrag_service.initialize()
+
+        try:
+            # Parse arguments
+            district_list = None
+            if districts:
+                district_list = [d.strip() for d in districts.split(",")]
+
+            property_type_list = None
+            if property_types:
+                property_type_list = [p.strip() for p in property_types.split(",")]
+
+            trade_type_list = None
+            if trade_types:
+                trade_type_list = [t.strip() for t in trade_types.split(",")]
+
+            # Load comprehensive data
+            if district_list or property_type_list or trade_type_list or limit:
+                # Custom filtering
+                stats = {
+                    "districts": await load_district_data(lightrag_service),
+                    "properties": await load_pdr_data(
+                        lightrag_service,
+                        districts=district_list,
+                        property_types=property_type_list,
+                        trade_types=trade_type_list,
+                        start_year_month=start_month,
+                        end_year_month=end_month,
+                        max_records=limit,
+                    ),
+                }
+            else:
+                # Full comprehensive load
+                stats = await load_comprehensive_data(
+                    lightrag_service,
+                    start_year_month=start_month,
+                    end_year_month=end_month,
+                    max_records=limit,
+                )
+
+            logger.info("\n✅ 데이터 로딩 성공!")
+            logger.info(
+                f"총 {stats['districts'] + stats['properties']}개 문서가 LightRAG에 삽입되었습니다."
+            )
+
+        except Exception as e:
+            logger.error(f"\n❌ 데이터 로딩 실패: {e}", exc_info=True)
+            raise typer.Exit(code=1)
+        finally:
+            await lightrag_service.finalize()
+            await ai_service.close()
+
+    asyncio.run(_run())
+
+
+async def load_reb_statistics(
+    lightrag_service: LightRAGService,
+    stat_types: list[str] | None = None,
+    start_year_month: str = "202401",
+    end_year_month: str | None = None,
+    seoul_only: bool = True,
+    max_records: int | None = None,
+) -> int:
+    """
+    한국부동산원 R-ONE 통계 데이터를 LightRAG에 삽입.
+
+    Args:
+        lightrag_service: LightRAG 서비스 인스턴스
+        stat_types: 수집할 통계 유형 (None이면 기본 통계)
+        start_year_month: 시작 연월
+        end_year_month: 종료 연월
+        seoul_only: 서울 지역만 수집
+        max_records: 최대 레코드 수
+
+    Returns:
+        삽입된 문서 수
+    """
+    logger.info("=" * 60)
+    logger.info("📊 한국부동산원 R-ONE 통계 데이터 로딩 시작")
+    logger.info("=" * 60)
+    logger.info(f"  - 통계 유형: {stat_types or '기본 (가격지수, 평균가격)'}")
+    logger.info(f"  - 기간: {start_year_month} ~ {end_year_month or '현재'}")
+    logger.info(f"  - 서울만: {seoul_only}")
+    logger.info(f"  - 최대 레코드: {max_records or '무제한'}")
+    logger.info("=" * 60)
+
+    collector = REBCollector()
+    config = REBCollectionConfig(
+        stat_types=stat_types,
+        start_year_month=start_year_month,
+        end_year_month=end_year_month,
+        seoul_only=seoul_only,
+        include_national=True,
+        max_records=max_records,
+    )
+
+    count = 0
+    import time
+
+    start_time = time.time()
+    last_log_time = start_time
+
+    try:
+        async for record in collector.collect_all_statistics(config):
+            document = format_statistics_document(record)
+            success = await lightrag_service.insert(document)
+
+            if success:
+                count += 1
+
+                # 진행률 로깅
+                current_time = time.time()
+                if count % 50 == 0 or (current_time - last_log_time) > 30:
+                    elapsed = current_time - start_time
+                    rate = count / elapsed * 60 if elapsed > 0 else 0
+                    logger.info(
+                        "📊 진행 중: %d개 삽입 완료 | 처리 속도: %.1f개/분",
+                        count,
+                        rate,
+                    )
+                    last_log_time = current_time
+
+                # Rate limiting
+                if count % 50 == 0:
+                    await asyncio.sleep(0.5)
+
+    except KeyboardInterrupt:
+        logger.warning("\n⚠️ 사용자 중단 요청")
+    except Exception as e:
+        logger.error(f"데이터 수집 중 오류 발생: {e}")
+        raise
+    finally:
+        await collector.close()
+
+    total_time = time.time() - start_time
+    logger.info("=" * 60)
+    logger.info("✅ R-ONE 통계 데이터 로딩 완료!")
+    logger.info(f"   - 총 삽입 문서: {count}개")
+    logger.info(f"   - 총 소요 시간: {total_time / 60:.1f}분")
+    logger.info("=" * 60)
+
+    return count
+
+
+@app.command()
+def reb_stats(
+    stat_types: str = typer.Option(
+        None,
+        "--stat-types",
+        "-st",
+        help="수집할 통계 유형 (쉼표로 구분). 예: apartment_sale_index,apartment_rent_index",
+    ),
+    start_month: str = typer.Option(
+        "202401",
+        "--start",
+        "-s",
+        help="시작 연월 (YYYYMM)",
+    ),
+    end_month: str = typer.Option(
+        None,
+        "--end",
+        "-e",
+        help="종료 연월 (YYYYMM). 미지정 시 현재월",
+    ),
+    seoul_only: bool = typer.Option(
+        True,
+        "--seoul-only/--all-regions",
+        help="서울 지역만 수집 / 전체 지역 수집",
+    ),
+    limit: int = typer.Option(
+        None,
+        "--limit",
+        "-l",
+        help="최대 수집 레코드 수",
+    ),
+) -> None:
+    """
+    한국부동산원 R-ONE 통계 데이터를 LightRAG에 로딩합니다.
+
+    수집 가능한 통계:
+    - apartment_sale_index: 아파트 매매가격지수
+    - apartment_rent_index: 아파트 전세가격지수
+    - apartment_sale_price: 아파트 평균 매매가격
+    - apartment_rent_price: 아파트 평균 전세가격
+    - seoul_sale_index: 서울 아파트 매매가격지수
+    - seoul_rent_index: 서울 아파트 전세가격지수
+
+    Examples:
+        # 기본 통계 수집 (서울만, 2024년)
+        uv run python -m scripts.load_data reb-stats
+
+        # 특정 통계만 수집
+        uv run python -m scripts.load_data reb-stats -st apartment_sale_index,apartment_rent_index
+
+        # 전체 지역 수집
+        uv run python -m scripts.load_data reb-stats --all-regions
+
+        # 테스트 (100개만)
+        uv run python -m scripts.load_data reb-stats --limit 100
+    """
+
+    async def _run():
+        logger.info("서비스 초기화 중...")
+        ai_service = AIService()
+        await ai_service.initialize()
+
+        lightrag_service = LightRAGService(ai_service=ai_service)
+        await lightrag_service.initialize()
+
+        try:
+            stat_type_list = None
+            if stat_types:
+                stat_type_list = [s.strip() for s in stat_types.split(",")]
+
+            count = await load_reb_statistics(
+                lightrag_service,
+                stat_types=stat_type_list,
+                start_year_month=start_month,
+                end_year_month=end_month,
+                seoul_only=seoul_only,
+                max_records=limit,
+            )
+
+            logger.info(f"\n✅ 총 {count}개 통계 문서가 LightRAG에 삽입되었습니다.")
+
+        except Exception as e:
+            logger.error(f"\n❌ 데이터 로딩 실패: {e}", exc_info=True)
+            raise typer.Exit(code=1)
+        finally:
+            await lightrag_service.finalize()
+            await ai_service.close()
+
+    asyncio.run(_run())
+
+
+async def load_seoul_redevelopment(
+    lightrag_service: LightRAGService,
+    api_key: str | None = None,
+    max_records: int | None = None,
+) -> int:
+    """
+    서울시 정비사업 현황 데이터를 LightRAG에 삽입.
+
+    Args:
+        lightrag_service: LightRAG 서비스 인스턴스
+        api_key: 서울 열린 데이터 API 키 (None이면 환경변수 사용)
+        max_records: 최대 레코드 수
+
+    Returns:
+        삽입된 문서 수
+    """
+    logger.info("=" * 60)
+    logger.info("🏗️ 서울시 정비사업 현황 데이터 로딩 시작")
+    logger.info("=" * 60)
+    logger.info(f"  - 데이터: 서울시 정비사업 현황 (OA-20281)")
+    logger.info(f"  - 최대 레코드: {max_records or '무제한'}")
+    logger.info("=" * 60)
+
+    collector = SeoulOpenDataCollector(api_key=api_key)
+
+    count = 0
+    import time
+
+    start_time = time.time()
+    last_log_time = start_time
+
+    try:
+        async for record in collector.collect_redevelopment_data(
+            max_records=max_records,
+        ):
+            document = format_redevelopment_document(record)
+            success = await lightrag_service.insert(document)
+
+            if success:
+                count += 1
+
+                # 진행률 로깅
+                current_time = time.time()
+                if count % 50 == 0 or (current_time - last_log_time) > 30:
+                    elapsed = current_time - start_time
+                    rate = count / elapsed * 60 if elapsed > 0 else 0
+                    logger.info(
+                        "🏗️ 진행 중: %d개 삽입 완료 | 처리 속도: %.1f개/분",
+                        count,
+                        rate,
+                    )
+                    last_log_time = current_time
+
+                # Rate limiting
+                if count % 50 == 0:
+                    await asyncio.sleep(0.5)
+
+    except KeyboardInterrupt:
+        logger.warning("\n⚠️ 사용자 중단 요청")
+    except Exception as e:
+        logger.error(f"데이터 수집 중 오류 발생: {e}")
+        raise
+    finally:
+        await collector.close()
+
+    total_time = time.time() - start_time
+    logger.info("=" * 60)
+    logger.info("✅ 정비사업 현황 데이터 로딩 완료!")
+    logger.info(f"   - 총 삽입 문서: {count}개")
+    logger.info(f"   - 총 소요 시간: {total_time / 60:.1f}분")
+    logger.info("=" * 60)
+
+    return count
+
+
+@app.command()
+def seoul_redevelopment(
+    api_key: str = typer.Option(
+        None,
+        "--api-key",
+        "-k",
+        help="서울 열린 데이터 API 키 (미지정 시 SEOUL_OPEN_API_KEY 환경변수 사용)",
+    ),
+    limit: int = typer.Option(
+        None,
+        "--limit",
+        "-l",
+        help="최대 수집 레코드 수",
+    ),
+) -> None:
+    """
+    서울시 정비사업 현황 데이터를 LightRAG에 로딩합니다.
+
+    서울시 재개발, 재건축 등 정비사업 현황 정보를 수집합니다:
+    - 사업명, 사업 유형 (재개발/재건축/도시환경정비 등)
+    - 위치 정보 (구, 동, 주소)
+    - 진행 단계 (조합설립/사업시행인가/착공/준공 등)
+    - 규모 (면적, 세대수)
+    - 조합, 시공사 정보
+
+    Examples:
+        # API 키로 수집
+        uv run python -m scripts.load_data seoul-redevelopment -k YOUR_API_KEY
+
+        # 테스트 (100개만)
+        uv run python -m scripts.load_data seoul-redevelopment -k YOUR_API_KEY --limit 100
+
+        # 환경변수 사용
+        export SEOUL_OPEN_API_KEY=YOUR_API_KEY
+        uv run python -m scripts.load_data seoul-redevelopment
+    """
+
+    async def _run():
+        logger.info("서비스 초기화 중...")
+        ai_service = AIService()
+        await ai_service.initialize()
+
+        lightrag_service = LightRAGService(ai_service=ai_service)
+        await lightrag_service.initialize()
+
+        try:
+            count = await load_seoul_redevelopment(
+                lightrag_service,
+                api_key=api_key,
+                max_records=limit,
+            )
+
+            logger.info(f"\n✅ 총 {count}개 정비사업 문서가 LightRAG에 삽입되었습니다.")
+
+        except Exception as e:
+            logger.error(f"\n❌ 데이터 로딩 실패: {e}", exc_info=True)
+            raise typer.Exit(code=1)
+        finally:
+            await lightrag_service.finalize()
+            await ai_service.close()
+
+    asyncio.run(_run())
+
+
+async def load_seoul_data_by_category(
+    lightrag_service: LightRAGService,
+    category: DataCategory | None = None,
+    service_keys: list[str] | None = None,
+    max_records_per_service: int | None = None,
+) -> int:
+    """
+    서울 열린 데이터를 카테고리 또는 서비스별로 수집.
+
+    Args:
+        lightrag_service: LightRAG 서비스 인스턴스
+        category: 수집할 카테고리 (None이면 service_keys 사용)
+        service_keys: 수집할 서비스 키 리스트 (None이면 category의 모든 서비스)
+        max_records_per_service: 서비스당 최대 레코드 수
+
+    Returns:
+        삽입된 총 문서 수
+    """
+    collector = SeoulOpenDataCollector()
+
+    # 수집할 서비스 결정
+    if service_keys:
+        services_to_collect = service_keys
+    elif category:
+        services_to_collect = [
+            k for k, v in SEOUL_SERVICES.items() if v.category == category
+        ]
+    else:
+        services_to_collect = list(SEOUL_SERVICES.keys())
+
+    total_count = 0
+    import time
+
+    start_time = time.time()
+
+    try:
+        for service_key in services_to_collect:
+            service = SEOUL_SERVICES.get(service_key)
+            if not service:
+                logger.warning(f"알 수 없는 서비스: {service_key}")
+                continue
+
+            logger.info(f"\n📥 수집 중: {service.description} ({service.service_name})")
+            service_count = 0
+            last_log_time = time.time()
+
+            try:
+                async for record in collector.collect_data(
+                    service_key,
+                    max_records=max_records_per_service,
+                ):
+                    document = format_document(record)
+                    success = await lightrag_service.insert(document)
+
+                    if success:
+                        service_count += 1
+                        total_count += 1
+
+                        # 진행률 로깅
+                        current_time = time.time()
+                        if service_count % 50 == 0 or (current_time - last_log_time) > 30:
+                            elapsed = current_time - start_time
+                            rate = total_count / elapsed * 60 if elapsed > 0 else 0
+                            logger.info(
+                                f"   {service_key}: {service_count}개 | 총 {total_count}개 | {rate:.1f}개/분"
+                            )
+                            last_log_time = current_time
+
+                        # Rate limiting
+                        if service_count % 50 == 0:
+                            await asyncio.sleep(0.5)
+
+            except Exception as e:
+                logger.error(f"❌ {service_key} 수집 실패: {e}")
+                continue
+
+            logger.info(f"   ✅ {service_key} 완료: {service_count}개")
+
+    except KeyboardInterrupt:
+        logger.warning("\n⚠️ 사용자 중단 요청")
+    finally:
+        await collector.close()
+
+    return total_count
+
+
+@app.command()
+def seoul_transport(
+    api_key: str = typer.Option(
+        None,
+        "--api-key",
+        "-k",
+        help="서울 열린 데이터 API 키 (미지정 시 SEOUL_OPEN_API_KEY 환경변수 사용)",
+    ),
+    limit: int = typer.Option(
+        None,
+        "--limit",
+        "-l",
+        help="서비스당 최대 수집 레코드 수",
+    ),
+    services: str = typer.Option(
+        None,
+        "--services",
+        "-s",
+        help="수집할 서비스 (쉼표로 구분: subway_station,subway_address,bus_stop). 미지정 시 전체",
+    ),
+) -> None:
+    """
+    서울시 교통/인프라 데이터를 LightRAG에 로딩합니다.
+
+    수집 가능한 데이터:
+    - subway_station: 지하철역 정보 (역코드, 역명, 노선)
+    - subway_address: 지하철역 주소 및 전화번호
+    - bus_stop: 버스정류소 위치정보 (좌표 포함)
+
+    Examples:
+        # 모든 교통 데이터 수집
+        uv run python -m scripts.load_data seoul-transport
+
+        # 지하철 데이터만
+        uv run python -m scripts.load_data seoul-transport -s subway_station,subway_address
+
+        # 테스트 (서비스당 100개)
+        uv run python -m scripts.load_data seoul-transport --limit 100
+    """
+
+    async def _run():
+        logger.info("=" * 60)
+        logger.info("🚇 서울시 교통/인프라 데이터 로딩 시작")
+        logger.info("=" * 60)
+
+        logger.info("서비스 초기화 중...")
+        ai_service = AIService()
+        await ai_service.initialize()
+
+        lightrag_service = LightRAGService(ai_service=ai_service)
+        await lightrag_service.initialize()
+
+        try:
+            service_list = None
+            if services:
+                service_list = [s.strip() for s in services.split(",")]
+
+            count = await load_seoul_data_by_category(
+                lightrag_service,
+                category=DataCategory.TRANSPORT if not service_list else None,
+                service_keys=service_list,
+                max_records_per_service=limit,
+            )
+
+            logger.info("=" * 60)
+            logger.info(f"✅ 총 {count}개 교통 문서가 LightRAG에 삽입되었습니다.")
+            logger.info("=" * 60)
+
+        except Exception as e:
+            logger.error(f"\n❌ 데이터 로딩 실패: {e}", exc_info=True)
+            raise typer.Exit(code=1)
+        finally:
+            await lightrag_service.finalize()
+            await ai_service.close()
+
+    asyncio.run(_run())
+
+
+@app.command()
+def seoul_real_estate(
+    api_key: str = typer.Option(
+        None,
+        "--api-key",
+        "-k",
+        help="서울 열린 데이터 API 키 (미지정 시 SEOUL_OPEN_API_KEY 환경변수 사용)",
+    ),
+    limit: int = typer.Option(
+        None,
+        "--limit",
+        "-l",
+        help="서비스당 최대 수집 레코드 수",
+    ),
+    services: str = typer.Option(
+        None,
+        "--services",
+        "-s",
+        help="수집할 서비스 (쉼표로 구분). 미지정 시 전체",
+    ),
+) -> None:
+    """
+    서울시 부동산 가격/거래 데이터를 LightRAG에 로딩합니다.
+
+    수집 가능한 데이터:
+    - real_transaction: 부동산 실거래가 정보 (OA-21275)
+    - rent_price: 부동산 전월세가 정보 (OA-21276)
+    - apartment_trade: 공동주택 아파트 정보 (OA-15818)
+    - land_price: 개별공시지가 정보 (OA-1180)
+
+    Examples:
+        # 모든 부동산 가격 데이터 수집
+        uv run python -m scripts.load_data seoul-real-estate
+
+        # 실거래가와 전월세가만
+        uv run python -m scripts.load_data seoul-real-estate -s real_transaction,rent_price
+
+        # 테스트 (서비스당 100개)
+        uv run python -m scripts.load_data seoul-real-estate --limit 100
+    """
+
+    async def _run():
+        logger.info("=" * 60)
+        logger.info("🏠 서울시 부동산 가격/거래 데이터 로딩 시작")
+        logger.info("=" * 60)
+
+        logger.info("서비스 초기화 중...")
+        ai_service = AIService()
+        await ai_service.initialize()
+
+        lightrag_service = LightRAGService(ai_service=ai_service)
+        await lightrag_service.initialize()
+
+        try:
+            service_list = None
+            if services:
+                service_list = [s.strip() for s in services.split(",")]
+
+            count = await load_seoul_data_by_category(
+                lightrag_service,
+                category=DataCategory.REAL_ESTATE if not service_list else None,
+                service_keys=service_list,
+                max_records_per_service=limit,
+            )
+
+            logger.info("=" * 60)
+            logger.info(f"✅ 총 {count}개 부동산 문서가 LightRAG에 삽입되었습니다.")
+            logger.info("=" * 60)
+
+        except Exception as e:
+            logger.error(f"\n❌ 데이터 로딩 실패: {e}", exc_info=True)
+            raise typer.Exit(code=1)
+        finally:
+            await lightrag_service.finalize()
+            await ai_service.close()
+
+    asyncio.run(_run())
+
+
+@app.command()
+def seoul_land_use(
+    api_key: str = typer.Option(
+        None,
+        "--api-key",
+        "-k",
+        help="서울 열린 데이터 API 키 (미지정 시 SEOUL_OPEN_API_KEY 환경변수 사용)",
+    ),
+    limit: int = typer.Option(
+        None,
+        "--limit",
+        "-l",
+        help="서비스당 최대 수집 레코드 수",
+    ),
+    services: str = typer.Option(
+        None,
+        "--services",
+        "-s",
+        help="수집할 서비스 (쉼표로 구분). 미지정 시 전체",
+    ),
+) -> None:
+    """
+    서울시 용도지역/공간정보 데이터를 LightRAG에 로딩합니다.
+
+    수집 가능한 데이터:
+    - land_use_zone: 용도지역(도시지역) 공간정보 (OA-21136)
+    - district_unit_zone: 지구단위계획구역 공간정보 (OA-21161)
+    - greenbelt: 개발제한구역 공간정보 (OA-21123)
+
+    Examples:
+        # 모든 용도지역 데이터 수집
+        uv run python -m scripts.load_data seoul-land-use
+
+        # 개발제한구역만
+        uv run python -m scripts.load_data seoul-land-use -s greenbelt
+
+        # 테스트 (서비스당 100개)
+        uv run python -m scripts.load_data seoul-land-use --limit 100
+    """
+
+    async def _run():
+        logger.info("=" * 60)
+        logger.info("🗺️ 서울시 용도지역/공간정보 데이터 로딩 시작")
+        logger.info("=" * 60)
+
+        logger.info("서비스 초기화 중...")
+        ai_service = AIService()
+        await ai_service.initialize()
+
+        lightrag_service = LightRAGService(ai_service=ai_service)
+        await lightrag_service.initialize()
+
+        try:
+            service_list = None
+            if services:
+                service_list = [s.strip() for s in services.split(",")]
+
+            count = await load_seoul_data_by_category(
+                lightrag_service,
+                category=DataCategory.LAND_USE if not service_list else None,
+                service_keys=service_list,
+                max_records_per_service=limit,
+            )
+
+            logger.info("=" * 60)
+            logger.info(f"✅ 총 {count}개 용도지역 문서가 LightRAG에 삽입되었습니다.")
+            logger.info("=" * 60)
+
+        except Exception as e:
+            logger.error(f"\n❌ 데이터 로딩 실패: {e}", exc_info=True)
+            raise typer.Exit(code=1)
+        finally:
+            await lightrag_service.finalize()
+            await ai_service.close()
+
+    asyncio.run(_run())
+
+
+@app.command()
+def seoul_all(
+    api_key: str = typer.Option(
+        None,
+        "--api-key",
+        "-k",
+        help="서울 열린 데이터 API 키 (미지정 시 SEOUL_OPEN_API_KEY 환경변수 사용)",
+    ),
+    limit: int = typer.Option(
+        None,
+        "--limit",
+        "-l",
+        help="서비스당 최대 수집 레코드 수",
+    ),
+    categories: str = typer.Option(
+        None,
+        "--categories",
+        "-c",
+        help="수집할 카테고리 (쉼표로 구분: real_estate,redevelopment,transport,land_use,agency). 미지정 시 전체",
+    ),
+) -> None:
+    """
+    서울 열린 데이터 광장의 모든 부동산 관련 데이터를 수집합니다.
+
+    카테고리별 데이터:
+    - real_estate: 실거래가, 전월세가, 아파트, 공시지가 (4개)
+    - redevelopment: 정비사업, 재개발, 지구단위계획 등 (7개)
+    - transport: 지하철역, 버스정류소 (3개)
+    - land_use: 용도지역, 개발제한구역 등 (3개)
+    - agency: 부동산 중개업소 (1개)
+    - population: 생활인구 (1개)
+
+    총 19개 데이터셋
+
+    Examples:
+        # 모든 서울 데이터 수집 (시간 오래 걸림)
+        uv run python -m scripts.load_data seoul-all
+
+        # 특정 카테고리만
+        uv run python -m scripts.load_data seoul-all -c real_estate,transport
+
+        # 테스트 (서비스당 50개)
+        uv run python -m scripts.load_data seoul-all --limit 50
+    """
+
+    async def _run():
+        logger.info("=" * 70)
+        logger.info("🌆 서울 열린 데이터 광장 전체 데이터 로딩 시작")
+        logger.info("=" * 70)
+        logger.info(f"총 {len(SEOUL_SERVICES)}개 서비스 수집 예정")
+        logger.info("")
+
+        # 카테고리별 서비스 수 표시
+        for cat in DataCategory:
+            services = [k for k, v in SEOUL_SERVICES.items() if v.category == cat]
+            logger.info(f"  {cat.value}: {len(services)}개 - {', '.join(services)}")
+
+        logger.info("")
+        logger.info("⚠️  대량 데이터 수집은 수 시간이 소요될 수 있습니다.")
+        logger.info("=" * 70)
+
+        logger.info("\n서비스 초기화 중...")
+        ai_service = AIService()
+        await ai_service.initialize()
+
+        lightrag_service = LightRAGService(ai_service=ai_service)
+        await lightrag_service.initialize()
+
+        try:
+            # 카테고리 필터링
+            category_filter = None
+            if categories:
+                category_list = [c.strip() for c in categories.split(",")]
+                # 해당 카테고리의 모든 서비스 키 수집
+                service_keys = []
+                for cat_name in category_list:
+                    try:
+                        cat = DataCategory(cat_name)
+                        service_keys.extend(
+                            [k for k, v in SEOUL_SERVICES.items() if v.category == cat]
+                        )
+                    except ValueError:
+                        logger.warning(f"알 수 없는 카테고리: {cat_name}")
+
+                count = await load_seoul_data_by_category(
+                    lightrag_service,
+                    service_keys=service_keys if service_keys else None,
+                    max_records_per_service=limit,
+                )
+            else:
+                # 전체 수집
+                count = await load_seoul_data_by_category(
+                    lightrag_service,
+                    max_records_per_service=limit,
+                )
+
+            logger.info("=" * 70)
+            logger.info("🎉 서울 열린 데이터 전체 로딩 완료!")
+            logger.info(f"   총 {count}개 문서가 LightRAG에 삽입되었습니다.")
+            logger.info("=" * 70)
+
+        except Exception as e:
+            logger.error(f"\n❌ 데이터 로딩 실패: {e}", exc_info=True)
+            raise typer.Exit(code=1)
+        finally:
+            await lightrag_service.finalize()
+            await ai_service.close()
+
+    asyncio.run(_run())
+
+
+@app.command()
+def list_options() -> None:
+    """
+    사용 가능한 자치구, 부동산 유형, 거래 유형, R-ONE 통계 목록을 표시합니다.
+    """
+    logger.info("=" * 50)
+    logger.info("📍 서울시 자치구 목록 (25개)")
+    logger.info("=" * 50)
+    for code, name in sorted(SEOUL_DISTRICTS.items()):
+        logger.info(f"  {code}: {name}")
+
+    logger.info("")
+    logger.info("=" * 50)
+    logger.info("🏠 부동산 유형 (PublicDataReader)")
+    logger.info("=" * 50)
+    logger.info("  - 아파트")
+    logger.info("  - 오피스텔")
+    logger.info("  - 연립다세대")
+    logger.info("  - 단독다가구")
+
+    logger.info("")
+    logger.info("=" * 50)
+    logger.info("💰 거래 유형 (PublicDataReader)")
+    logger.info("=" * 50)
+    logger.info("  - 매매")
+    logger.info("  - 전월세 (전세/월세 포함)")
+
+    logger.info("")
+    logger.info("=" * 50)
+    logger.info("🏢 부동산 유형 (RealEstateCollector - data.go.kr)")
+    logger.info("=" * 50)
+    property_type_desc = {
+        "apartment_trade": "아파트 매매",
+        "apartment_trade_detail": "아파트 매매 상세 (실거래가 상세)",
+        "apartment_rent": "아파트 전월세",
+        "multifamily_trade": "연립다세대 매매",
+        "multifamily_rent": "연립다세대 전월세",
+        "officetel_trade": "오피스텔 매매",
+        "officetel_rent": "오피스텔 전월세",
+    }
+    for prop_type in SUPPORTED_PROPERTY_TYPES:
+        desc = property_type_desc.get(prop_type, prop_type)
+        logger.info(f"  {prop_type}: {desc}")
+
+    logger.info("")
+    logger.info("=" * 50)
+    logger.info("📊 R-ONE 통계 유형 (한국부동산원)")
+    logger.info("=" * 50)
+    for key, config in STATISTICS_TABLES.items():
+        logger.info(f"  {key}:")
+        logger.info(f"    - {config.name_ko}")
+        logger.info(f"    - {config.description}")
+
+    logger.info("")
+    logger.info("=" * 50)
+    logger.info("🌆 서울 열린 데이터 광장 (서울시)")
+    logger.info("=" * 50)
+    logger.info(f"  총 {len(SEOUL_SERVICES)}개 데이터셋")
+    logger.info("")
+
+    for cat in DataCategory:
+        services = {k: v for k, v in SEOUL_SERVICES.items() if v.category == cat}
+        if services:
+            logger.info(f"  [{cat.value}] ({len(services)}개)")
+            for key, service in services.items():
+                logger.info(f"    - {key}: {service.description} ({service.data_code})")
+            logger.info("")
 
 
 if __name__ == "__main__":

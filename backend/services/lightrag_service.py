@@ -106,6 +106,11 @@ def _setup_postgres_env() -> None:
     if settings.POSTGRES_DB:
         os.environ["POSTGRES_DB"] = settings.POSTGRES_DB
 
+    # SSL mode 설정 (AWS RDS 연결에 필수)
+    if settings.POSTGRES_SSL_MODE:
+        os.environ["POSTGRES_SSL_MODE"] = settings.POSTGRES_SSL_MODE
+        logger.info(f"PostgreSQL SSL mode set to: {settings.POSTGRES_SSL_MODE}")
+
     # DATABASE_URL에서 PostgreSQL 정보 추출 (fallback)
     if settings.DATABASE_URL and not settings.POSTGRES_HOST:
         _parse_database_url_to_env(settings.DATABASE_URL)

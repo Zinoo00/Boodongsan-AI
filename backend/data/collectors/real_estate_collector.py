@@ -25,7 +25,15 @@ logger = logging.getLogger(__name__)
 
 MOLIT_BASE_URL = "http://apis.data.go.kr/1613000"
 DEFAULT_PAGE_SIZE = 1000
-SUPPORTED_PROPERTY_TYPES = ("apartment_trade", "apartment_rent")
+SUPPORTED_PROPERTY_TYPES = (
+    "apartment_trade",  # 아파트 매매
+    "apartment_trade_detail",  # 아파트 매매 상세
+    "apartment_rent",  # 아파트 전월세
+    "multifamily_trade",  # 연립다세대 매매
+    "multifamily_rent",  # 연립다세대 전월세
+    "officetel_trade",  # 오피스텔 매매
+    "officetel_rent",  # 오피스텔 전월세
+)
 
 
 class RealEstateCollector:
@@ -41,7 +49,12 @@ class RealEstateCollector:
             str, Callable[[SigunguInfo, str], AsyncGenerator[dict[str, Any], None]]
         ] = {
             "apartment_trade": self._collect_apartment_trade,
+            "apartment_trade_detail": self._collect_apartment_trade_detail,
             "apartment_rent": self._collect_apartment_rent,
+            "multifamily_trade": self._collect_multifamily_trade,
+            "multifamily_rent": self._collect_multifamily_rent,
+            "officetel_trade": self._collect_officetel_trade,
+            "officetel_rent": self._collect_officetel_rent,
         }
 
     async def initialize(self) -> None:
@@ -443,3 +456,294 @@ class RealEstateCollector:
         ]
 
         return hashlib.md5("|".join(key_fields).encode("utf-8")).hexdigest()
+
+    # ========== 아파트 매매 상세 (RTMSDataSvcAptTradeDev) ==========
+
+    async def _collect_apartment_trade_detail(
+        self,
+        sigungu_info: SigunguInfo,
+        deal_ymd: str,
+    ) -> AsyncGenerator[dict[str, Any], None]:
+        """아파트 매매 실거래가 상세 데이터 수집."""
+        async for item in self._iterate_endpoint(
+            service="RTMSDataSvcAptTradeDev",
+            operation="getRTMSDataSvcAptTradeDev",
+            params={"LAWD_CD": sigungu_info.sigungu_code, "DEAL_YMD": deal_ymd},
+        ):
+            yield self._transform_apartment_trade_detail_record(item, sigungu_info)
+
+    def _transform_apartment_trade_detail_record(
+        self, item: dict[str, Any], sigungu: SigunguInfo
+    ) -> dict[str, Any]:
+        """아파트 매매 상세 레코드 변환."""
+        price = self._parse_price(item.get("dealAmount"))
+        area_m2 = self._parse_float(item.get("excluUseAr"))
+        transaction_date = self._compose_transaction_date(
+            item.get("dealYear"),
+            item.get("dealMonth"),
+            item.get("dealDay"),
+        )
+
+        record = {
+            "data_source": "MOLIT_DETAIL",
+            "property_type": "아파트",
+            "transaction_type": "매매",
+            "sigungu": sigungu.sigungu_name,
+            "sigungu_code": sigungu.sigungu_code,
+            "sido": sigungu.sido_fullname,
+            "dong": item.get("umdNm"),
+            "building_name": item.get("aptNm"),
+            "price": price,
+            "deposit": None,
+            "monthly_rent": None,
+            "area_m2": area_m2,
+            "area_pyeong": round(area_m2 / 3.3058, 2) if area_m2 else None,
+            "floor": self._parse_int(item.get("floor")),
+            "jibun": self._clean_str(item.get("jibun")),
+            "building_year": self._parse_int(item.get("buildYear")),
+            "transaction_year": self._parse_int(item.get("dealYear")),
+            "transaction_month": self._parse_int(item.get("dealMonth")),
+            "transaction_day": self._parse_int(item.get("dealDay")),
+            "transaction_date": transaction_date,
+            # 상세 데이터 추가 필드
+            "road_name": self._clean_str(item.get("roadNm")),
+            "road_name_bonbun": self._clean_str(item.get("roadNmBonbun")),
+            "road_name_bubun": self._clean_str(item.get("roadNmBubun")),
+            "apt_seq": self._clean_str(item.get("aptSeq")),
+            "deal_type": self._clean_str(item.get("dealingGbn")),  # 중개/직거래
+            "buyer_gbn": self._clean_str(item.get("buyerGbn")),  # 매수자 구분
+            "rgst_date": self._clean_str(item.get("rgstDate")),  # 등기 일자
+            "collected_at": datetime.utcnow().isoformat(),
+        }
+
+        record["address"] = self._compose_address(record, fallback=item.get("roadNm"))
+        record["source_id"] = self._generate_source_id(record)
+        return record
+
+    # ========== 연립다세대 매매 (RTMSDataSvcRHTrade) ==========
+
+    async def _collect_multifamily_trade(
+        self,
+        sigungu_info: SigunguInfo,
+        deal_ymd: str,
+    ) -> AsyncGenerator[dict[str, Any], None]:
+        """연립다세대 매매 실거래가 데이터 수집."""
+        async for item in self._iterate_endpoint(
+            service="RTMSDataSvcRHTrade",
+            operation="getRTMSDataSvcRHTrade",
+            params={"LAWD_CD": sigungu_info.sigungu_code, "DEAL_YMD": deal_ymd},
+        ):
+            yield self._transform_multifamily_trade_record(item, sigungu_info)
+
+    def _transform_multifamily_trade_record(
+        self, item: dict[str, Any], sigungu: SigunguInfo
+    ) -> dict[str, Any]:
+        """연립다세대 매매 레코드 변환."""
+        price = self._parse_price(item.get("dealAmount"))
+        area_m2 = self._parse_float(item.get("excluUseAr"))
+        transaction_date = self._compose_transaction_date(
+            item.get("dealYear"),
+            item.get("dealMonth"),
+            item.get("dealDay"),
+        )
+
+        record = {
+            "data_source": "MOLIT",
+            "property_type": "연립다세대",
+            "transaction_type": "매매",
+            "sigungu": sigungu.sigungu_name,
+            "sigungu_code": sigungu.sigungu_code,
+            "sido": sigungu.sido_fullname,
+            "dong": item.get("umdNm"),
+            "building_name": item.get("mhouseNm"),  # 연립다세대명
+            "price": price,
+            "deposit": None,
+            "monthly_rent": None,
+            "area_m2": area_m2,
+            "area_pyeong": round(area_m2 / 3.3058, 2) if area_m2 else None,
+            "floor": self._parse_int(item.get("floor")),
+            "jibun": self._clean_str(item.get("jibun")),
+            "building_year": self._parse_int(item.get("buildYear")),
+            "transaction_year": self._parse_int(item.get("dealYear")),
+            "transaction_month": self._parse_int(item.get("dealMonth")),
+            "transaction_day": self._parse_int(item.get("dealDay")),
+            "transaction_date": transaction_date,
+            "land_area": self._parse_float(item.get("slerGbn")),  # 대지권면적
+            "collected_at": datetime.utcnow().isoformat(),
+        }
+
+        record["address"] = self._compose_address(record)
+        record["source_id"] = self._generate_source_id(record)
+        return record
+        return record
+
+    # ========== 연립다세대 전월세 (RTMSDataSvcRHRent) ==========
+
+    async def _collect_multifamily_rent(
+        self,
+        sigungu_info: SigunguInfo,
+        deal_ymd: str,
+    ) -> AsyncGenerator[dict[str, Any], None]:
+        """연립다세대 전월세 실거래가 데이터 수집."""
+        async for item in self._iterate_endpoint(
+            service="RTMSDataSvcRHRent",
+            operation="getRTMSDataSvcRHRent",
+            params={"LAWD_CD": sigungu_info.sigungu_code, "DEAL_YMD": deal_ymd},
+        ):
+            yield self._transform_multifamily_rent_record(item, sigungu_info)
+
+    def _transform_multifamily_rent_record(
+        self, item: dict[str, Any], sigungu: SigunguInfo
+    ) -> dict[str, Any]:
+        """연립다세대 전월세 레코드 변환."""
+        deposit = self._parse_price(item.get("deposit"))
+        monthly_rent = self._parse_price(item.get("monthlyRent"))
+        transaction_type = "전세" if monthly_rent == 0 else "월세"
+        area_m2 = self._parse_float(item.get("excluUseAr"))
+        transaction_date = self._compose_transaction_date(
+            item.get("dealYear"),
+            item.get("dealMonth"),
+            item.get("dealDay"),
+        )
+
+        record = {
+            "data_source": "MOLIT",
+            "property_type": "연립다세대",
+            "transaction_type": transaction_type,
+            "sigungu": sigungu.sigungu_name,
+            "sigungu_code": sigungu.sigungu_code,
+            "sido": sigungu.sido_fullname,
+            "dong": item.get("umdNm"),
+            "building_name": item.get("mhouseNm"),
+            "price": deposit,
+            "deposit": deposit,
+            "monthly_rent": monthly_rent,
+            "area_m2": area_m2,
+            "area_pyeong": round(area_m2 / 3.3058, 2) if area_m2 else None,
+            "floor": self._parse_int(item.get("floor")),
+            "jibun": self._clean_str(item.get("jibun")),
+            "building_year": self._parse_int(item.get("buildYear")),
+            "transaction_year": self._parse_int(item.get("dealYear")),
+            "transaction_month": self._parse_int(item.get("dealMonth")),
+            "transaction_day": self._parse_int(item.get("dealDay")),
+            "transaction_date": transaction_date,
+            "collected_at": datetime.utcnow().isoformat(),
+        }
+
+        record["address"] = self._compose_address(record)
+        record["source_id"] = self._generate_source_id(record)
+        return record
+        return record
+
+    # ========== 오피스텔 매매 (RTMSDataSvcOffiTrade) ==========
+
+    async def _collect_officetel_trade(
+        self,
+        sigungu_info: SigunguInfo,
+        deal_ymd: str,
+    ) -> AsyncGenerator[dict[str, Any], None]:
+        """오피스텔 매매 실거래가 데이터 수집."""
+        async for item in self._iterate_endpoint(
+            service="RTMSDataSvcOffiTrade",
+            operation="getRTMSDataSvcOffiTrade",
+            params={"LAWD_CD": sigungu_info.sigungu_code, "DEAL_YMD": deal_ymd},
+        ):
+            yield self._transform_officetel_trade_record(item, sigungu_info)
+
+    def _transform_officetel_trade_record(
+        self, item: dict[str, Any], sigungu: SigunguInfo
+    ) -> dict[str, Any]:
+        """오피스텔 매매 레코드 변환."""
+        price = self._parse_price(item.get("dealAmount"))
+        area_m2 = self._parse_float(item.get("excluUseAr"))
+        transaction_date = self._compose_transaction_date(
+            item.get("dealYear"),
+            item.get("dealMonth"),
+            item.get("dealDay"),
+        )
+
+        record = {
+            "data_source": "MOLIT",
+            "property_type": "오피스텔",
+            "transaction_type": "매매",
+            "sigungu": sigungu.sigungu_name,
+            "sigungu_code": sigungu.sigungu_code,
+            "sido": sigungu.sido_fullname,
+            "dong": item.get("umdNm"),
+            "building_name": item.get("offiNm"),  # 오피스텔명
+            "price": price,
+            "deposit": None,
+            "monthly_rent": None,
+            "area_m2": area_m2,
+            "area_pyeong": round(area_m2 / 3.3058, 2) if area_m2 else None,
+            "floor": self._parse_int(item.get("floor")),
+            "jibun": self._clean_str(item.get("jibun")),
+            "building_year": self._parse_int(item.get("buildYear")),
+            "transaction_year": self._parse_int(item.get("dealYear")),
+            "transaction_month": self._parse_int(item.get("dealMonth")),
+            "transaction_day": self._parse_int(item.get("dealDay")),
+            "transaction_date": transaction_date,
+            "collected_at": datetime.utcnow().isoformat(),
+        }
+
+        record["address"] = self._compose_address(record)
+        record["source_id"] = self._generate_source_id(record)
+        return record
+        return record
+
+    # ========== 오피스텔 전월세 (RTMSDataSvcOffiRent) ==========
+
+    async def _collect_officetel_rent(
+        self,
+        sigungu_info: SigunguInfo,
+        deal_ymd: str,
+    ) -> AsyncGenerator[dict[str, Any], None]:
+        """오피스텔 전월세 실거래가 데이터 수집."""
+        async for item in self._iterate_endpoint(
+            service="RTMSDataSvcOffiRent",
+            operation="getRTMSDataSvcOffiRent",
+            params={"LAWD_CD": sigungu_info.sigungu_code, "DEAL_YMD": deal_ymd},
+        ):
+            yield self._transform_officetel_rent_record(item, sigungu_info)
+
+    def _transform_officetel_rent_record(
+        self, item: dict[str, Any], sigungu: SigunguInfo
+    ) -> dict[str, Any]:
+        """오피스텔 전월세 레코드 변환."""
+        deposit = self._parse_price(item.get("deposit"))
+        monthly_rent = self._parse_price(item.get("monthlyRent"))
+        transaction_type = "전세" if monthly_rent == 0 else "월세"
+        area_m2 = self._parse_float(item.get("excluUseAr"))
+        transaction_date = self._compose_transaction_date(
+            item.get("dealYear"),
+            item.get("dealMonth"),
+            item.get("dealDay"),
+        )
+
+        record = {
+            "data_source": "MOLIT",
+            "property_type": "오피스텔",
+            "transaction_type": transaction_type,
+            "sigungu": sigungu.sigungu_name,
+            "sigungu_code": sigungu.sigungu_code,
+            "sido": sigungu.sido_fullname,
+            "dong": item.get("umdNm"),
+            "building_name": item.get("offiNm"),
+            "price": deposit,
+            "deposit": deposit,
+            "monthly_rent": monthly_rent,
+            "area_m2": area_m2,
+            "area_pyeong": round(area_m2 / 3.3058, 2) if area_m2 else None,
+            "floor": self._parse_int(item.get("floor")),
+            "jibun": self._clean_str(item.get("jibun")),
+            "building_year": self._parse_int(item.get("buildYear")),
+            "transaction_year": self._parse_int(item.get("dealYear")),
+            "transaction_month": self._parse_int(item.get("dealMonth")),
+            "transaction_day": self._parse_int(item.get("dealDay")),
+            "transaction_date": transaction_date,
+            "collected_at": datetime.utcnow().isoformat(),
+        }
+
+        record["address"] = self._compose_address(record)
+        record["source_id"] = self._generate_source_id(record)
+        return record

@@ -37,7 +37,7 @@ dependencies = [
     # Data processing
     "pandas==2.2.3",
     "httpx==0.28.1",
-    "requests==2.32.4",
+    "requests>=2.32.0",
     "tenacity==8.2.3",
     # Configuration
     "python-dotenv==1.0.1",
@@ -48,6 +48,8 @@ dependencies = [
     # Email validation for Pydantic
     "email-validator>=2.0.0",
     "boto3>=1.40.65",
+    # Korean Public Data API wrapper (국토교통부 실거래가 등)
+    "PublicDataReader>=1.1.1",
 ]
 
 [tool.uv]
@@ -63,7 +65,7 @@ ml = [
 ]
 
 data-collection = [
-  "beautifulsoup4>=4.12,<4.13",
+  "beautifulsoup4>=4.12",
   "selenium==4.29.0",
   "scrapy==2.13.3",
   "geopy==2.4.1",
@@ -106,7 +108,7 @@ config = [
 ]
 
 xml = [
-  "xmltodict==0.13.0",
+  "xmltodict>=0.13.0",
 ]
 
 # Development only dependencies

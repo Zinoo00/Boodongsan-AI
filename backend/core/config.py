@@ -84,6 +84,9 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = ""
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
+    # SSL mode for PostgreSQL connections (required for AWS RDS)
+    # Options: disable, allow, prefer, require, verify-ca, verify-full
+    POSTGRES_SSL_MODE: str = "require"  # Default to require for AWS RDS compatibility
 
     # LightRAG - Knowledge Graph RAG
     LIGHTRAG_WORKING_DIR: str = "./lightrag_storage"

@@ -36,10 +36,10 @@
     <node id="서울특별시">
       <data key="d0">서울특별시</data>
       <data key="d1">location</data>
-      <data key="d2">서울특별시 is the capital city of South Korea, a major metropolitan area with diverse residential and commercial districts.</data>
-      <data key="d3">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b</data>
+      <data key="d2">서울특별시 is the capital city of South Korea, a major metropolitan area with diverse residential and commercial districts.&lt;SEP&gt;서울특별시 is a special city in South Korea that contains multiple autonomous districts.&lt;SEP&gt;서울특별시 is a special city in South Korea that serves as the capital and contains multiple autonomous districts.</data>
+      <data key="d3">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b&lt;SEP&gt;chunk-ff12e0bcde450dc70c733655e1372111&lt;SEP&gt;chunk-6d24b1ba5974ca3013ef835560acdfae</data>
       <data key="d4">unknown_source</data>
-      <data key="d5">1764561026</data>
+      <data key="d5">1765771706</data>
       <data key="d6" />
     </node>
     <node id="테스트 아파트">
@@ -99,10 +99,10 @@
     <node id="Gangnam-gu">
       <data key="d0">Gangnam-gu</data>
       <data key="d1">location</data>
-      <data key="d2">Gangnam-gu is a district in Seoul, South Korea, known for its affluent residential areas and commercial districts.</data>
-      <data key="d3">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b</data>
+      <data key="d2">Gangnam-gu is a district in Seoul, South Korea, known for its affluent residential areas and commercial districts.&lt;SEP&gt;Gangnam-gu is an autonomous district located within Seoul, with the administrative code 11680.</data>
+      <data key="d3">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b&lt;SEP&gt;chunk-c4bd1b7c722f7d709f934e273cc5be3f</data>
       <data key="d4">unknown_source</data>
-      <data key="d5">1764561027</data>
+      <data key="d5">1765771725</data>
       <data key="d6" />
     </node>
     <node id="Samsung-dong">
@@ -162,10 +162,982 @@
     <node id="Seoul">
       <data key="d0">Seoul</data>
       <data key="d1">location</data>
-      <data key="d2">Seoul is the capital city of South Korea where Gangnam-gu is located.</data>
-      <data key="d3">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b</data>
+      <data key="d2">Seoul is the capital city of South Korea and holds the administrative status of a special city, also referred to as a special metropolitan city. This designation reflects Seoul's unique status within South Korea's administrative hierarchy, distinguishing it from other cities and provinces. As the nation's capital, Seoul serves as a major administrative region that exercises direct administrative control over numerous autonomous districts within its jurisdiction, functioning both as a city and a higher-level administrative division.
+
+Seoul's administrative structure is organized into various autonomous districts that operate under its authority as a special city. These districts function as subordinate administrative divisions within Seoul's governance framework, with Seoul maintaining administrative authority and serving as their administrative parent region. The autonomous districts that comprise Seoul include Gangnam-gu, Jongno-gu, Seongbuk-gu, Nowon-gu, Eunpyeong-gu, Mapo-gu, Gangseo-gu, Guro-gu, and Seocho-gu, among others. Each of these districts operates within Seoul's coordinated governance system.
+
+Through this special city structure, Seoul coordinates governance and urban management across its metropolitan area, serving as the administrative region to which its various constituent districts belong. This organizational framework enables Seoul to effectively manage its role as both the national capital and a complex metropolitan administrative entity.&lt;SEP&gt;Seoul is a special city in South Korea that serves as the administrative parent region of Gangnam-gu.&lt;SEP&gt;Seoul is a special metropolitan city that contains multiple autonomous districts.&lt;SEP&gt;Seoul is a special city that serves as the administrative parent region for multiple districts.</data>
+      <data key="d3">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b&lt;SEP&gt;chunk-73c9d7a70ce525b4e57fa371d9b90f53&lt;SEP&gt;chunk-48c028f3004b35c16f57482f5741c5d7&lt;SEP&gt;chunk-0b64ffc75148f235760d93f0b7d2e0e5&lt;SEP&gt;chunk-ea1e3f14dd430e90040d8f01e5fc5bb4&lt;SEP&gt;chunk-6e0848b1b119121dd5a60b5cf3c301ef&lt;SEP&gt;chunk-2ff67ac67cc9eeac45a0205b35dd39f1&lt;SEP&gt;chunk-e4634cc4eba25b66d38b04ecc11cd7da&lt;SEP&gt;chunk-5891f3364a5bfdd86b9a4c8052cfa3b9&lt;SEP&gt;chunk-09d75c5313df1318db9ef4ffaa364562&lt;SEP&gt;chunk-3f6f80a23c789323038b051e370b122d&lt;SEP&gt;chunk-c0bbc84bdc3d0142ced9bccd29033ddf&lt;SEP&gt;chunk-36504f5106c2785a957ce01e0ec2a6a0&lt;SEP&gt;chunk-9df2cb01e9dcae684eda36c3f419e9af&lt;SEP&gt;chunk-6d24b1ba5974ca3013ef835560acdfae&lt;SEP&gt;chunk-c4bd1b7c722f7d709f934e273cc5be3f&lt;SEP&gt;chunk-8aac7537227c4daf63ed401fb51bb0ae&lt;SEP&gt;chunk-c86aede000cfd461b40f495155982ca9</data>
       <data key="d4">unknown_source</data>
-      <data key="d5">1764561027</data>
+      <data key="d5">1765771749</data>
+      <data key="d6" />
+    </node>
+    <node id="Jongno-gu">
+      <data key="d0">Jongno-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Jongno-gu is an autonomous district (gu) in Seoul with administrative code 11110.</data>
+      <data key="d3">chunk-73c9d7a70ce525b4e57fa371d9b90f53</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771436</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11110">
+      <data key="d0">Administrative Code 11110</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11110 is the official identification code assigned to Jongno-gu district.</data>
+      <data key="d3">chunk-73c9d7a70ce525b4e57fa371d9b90f53</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771436</data>
+      <data key="d6" />
+    </node>
+    <node id="Seoul Special City">
+      <data key="d0">Seoul Special City</data>
+      <data key="d1">location</data>
+      <data key="d2">Seoul Special City is a special metropolitan city and city-level administrative division in South Korea, serving as the nation's capital and largest urban center. This distinctive designation as a "special" metropolitan city reflects its unique status within South Korea's administrative hierarchy, setting it apart from ordinary cities and provinces. The special classification grants Seoul greater autonomy and administrative authority, which is appropriate for its critical role as the national capital and economic center of the country.
+
+The city functions as a comprehensive metropolitan area with a distinctive administrative structure that governs multiple autonomous districts throughout its territory. Seoul Special City is organized into numerous self-governing subdivisions, each functioning as an autonomous district with considerable local administrative powers while remaining part of the unified Seoul Special City framework. These autonomous districts are responsible for local governance within their respective boundaries and coordinate with the city-level government on metropolitan-wide policies and services.
+
+The autonomous districts within Seoul Special City include Jongno-gu, Yongsan-gu, Seongdong-gu, Jungnang-gu, Gangbuk-gu, Dobong-gu, Nowon-gu, Seodaemun-gu, Mapo-gu, Yeongdeungpo-gu, Guro-gu, and Geumcheon-gu, among others. Each district serves as an administrative unit operating with substantial local administrative authority while maintaining its connection to the broader metropolitan governance structure.
+
+This multi-tiered governance system enables Seoul Special City to efficiently manage the complex needs of its dense urban population and diverse neighborhoods distributed across its various districts. The structure balances centralized metropolitan coordination with localized district-level administration, allowing the city to address both city-wide strategic concerns and neighborhood-specific issues effectively. Through this administrative framework, Seoul Special City maintains its position as South Korea's premier metropolitan region while ensuring responsive governance across all its constituent districts.&lt;SEP&gt;Seoul Special City is the capital and largest metropolis of South Korea, serving as the governing administrative body for various districts including Dongjak-gu.&lt;SEP&gt;Seoul Special City is a metropolitan city that contains Gangnam-gu as one of its districts.&lt;SEP&gt;Seoul Special City is a metropolitan city in South Korea that contains Songpa-gu as one of its administrative districts.&lt;SEP&gt;Seoul Special City is a special city administrative division that governs Gangdong-gu.</data>
+      <data key="d3">chunk-73c9d7a70ce525b4e57fa371d9b90f53&lt;SEP&gt;chunk-2afeacd0a2acd216ae68220dfe54f1d5&lt;SEP&gt;chunk-ba2fb2fc296c6534e33e59f09c2fd071&lt;SEP&gt;chunk-ff12e0bcde450dc70c733655e1372111&lt;SEP&gt;chunk-88abc9bd51b1b657051999f057afcd49&lt;SEP&gt;chunk-ea1e3f14dd430e90040d8f01e5fc5bb4&lt;SEP&gt;chunk-6e0848b1b119121dd5a60b5cf3c301ef&lt;SEP&gt;chunk-2ff67ac67cc9eeac45a0205b35dd39f1&lt;SEP&gt;chunk-e4634cc4eba25b66d38b04ecc11cd7da&lt;SEP&gt;chunk-2b87a139c84f7b979018131d3eaff697&lt;SEP&gt;chunk-09d75c5313df1318db9ef4ffaa364562&lt;SEP&gt;chunk-3f6f80a23c789323038b051e370b122d&lt;SEP&gt;chunk-36504f5106c2785a957ce01e0ec2a6a0&lt;SEP&gt;chunk-c83b2b38bf556783a8733e54499d62bb&lt;SEP&gt;chunk-618ce06f064b6fccec91a4f5161efba3&lt;SEP&gt;chunk-4604c150a35c9545e35acb2c818250a1&lt;SEP&gt;chunk-c4bd1b7c722f7d709f934e273cc5be3f&lt;SEP&gt;chunk-8aac7537227c4daf63ed401fb51bb0ae&lt;SEP&gt;chunk-c86aede000cfd461b40f495155982ca9</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771749</data>
+      <data key="d6" />
+    </node>
+    <node id="Jung-gu">
+      <data key="d0">Jung-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Jung-gu is an autonomous district belonging to Seoul Special City with administrative code 11140.&lt;SEP&gt;Jung-gu is an autonomous district with administrative code 26110, located in Busan Metropolitan City.</data>
+      <data key="d3">chunk-2afeacd0a2acd216ae68220dfe54f1d5&lt;SEP&gt;chunk-961f1fc7dd6c7edd94429e83ce3c3b28</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771761</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11140">
+      <data key="d0">Administrative Code 11140</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11140 is the official administrative district code assigned to Jung-gu.</data>
+      <data key="d3">chunk-2afeacd0a2acd216ae68220dfe54f1d5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771447</data>
+      <data key="d6" />
+    </node>
+    <node id="Yongsan-gu">
+      <data key="d0">Yongsan-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Yongsan-gu is an autonomous district located in Seoul Special City with the administrative code 11170.</data>
+      <data key="d3">chunk-ba2fb2fc296c6534e33e59f09c2fd071</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771460</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11170">
+      <data key="d0">Administrative Code 11170</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11170 is the official administrative identification code assigned to Yongsan-gu.</data>
+      <data key="d3">chunk-ba2fb2fc296c6534e33e59f09c2fd071</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771460</data>
+      <data key="d6" />
+    </node>
+    <node id="성동구">
+      <data key="d0">성동구</data>
+      <data key="d1">location</data>
+      <data key="d2">성동구 is an autonomous district in Seoul with administrative code 11200.</data>
+      <data key="d3">chunk-ff12e0bcde450dc70c733655e1372111</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771472</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11200">
+      <data key="d0">Administrative Code 11200</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11200 is the official administrative identification code assigned to Seongdong-gu.</data>
+      <data key="d3">chunk-ff12e0bcde450dc70c733655e1372111</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771472</data>
+      <data key="d6" />
+    </node>
+    <node id="Seongdong-gu">
+      <data key="d0">Seongdong-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Seongdong-gu is an autonomous district belonging to Seoul Special City with administrative code 11200.</data>
+      <data key="d3">chunk-ff12e0bcde450dc70c733655e1372111</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771472</data>
+      <data key="d6" />
+    </node>
+    <node id="Gwangjin-gu">
+      <data key="d0">Gwangjin-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Gwangjin-gu is an autonomous district with administrative code 11215.</data>
+      <data key="d3">chunk-48c028f3004b35c16f57482f5741c5d7</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771484</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11215">
+      <data key="d0">Administrative Code 11215</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11215 is the official identification code assigned to Gwangjin-gu.</data>
+      <data key="d3">chunk-48c028f3004b35c16f57482f5741c5d7</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771484</data>
+      <data key="d6" />
+    </node>
+    <node id="Dongdaemun-gu">
+      <data key="d0">Dongdaemun-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Dongdaemun-gu is an autonomous district with administrative code 11230.</data>
+      <data key="d3">chunk-0b64ffc75148f235760d93f0b7d2e0e5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771497</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11230">
+      <data key="d0">Administrative Code 11230</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11230 is the official administrative region code assigned to Dongdaemun-gu.</data>
+      <data key="d3">chunk-0b64ffc75148f235760d93f0b7d2e0e5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771497</data>
+      <data key="d6" />
+    </node>
+    <node id="Jungnang-gu">
+      <data key="d0">Jungnang-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Jungnang-gu is an autonomous district belonging to Seoul Special City with the administrative code 11260.</data>
+      <data key="d3">chunk-88abc9bd51b1b657051999f057afcd49</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771508</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11260">
+      <data key="d0">Administrative Code 11260</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11260 is the official administrative region code assigned to Jungnang-gu.</data>
+      <data key="d3">chunk-88abc9bd51b1b657051999f057afcd49</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771508</data>
+      <data key="d6" />
+    </node>
+    <node id="Seongbuk-gu">
+      <data key="d0">Seongbuk-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Seongbuk-gu is an autonomous district within Seoul, with administrative code 11290.</data>
+      <data key="d3">chunk-ea1e3f14dd430e90040d8f01e5fc5bb4</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771521</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11290">
+      <data key="d0">Administrative Code 11290</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11290 is the official government identification code assigned to Seongbuk-gu.</data>
+      <data key="d3">chunk-ea1e3f14dd430e90040d8f01e5fc5bb4</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771521</data>
+      <data key="d6" />
+    </node>
+    <node id="Gangbuk-gu">
+      <data key="d0">Gangbuk-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Gangbuk-gu is an autonomous district with administrative code 11305.</data>
+      <data key="d3">chunk-6e0848b1b119121dd5a60b5cf3c301ef</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771531</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11305">
+      <data key="d0">Administrative Code 11305</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11305 is the official administrative region code assigned to Gangbuk-gu.</data>
+      <data key="d3">chunk-6e0848b1b119121dd5a60b5cf3c301ef</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771531</data>
+      <data key="d6" />
+    </node>
+    <node id="Dobong-gu">
+      <data key="d0">Dobong-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Dobong-gu is an autonomous district belonging to Seoul Special City with administrative code 11320.</data>
+      <data key="d3">chunk-2ff67ac67cc9eeac45a0205b35dd39f1</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771544</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11320">
+      <data key="d0">Administrative Code 11320</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11320 is the official administrative identification code assigned to Dobong-gu.</data>
+      <data key="d3">chunk-2ff67ac67cc9eeac45a0205b35dd39f1</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771544</data>
+      <data key="d6" />
+    </node>
+    <node id="Nowon-gu">
+      <data key="d0">Nowon-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Nowon-gu is an autonomous district with administrative code 11350, located in Seoul Special City.</data>
+      <data key="d3">chunk-e4634cc4eba25b66d38b04ecc11cd7da</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771565</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11350">
+      <data key="d0">Administrative Code 11350</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11350 is the official administrative region code assigned to Nowon-gu.</data>
+      <data key="d3">chunk-e4634cc4eba25b66d38b04ecc11cd7da</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771565</data>
+      <data key="d6" />
+    </node>
+    <node id="Eunpyeong-gu">
+      <data key="d0">Eunpyeong-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Eunpyeong-gu is an autonomous district with the administrative code 11380.</data>
+      <data key="d3">chunk-5891f3364a5bfdd86b9a4c8052cfa3b9</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771582</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11380">
+      <data key="d0">Administrative Code 11380</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11380 is the official administrative region code assigned to Eunpyeong-gu.</data>
+      <data key="d3">chunk-5891f3364a5bfdd86b9a4c8052cfa3b9</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771582</data>
+      <data key="d6" />
+    </node>
+    <node id="Seodaemun-gu">
+      <data key="d0">Seodaemun-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Seodaemun-gu is an autonomous district located in Seoul Special City with administrative district code 11410.</data>
+      <data key="d3">chunk-2b87a139c84f7b979018131d3eaff697</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771594</data>
+      <data key="d6" />
+    </node>
+    <node id="11410">
+      <data key="d0">11410</data>
+      <data key="d1">data</data>
+      <data key="d2">11410 is the administrative code assigned to Seodaemun-gu.</data>
+      <data key="d3">chunk-2b87a139c84f7b979018131d3eaff697</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771594</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative District Code 11410">
+      <data key="d0">Administrative District Code 11410</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative District Code 11410 is the official identification number assigned to Seodaemun-gu.</data>
+      <data key="d3">chunk-2b87a139c84f7b979018131d3eaff697</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771594</data>
+      <data key="d6" />
+    </node>
+    <node id="Mapo-gu">
+      <data key="d0">Mapo-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Mapo-gu is an autonomous district with administrative code 11440 that belongs to Seoul Special City.</data>
+      <data key="d3">chunk-09d75c5313df1318db9ef4ffaa364562</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771606</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11440">
+      <data key="d0">Administrative Code 11440</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11440 is the official administrative region code assigned to Mapo-gu.</data>
+      <data key="d3">chunk-09d75c5313df1318db9ef4ffaa364562</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771606</data>
+      <data key="d6" />
+    </node>
+    <node id="Yangcheon-gu">
+      <data key="d0">Yangcheon-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Yangcheon-gu is an autonomous district with administrative code 11470.</data>
+      <data key="d3">chunk-3f6f80a23c789323038b051e370b122d</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771618</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11470">
+      <data key="d0">Administrative Code 11470</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11470 is the official administrative identification number assigned to Yangcheon-gu.</data>
+      <data key="d3">chunk-3f6f80a23c789323038b051e370b122d</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771618</data>
+      <data key="d6" />
+    </node>
+    <node id="11470">
+      <data key="d0">11470</data>
+      <data key="d1">data</data>
+      <data key="d2">11470 is the administrative区域code assigned to Yangcheon-gu.</data>
+      <data key="d3">chunk-3f6f80a23c789323038b051e370b122d</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771618</data>
+      <data key="d6" />
+    </node>
+    <node id="Gangseo-gu">
+      <data key="d0">Gangseo-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Gangseo-gu is an autonomous district with administrative code 11500.</data>
+      <data key="d3">chunk-c0bbc84bdc3d0142ced9bccd29033ddf</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771630</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11500">
+      <data key="d0">Administrative Code 11500</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11500 is the official administrative identification code assigned to Gangseo-gu.</data>
+      <data key="d3">chunk-c0bbc84bdc3d0142ced9bccd29033ddf</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771630</data>
+      <data key="d6" />
+    </node>
+    <node id="Guro-gu">
+      <data key="d0">Guro-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Guro-gu is an autonomous district with the administrative code 11530.</data>
+      <data key="d3">chunk-36504f5106c2785a957ce01e0ec2a6a0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771640</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11530">
+      <data key="d0">Administrative Code 11530</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11530 is the official administrative identification code assigned to Guro-gu.</data>
+      <data key="d3">chunk-36504f5106c2785a957ce01e0ec2a6a0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771640</data>
+      <data key="d6" />
+    </node>
+    <node id="Geumcheon-gu">
+      <data key="d0">Geumcheon-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Geumcheon-gu is an autonomous district (gu) belonging to Seoul Special City with the administrative code 11545.</data>
+      <data key="d3">chunk-c83b2b38bf556783a8733e54499d62bb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771653</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11545">
+      <data key="d0">Administrative Code 11545</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11545 is the official administrative region code assigned to Geumcheon-gu.</data>
+      <data key="d3">chunk-c83b2b38bf556783a8733e54499d62bb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771653</data>
+      <data key="d6" />
+    </node>
+    <node id="Yeongdeungpo-gu">
+      <data key="d0">Yeongdeungpo-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Yeongdeungpo-gu is an autonomous district with administrative code 11560 that belongs to Seoul Special City.</data>
+      <data key="d3">chunk-618ce06f064b6fccec91a4f5161efba3</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771664</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11560">
+      <data key="d0">Administrative Code 11560</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11560 is the official administrative region code assigned to Yeongdeungpo-gu.</data>
+      <data key="d3">chunk-618ce06f064b6fccec91a4f5161efba3</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771664</data>
+      <data key="d6" />
+    </node>
+    <node id="Dongjak-gu">
+      <data key="d0">Dongjak-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Dongjak-gu is an autonomous district belonging to Seoul Special City with administrative code 11590.</data>
+      <data key="d3">chunk-4604c150a35c9545e35acb2c818250a1</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771685</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11590">
+      <data key="d0">Administrative Code 11590</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11590 is the official identification number assigned to Dongjak-gu for administrative purposes.</data>
+      <data key="d3">chunk-4604c150a35c9545e35acb2c818250a1</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771685</data>
+      <data key="d6" />
+    </node>
+    <node id="Gwanak-gu">
+      <data key="d0">Gwanak-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Gwanak-gu is an autonomous district with the administrative code 11620.</data>
+      <data key="d3">chunk-9df2cb01e9dcae684eda36c3f419e9af</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771695</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11620">
+      <data key="d0">Administrative Code 11620</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11620 is the unique identifier assigned to Gwanak-gu for administrative purposes.</data>
+      <data key="d3">chunk-9df2cb01e9dcae684eda36c3f419e9af</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771695</data>
+      <data key="d6" />
+    </node>
+    <node id="서초구">
+      <data key="d0">서초구</data>
+      <data key="d1">location</data>
+      <data key="d2">서초구 is an autonomous district in Seoul with administrative code 11650.</data>
+      <data key="d3">chunk-6d24b1ba5974ca3013ef835560acdfae</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771706</data>
+      <data key="d6" />
+    </node>
+    <node id="11650">
+      <data key="d0">11650</data>
+      <data key="d1">data</data>
+      <data key="d2">11650 is the administrative region code assigned to Seocho-gu.</data>
+      <data key="d3">chunk-6d24b1ba5974ca3013ef835560acdfae</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771706</data>
+      <data key="d6" />
+    </node>
+    <node id="Seocho-gu">
+      <data key="d0">Seocho-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Seocho-gu is an autonomous district with administrative code 11650.</data>
+      <data key="d3">chunk-6d24b1ba5974ca3013ef835560acdfae</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771706</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11680">
+      <data key="d0">Administrative Code 11680</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11680 is the official administrative region code assigned to Gangnam-gu.</data>
+      <data key="d3">chunk-c4bd1b7c722f7d709f934e273cc5be3f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771725</data>
+      <data key="d6" />
+    </node>
+    <node id="Songpa-gu">
+      <data key="d0">Songpa-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Songpa-gu is an autonomous district with administrative code 11710 that belongs to Seoul Special City.</data>
+      <data key="d3">chunk-8aac7537227c4daf63ed401fb51bb0ae</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771738</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11710">
+      <data key="d0">Administrative Code 11710</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11710 is the official administrative region code assigned to Songpa-gu.</data>
+      <data key="d3">chunk-8aac7537227c4daf63ed401fb51bb0ae</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771738</data>
+      <data key="d6" />
+    </node>
+    <node id="Gangdong-gu">
+      <data key="d0">Gangdong-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Gangdong-gu is an autonomous district with administrative code 11740, belonging to Seoul Special City.</data>
+      <data key="d3">chunk-c86aede000cfd461b40f495155982ca9</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771749</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 11740">
+      <data key="d0">Administrative Code 11740</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 11740 is the official administrative identification number assigned to Gangdong-gu.</data>
+      <data key="d3">chunk-c86aede000cfd461b40f495155982ca9</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771749</data>
+      <data key="d6" />
+    </node>
+    <node id="Busan Metropolitan City">
+      <data key="d0">Busan Metropolitan City</data>
+      <data key="d1">location</data>
+      <data key="d2">Busan Metropolitan City is a metropolitan city in South Korea that contains Jung-gu as one of its autonomous districts.&lt;SEP&gt;Busan Metropolitan City is a metropolitan city in South Korea that contains Seo-gu as one of its autonomous districts.&lt;SEP&gt;Busan Metropolitan City is a metropolitan city in South Korea that encompasses various autonomous districts.&lt;SEP&gt;Busan Metropolitan City is a metropolitan city in South Korea that governs Yeongdo-gu.&lt;SEP&gt;Busan Metropolitan City is a metropolitan city in South Korea that contains autonomous districts.&lt;SEP&gt;Busan Metropolitan City is a metropolitan city in South Korea that contains Dongnae-gu as one of its autonomous districts.</data>
+      <data key="d3">chunk-961f1fc7dd6c7edd94429e83ce3c3b28&lt;SEP&gt;chunk-78a787ae0cb06803b352769561ab969d&lt;SEP&gt;chunk-88f798edb4f77e0e46a68196f4986c02&lt;SEP&gt;chunk-7948217ad947c2ca90abfc9216b8d5e4&lt;SEP&gt;chunk-7d77972a76bab56fe4658d4da55a7774&lt;SEP&gt;chunk-d27c29ca8001628fd2d891cd4a4140a0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775254</data>
+      <data key="d6" />
+    </node>
+    <node id="26110">
+      <data key="d0">26110</data>
+      <data key="d1">data</data>
+      <data key="d2">26110 is the administrative region code assigned to Jung-gu.</data>
+      <data key="d3">chunk-961f1fc7dd6c7edd94429e83ce3c3b28</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771761</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 26110">
+      <data key="d0">Administrative Code 26110</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 26110 is the official administrative region code assigned to Jung-gu.</data>
+      <data key="d3">chunk-961f1fc7dd6c7edd94429e83ce3c3b28</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771761</data>
+      <data key="d6" />
+    </node>
+    <node id="Seogu">
+      <data key="d0">Seogu</data>
+      <data key="d1">location</data>
+      <data key="d2">Seogu is an autonomous district with administrative code 26140.</data>
+      <data key="d3">chunk-78a787ae0cb06803b352769561ab969d</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771774</data>
+      <data key="d6" />
+    </node>
+    <node id="26140">
+      <data key="d0">26140</data>
+      <data key="d1">data</data>
+      <data key="d2">26140 is the administrative region code assigned to Seo-gu.</data>
+      <data key="d3">chunk-78a787ae0cb06803b352769561ab969d</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771774</data>
+      <data key="d6" />
+    </node>
+    <node id="Seo-gu">
+      <data key="d0">Seo-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Seo-gu is an autonomous district that belongs to Busan Metropolitan City.</data>
+      <data key="d3">chunk-78a787ae0cb06803b352769561ab969d</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771774</data>
+      <data key="d6" />
+    </node>
+    <node id="Dong-gu">
+      <data key="d0">Dong-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Dong-gu is an autonomous district with administrative code 26170.</data>
+      <data key="d3">chunk-88f798edb4f77e0e46a68196f4986c02</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771784</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 26170">
+      <data key="d0">Administrative Code 26170</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 26170 is the official administrative identification code assigned to Dong-gu.</data>
+      <data key="d3">chunk-88f798edb4f77e0e46a68196f4986c02</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771784</data>
+      <data key="d6" />
+    </node>
+    <node id="Yeongdo-Gu">
+      <data key="d0">Yeongdo-Gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Yeongdo-gu is an autonomous district with administrative code 26200.</data>
+      <data key="d3">chunk-7948217ad947c2ca90abfc9216b8d5e4</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771797</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 26200">
+      <data key="d0">Administrative Code 26200</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 26200 is the official administrative region code assigned to Yeongdo-gu.</data>
+      <data key="d3">chunk-7948217ad947c2ca90abfc9216b8d5e4</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771797</data>
+      <data key="d6" />
+    </node>
+    <node id="Yeongdo-gu">
+      <data key="d0">Yeongdo-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Yeongdo-gu is an autonomous district with administrative code 26200.</data>
+      <data key="d3">chunk-7948217ad947c2ca90abfc9216b8d5e4</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771797</data>
+      <data key="d6" />
+    </node>
+    <node id="Busanjin-gu">
+      <data key="d0">Busanjin-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Busanjin-gu is an autonomous district with administrative code 26230.</data>
+      <data key="d3">chunk-7d77972a76bab56fe4658d4da55a7774</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771809</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 26230">
+      <data key="d0">Administrative Code 26230</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 26230 is the official administrative code assigned to Busanjin-gu.</data>
+      <data key="d3">chunk-7d77972a76bab56fe4658d4da55a7774</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771809</data>
+      <data key="d6" />
+    </node>
+    <node id="26230">
+      <data key="d0">26230</data>
+      <data key="d1">data</data>
+      <data key="d2">26230 is the administrative region code assigned to Busanjin-gu.</data>
+      <data key="d3">chunk-7d77972a76bab56fe4658d4da55a7774</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765771809</data>
+      <data key="d6" />
+    </node>
+    <node id="Dongnae-gu">
+      <data key="d0">Dongnae-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Dongnae-gu is an autonomous district with administrative code 26260, located in Busan Metropolitan City.</data>
+      <data key="d3">chunk-d27c29ca8001628fd2d891cd4a4140a0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775254</data>
+      <data key="d6" />
+    </node>
+    <node id="Administrative Code 26260">
+      <data key="d0">Administrative Code 26260</data>
+      <data key="d1">data</data>
+      <data key="d2">Administrative Code 26260 is the official administrative region code assigned to Dongnae-gu.</data>
+      <data key="d3">chunk-d27c29ca8001628fd2d891cd4a4140a0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775254</data>
+      <data key="d6" />
+    </node>
+    <node id="26260">
+      <data key="d0">26260</data>
+      <data key="d1">data</data>
+      <data key="d2">26260 is the administrative code assigned to Dongnae-gu district.</data>
+      <data key="d3">chunk-d27c29ca8001628fd2d891cd4a4140a0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775254</data>
+      <data key="d6" />
+    </node>
+    <node id="National Apartment Sale Price Index">
+      <data key="d0">National Apartment Sale Price Index</data>
+      <data key="d1">data</data>
+      <data key="d2">The National Apartment Sale Price Index is a statistical measure tracking apartment sale prices across South Korea with a baseline of 100 set in June 2021.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775266</data>
+      <data key="d6" />
+    </node>
+    <node id="South Korea">
+      <data key="d0">South Korea</data>
+      <data key="d1">location</data>
+      <data key="d2">South Korea is the country where the apartment sale price index is measured and tracked.&lt;SEP&gt;South Korea is the country where the apartment sales price data is collected and analyzed.&lt;SEP&gt;South Korea (전국) is the geographic region covered by the apartment sales price index statistics.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775421</data>
+      <data key="d6" />
+    </node>
+    <node id="January 2024">
+      <data key="d0">January 2024</data>
+      <data key="d1">event</data>
+      <data key="d2">January 2024 is the reference time point for the apartment transaction price index measurement showing a value of 99.97.&lt;SEP&gt;January 2024 is the reference time point for the apartment sales price index measurement in Incheon Jung-gu.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-a3f23e7d033713a722554a57577cd4cd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775290</data>
+      <data key="d6" />
+    </node>
+    <node id="June 2021">
+      <data key="d0">June 2021</data>
+      <data key="d1">event</data>
+      <data key="d2">June 2021 serves as the baseline reference period for the apartment sales price index, with the index value established at 100. This baseline is used for measuring changes in apartment transaction prices and apartment sale prices over time. The index specifically applies to the measurement of apartment sales price changes in South Korea, providing a standardized reference point from which subsequent price movements and trends in the apartment market can be tracked and compared.&lt;SEP&gt;June 2021 is the base period (set at index value 100) for measuring apartment sales price changes in South Korea.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-f52ad34fcfff2c6894ff4918dca7427f&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775477</data>
+      <data key="d6" />
+    </node>
+    <node id="한국부동산원 R-ONE">
+      <data key="d0">한국부동산원 R-ONE</data>
+      <data key="d1">organization</data>
+      <data key="d2">한국부동산원 R-ONE is the Korean real estate organization that provides the data source for the apartment sale price index.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775266</data>
+      <data key="d6" />
+    </node>
+    <node id="99.97 Index Value">
+      <data key="d0">99.97 Index Value</data>
+      <data key="d1">data</data>
+      <data key="d2">99.97 is the index value recorded in January 2024, indicating a 0.03% decline from the baseline of 100.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775266</data>
+      <data key="d6" />
+    </node>
+    <node id="Real Estate Market Statistics">
+      <data key="d0">Real Estate Market Statistics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Real Estate Market Statistics encompasses the collection and analysis of data related to property prices and market trends.&lt;SEP&gt;Real Estate Market Statistics encompass data and analysis about property prices, including apartment sales price indices.&lt;SEP&gt;Real Estate Market Statistics refers to numerical data and analysis related to housing market trends and pricing.&lt;SEP&gt;Real Estate Market Statistics is the category encompassing data about apartment sales price indices across regions.&lt;SEP&gt;Statistical data and analysis related to the real estate market, specifically focusing on apartment sales prices.&lt;SEP&gt;Real Estate Market Statistics refers to the systematic collection and analysis of data related to property prices and transactions.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
+      <data key="d6" />
+    </node>
+    <node id="Korea Real Estate Board">
+      <data key="d0">Korea Real Estate Board</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Korea Real Estate Board (한국부동산원) is a South Korean organization that serves as the primary operator and administrator of the R-ONE system, a comprehensive real estate data platform. This organization functions as the authoritative data source for real estate market information and statistics in South Korea.
+
+The Korea Real Estate Board is responsible for maintaining and publishing the R-ONE real estate data system, which serves as a centralized platform for real estate market information. Through this system, the organization provides a wide range of real estate market data, including apartment transaction price indices and apartment sales price indices. These statistics are essential resources for monitoring real estate market trends, informing policy decisions, and providing transparency to market participants.
+
+As the official publisher of R-ONE real estate statistics, the Korea Real Estate Board plays a crucial role in the South Korean real estate ecosystem by ensuring the systematic collection, organization, and dissemination of reliable real estate market data to government agencies, researchers, industry professionals, and the general public.&lt;SEP&gt;Korea Real Estate Board (한국부동산원) is the organization that provides real estate market data through the R-ONE system.&lt;SEP&gt;Korea Real Estate Board is the organization that provides real estate data through the R-ONE system.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-f52ad34fcfff2c6894ff4918dca7427f&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
+      <data key="d6" />
+    </node>
+    <node id="R-ONE">
+      <data key="d0">R-ONE</data>
+      <data key="d1">data</data>
+      <data key="d2">R-ONE is a comprehensive real estate data system and information platform operated by the Korea Real Estate Board. The system serves as a central repository and distribution point for real estate market statistics and information across South Korea.
+
+The platform specializes in providing apartment transaction and sales price indices, offering both national and regional data. These price index statistics enable market participants, researchers, policymakers, and the public to track and analyze trends in the apartment housing market across different geographic areas. The system maintains comprehensive data on apartment price movements, making it a valuable resource for understanding real estate market dynamics.
+
+Beyond apartment-specific metrics, R-ONE provides broader housing market statistics and comprehensive real estate market data. This wider scope allows users to access a full range of real estate information and market indicators, supporting informed decision-making for various stakeholders in the Korean real estate sector. Through its operation by the Korea Real Estate Board, R-ONE serves as an authoritative source for real estate market intelligence in South Korea.&lt;SEP&gt;R-ONE is the data system operated by Korea Real Estate Board that provides real estate market statistics.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-f52ad34fcfff2c6894ff4918dca7427f&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
+      <data key="d6" />
+    </node>
+    <node id="Apartment Transaction Price Index">
+      <data key="d0">Apartment Transaction Price Index</data>
+      <data key="d1">data</data>
+      <data key="d2">The Apartment Transaction Price Index is a statistical measure tracking apartment sales prices across regions in South Korea, with a base period of June 2021 set at 100.&lt;SEP&gt;The Apartment Transaction Price Index is a statistical measure tracking changes in apartment sale prices, with a baseline of 100 set in June 2021.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775344</data>
+      <data key="d6" />
+    </node>
+    <node id="Nationwide">
+      <data key="d0">Nationwide</data>
+      <data key="d1">location</data>
+      <data key="d2">Nationwide refers to the entire territory of South Korea for which the apartment price index is calculated.&lt;SEP&gt;Nationwide refers to the entire territory of South Korea as the geographical scope for the apartment price index statistics.&lt;SEP&gt;Nationwide refers to the entire country of South Korea as the geographical scope of the apartment sales price index.</data>
+      <data key="d3">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775370</data>
+      <data key="d6" />
+    </node>
+    <node id="Incheon Jung-gu">
+      <data key="d0">Incheon Jung-gu</data>
+      <data key="d1">location</data>
+      <data key="d2">Incheon Jung-gu is a district in Incheon where apartment sales price index data is collected and analyzed.&lt;SEP&gt;Incheon Jung-gu is a district in Incheon where apartment transaction price index data is collected and analyzed.&lt;SEP&gt;Incheon Jung-gu is a district in Incheon, South Korea, for which apartment sales price index data is being tracked.&lt;SEP&gt;Incheon Jung-gu is a district in Incheon, South Korea, where apartment sales price index data is measured.&lt;SEP&gt;Incheon Jung-gu is a district in Incheon, South Korea, where apartment sales price index data is collected.</data>
+      <data key="d3">chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-f52ad34fcfff2c6894ff4918dca7427f&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
+      <data key="d6" />
+    </node>
+    <node id="Apartment Sales Price Index">
+      <data key="d0">Apartment Sales Price Index</data>
+      <data key="d1">data</data>
+      <data key="d2">The Apartment Sales Price Index is a statistical measure tracking apartment transaction prices with a baseline of 100 set in June 2021.&lt;SEP&gt;The Apartment Sales Price Index is a statistical measure tracking apartment sales prices nationwide and regionally, with a base period of June 2021 set at 100.&lt;SEP&gt;The Apartment Sales Price Index is a statistical measure tracking changes in apartment sales prices, with a baseline of 100 set at June 2021.&lt;SEP&gt;The Apartment Sales Price Index is a statistical measure tracking changes in apartment sale prices across South Korea, with a base value of 100 set in June 2021.&lt;SEP&gt;Apartment Sales Price Index is a statistical measure tracking the changes in apartment transaction prices with a baseline of 100 set in June 2021.&lt;SEP&gt;A methodological approach to measure and track changes in apartment sales prices over time using an indexed system.&lt;SEP&gt;The Apartment Sales Price Index is a statistical measure tracking apartment transaction prices with a baseline of 100 set in June 2021.</data>
+      <data key="d3">chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
+      <data key="d6" />
+    </node>
+    <node id="99.06 Index Value">
+      <data key="d0">99.06 Index Value</data>
+      <data key="d1">data</data>
+      <data key="d2">The index value of 99.06 represents the apartment sales price level in Incheon Jung-gu as of January 2024, indicating a 0.9% decrease from the baseline.</data>
+      <data key="d3">chunk-a3f23e7d033713a722554a57577cd4cd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775290</data>
+      <data key="d6" />
+    </node>
+    <node id="National Apartment Sales Price Index">
+      <data key="d0">National Apartment Sales Price Index</data>
+      <data key="d1">data</data>
+      <data key="d2">The National Apartment Sales Price Index is a statistical measure tracking apartment sales prices across South Korea with a base period of June 2021 set at 100.&lt;SEP&gt;The National Apartment Sales Price Index is a statistical measure tracking apartment sales prices across South Korea with a base period of June 2021.&lt;SEP&gt;A statistical indicator measuring apartment sales prices across South Korea, with a base period of June 2021 set at 100, showing a value of 99.48 in May 2024.</data>
+      <data key="d3">chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775477</data>
+      <data key="d6" />
+    </node>
+    <node id="February 2024">
+      <data key="d0">February 2024</data>
+      <data key="d1">event</data>
+      <data key="d2">February 2024 is the reference time point for the apartment price index measurement showing a value of 99.76.&lt;SEP&gt;February 2024 is the reference time point for the reported apartment transaction price index measurement.</data>
+      <data key="d3">chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775344</data>
+      <data key="d6" />
+    </node>
+    <node id="99.76 Index Value">
+      <data key="d0">99.76 Index Value</data>
+      <data key="d1">data</data>
+      <data key="d2">99.76 is the apartment sales price index value recorded in February 2024, indicating a 0.2% decrease from the base period.</data>
+      <data key="d3">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775317</data>
+      <data key="d6" />
+    </node>
+    <node id="한국부동산원">
+      <data key="d0">한국부동산원</data>
+      <data key="d1">organization</data>
+      <data key="d2">한국부동산원 (Korea Real Estate Board) is the organization that maintains and publishes real estate market statistics.&lt;SEP&gt;한국부동산원 (Korea Real Estate Board) is the organization that provides real estate market data and analysis.&lt;SEP&gt;한국부동산원 (Korea Real Estate Board) is the organization that provides real estate market data and statistics.&lt;SEP&gt;Korea Real Estate Board, the organization responsible for collecting and providing real estate market data.&lt;SEP&gt;한국부동산원 (Korea Real Estate Board) is the organization that provides real estate market data and statistics.</data>
+      <data key="d3">chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
+      <data key="d6" />
+    </node>
+    <node id="Apartment Price Index">
+      <data key="d0">Apartment Price Index</data>
+      <data key="d1">data</data>
+      <data key="d2">Apartment Price Index is a statistical measure tracking apartment transaction prices across regions, with a baseline of 100 set in June 2021.</data>
+      <data key="d3">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775317</data>
+      <data key="d6" />
+    </node>
+    <node id="98.56 Index Value">
+      <data key="d0">98.56 Index Value</data>
+      <data key="d1">data</data>
+      <data key="d2">98.56 is the specific index value recorded for Incheon Jung-gu in February 2024, representing a 1.4% decrease from the baseline.</data>
+      <data key="d3">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775344</data>
+      <data key="d6" />
+    </node>
+    <node id="June 2021 Baseline">
+      <data key="d0">June 2021 Baseline</data>
+      <data key="d1">event</data>
+      <data key="d2">June 2021 serves as the baseline period with an index value of 100 for measuring apartment transaction price changes.&lt;SEP&gt;June 2021 serves as the baseline period with an index value of 100 for measuring apartment sales price changes.&lt;SEP&gt;June 2021 serves as the baseline period with an index value of 100 for apartment sales price measurements.</data>
+      <data key="d3">chunk-f52ad34fcfff2c6894ff4918dca7427f&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
+      <data key="d6" />
+    </node>
+    <node id="R-ONE System">
+      <data key="d0">R-ONE System</data>
+      <data key="d1">data</data>
+      <data key="d2">R-ONE is a data system operated by Korea Real Estate Board that collects and provides regional apartment transaction price indices.&lt;SEP&gt;R-ONE is a real estate data system operated by Korea Real Estate Board that serves as the data source for apartment sales price indices.</data>
+      <data key="d3">chunk-f52ad34fcfff2c6894ff4918dca7427f&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775396</data>
+      <data key="d6" />
+    </node>
+    <node id="1.4% Decline">
+      <data key="d0">1.4% Decline</data>
+      <data key="d1">data</data>
+      <data key="d2">The 1.4% decline represents the percentage decrease in apartment transaction prices in Incheon Jung-gu compared to the June 2021 baseline.</data>
+      <data key="d3">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775344</data>
+      <data key="d6" />
+    </node>
+    <node id="March 2024">
+      <data key="d0">March 2024</data>
+      <data key="d1">event</data>
+      <data key="d2">March 2024 is the reference time point for the apartment sales price index measurement.&lt;SEP&gt;March 2024 is the reference time point when the apartment sales price index was measured at 98.69.</data>
+      <data key="d3">chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775396</data>
+      <data key="d6" />
+    </node>
+    <node id="99.58 Index Value">
+      <data key="d0">99.58 Index Value</data>
+      <data key="d1">data</data>
+      <data key="d2">99.58 is the index value for March 2024, representing a 0.4% decline from the base period of June 2021.</data>
+      <data key="d3">chunk-1d7f0fdc03368ea6a5088322d896a022</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775370</data>
+      <data key="d6" />
+    </node>
+    <node id="0.4% Decline">
+      <data key="d0">0.4% Decline</data>
+      <data key="d1">data</data>
+      <data key="d2">0.4% decline represents the percentage decrease in apartment sales prices compared to the baseline period.</data>
+      <data key="d3">chunk-1d7f0fdc03368ea6a5088322d896a022</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775370</data>
+      <data key="d6" />
+    </node>
+    <node id="98.69 Index Value">
+      <data key="d0">98.69 Index Value</data>
+      <data key="d1">data</data>
+      <data key="d2">98.69 is the apartment sales price index value for Incheon Jung-gu in March 2024, indicating a 1.3% decline from the baseline.</data>
+      <data key="d3">chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775396</data>
+      <data key="d6" />
+    </node>
+    <node id="Korea Real Estate Board R-ONE">
+      <data key="d0">Korea Real Estate Board R-ONE</data>
+      <data key="d1">organization</data>
+      <data key="d2">Korea Real Estate Board R-ONE is the data source for the apartment sales price index statistics.</data>
+      <data key="d3">chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775396</data>
+      <data key="d6" />
+    </node>
+    <node id="전국">
+      <data key="d0">전국</data>
+      <data key="d1">location</data>
+      <data key="d2">전국 refers to the entire nation of South Korea as the geographic scope of the apartment sales price index.&lt;SEP&gt;Refers to the entire nationwide region of South Korea where the apartment sales price index is measured.</data>
+      <data key="d3">chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775477</data>
+      <data key="d6" />
+    </node>
+    <node id="April 2024">
+      <data key="d0">April 2024</data>
+      <data key="d1">event</data>
+      <data key="d2">April 2024 represents the reference time point for the reported apartment sales price index measurements.&lt;SEP&gt;April 2024 is the reference timepoint for the apartment sales price index measurement in Incheon Jung-gu.</data>
+      <data key="d3">chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775445</data>
+      <data key="d6" />
+    </node>
+    <node id="99.50 Index Value">
+      <data key="d0">99.50 Index Value</data>
+      <data key="d1">data</data>
+      <data key="d2">99.50 is the index value representing apartment sales prices in April 2024, indicating a 0.5% decline from the base period.</data>
+      <data key="d3">chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775421</data>
+      <data key="d6" />
+    </node>
+    <node id="Apartment Sales Price Statistics">
+      <data key="d0">Apartment Sales Price Statistics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Apartment Sales Price Statistics is a methodology for measuring and tracking changes in residential real estate market prices.</data>
+      <data key="d3">chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775421</data>
+      <data key="d6" />
+    </node>
+    <node id="May 2024">
+      <data key="d0">May 2024</data>
+      <data key="d1">event</data>
+      <data key="d2">May 2024 is the reference point for the apartment sales price index measurement showing a 0.5% decline from the base period.&lt;SEP&gt;May 2024 is the reference time point for the reported apartment sales price index data.</data>
+      <data key="d3">chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
+      <data key="d6" />
+    </node>
+    <node id="0.5% Decline">
+      <data key="d0">0.5% Decline</data>
+      <data key="d1">data</data>
+      <data key="d2">The percentage decrease in apartment sales prices from the base period to May 2024.</data>
+      <data key="d3">chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775477</data>
+      <data key="d6" />
+    </node>
+    <node id="99.10 Index Value">
+      <data key="d0">99.10 Index Value</data>
+      <data key="d1">data</data>
+      <data key="d2">99.10 is the apartment sales price index value for Incheon Jung-gu in May 2024, indicating a 0.9% decline from the baseline.</data>
+      <data key="d3">chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1765775512</data>
       <data key="d6" />
     </node>
     <edge source="삼성동" target="강남구">
@@ -213,6 +1185,24 @@
       <data key="d12">1764561030</data>
       <data key="d13" />
     </edge>
+    <edge source="서울특별시" target="성동구">
+      <data key="d7">1.0</data>
+      <data key="d8">성동구 is an autonomous district that belongs to 서울특별시.</data>
+      <data key="d9">administrative division,geographic containment</data>
+      <data key="d10">chunk-ff12e0bcde450dc70c733655e1372111</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771472</data>
+      <data key="d13" />
+    </edge>
+    <edge source="서울특별시" target="서초구">
+      <data key="d7">1.0</data>
+      <data key="d8">서초구 is an autonomous district that belongs to 서울특별시.</data>
+      <data key="d9">administrative subdivision,territorial governance</data>
+      <data key="d10">chunk-6d24b1ba5974ca3013ef835560acdfae</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771713</data>
+      <data key="d13" />
+    </edge>
     <edge source="테스트 아파트" target="Apartment Sale Transaction">
       <data key="d7">1.0</data>
       <data key="d8">The apartment sale transaction involved a unit in 테스트 아파트 being sold for 1.5 billion won.</data>
@@ -250,12 +1240,30 @@
       <data key="d13" />
     </edge>
     <edge source="Gangnam-gu" target="Seoul">
-      <data key="d7">1.0</data>
-      <data key="d8">Gangnam-gu is a district within Seoul city.</data>
-      <data key="d9">administrative division,geographic hierarchy</data>
-      <data key="d10">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b</data>
+      <data key="d7">2.0</data>
+      <data key="d8">Gangnam-gu is a district within Seoul city.&lt;SEP&gt;Gangnam-gu is an autonomous district that belongs to and is administratively subordinate to Seoul.</data>
+      <data key="d9">administrative division,geographic hierarchy,geographical hierarchy</data>
+      <data key="d10">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b&lt;SEP&gt;chunk-c4bd1b7c722f7d709f934e273cc5be3f</data>
       <data key="d11">unknown_source</data>
-      <data key="d12">1764561030</data>
+      <data key="d12">1765771725</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Gangnam-gu" target="Administrative Code 11680">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangnam-gu is identified by the administrative code 11680 within the government system.</data>
+      <data key="d9">administrative system,identification</data>
+      <data key="d10">chunk-c4bd1b7c722f7d709f934e273cc5be3f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771725</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Gangnam-gu" target="Seoul Special City">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangnam-gu is an autonomous district belonging to Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,territorial governance</data>
+      <data key="d10">chunk-c4bd1b7c722f7d709f934e273cc5be3f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771725</data>
       <data key="d13" />
     </edge>
     <edge source="Samsung-dong" target="Test Apartment">
@@ -301,6 +1309,1338 @@
       <data key="d10">chunk-6dc46df2cbef24a2549d0e6a07d4ce8b</data>
       <data key="d11">unknown_source</data>
       <data key="d12">1764561030</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Jongno-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Jongno-gu is an autonomous district that belongs to Seoul.</data>
+      <data key="d9">administrative hierarchy,geographic containment</data>
+      <data key="d10">chunk-73c9d7a70ce525b4e57fa371d9b90f53</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771436</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Gwangjin-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Gwangjin-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,jurisdictional relationship</data>
+      <data key="d10">chunk-48c028f3004b35c16f57482f5741c5d7</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771484</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Dongdaemun-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Dongdaemun-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative division,governance</data>
+      <data key="d10">chunk-0b64ffc75148f235760d93f0b7d2e0e5</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771497</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Seongbuk-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seongbuk-gu is an autonomous district that belongs to and is governed under Seoul.</data>
+      <data key="d9">administrative hierarchy,territorial jurisdiction</data>
+      <data key="d10">chunk-ea1e3f14dd430e90040d8f01e5fc5bb4</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771521</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Gangbuk-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangbuk-gu is an autonomous district that belongs to Seoul Special Metropolitan City.</data>
+      <data key="d9">administrative division,jurisdiction</data>
+      <data key="d10">chunk-6e0848b1b119121dd5a60b5cf3c301ef</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771531</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Dobong-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Dobong-gu is an autonomous district belonging to Seoul.</data>
+      <data key="d9">administrative division,jurisdictional hierarchy</data>
+      <data key="d10">chunk-2ff67ac67cc9eeac45a0205b35dd39f1</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771551</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Nowon-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Nowon-gu is an autonomous district that belongs to Seoul.</data>
+      <data key="d9">administrative division,jurisdictional hierarchy</data>
+      <data key="d10">chunk-e4634cc4eba25b66d38b04ecc11cd7da</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771571</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Eunpyeong-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Eunpyeong-gu is an autonomous district that belongs to Seoul.</data>
+      <data key="d9">administrative hierarchy,jurisdictional relationship</data>
+      <data key="d10">chunk-5891f3364a5bfdd86b9a4c8052cfa3b9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771582</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Mapo-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Mapo-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative jurisdiction,geographic hierarchy</data>
+      <data key="d10">chunk-09d75c5313df1318db9ef4ffaa364562</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771606</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Yangcheon-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Yangcheon-gu is an autonomous district that belongs to Seoul.</data>
+      <data key="d9">administrative division,jurisdictional hierarchy</data>
+      <data key="d10">chunk-3f6f80a23c789323038b051e370b122d</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771618</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Gangseo-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangseo-gu is an autonomous district that belongs to Seoul Special Metropolitan City.</data>
+      <data key="d9">administrative hierarchy,geographic containment</data>
+      <data key="d10">chunk-c0bbc84bdc3d0142ced9bccd29033ddf</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771630</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Guro-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Guro-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,district membership</data>
+      <data key="d10">chunk-36504f5106c2785a957ce01e0ec2a6a0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771641</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Gwanak-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Gwanak-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,geographic containment</data>
+      <data key="d10">chunk-9df2cb01e9dcae684eda36c3f419e9af</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771695</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Seocho-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seocho-gu is an autonomous district that belongs to Seoul.</data>
+      <data key="d9">administrative hierarchy,regional governance</data>
+      <data key="d10">chunk-6d24b1ba5974ca3013ef835560acdfae</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771713</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Songpa-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Songpa-gu is an autonomous district that belongs to Seoul Special Metropolitan City.</data>
+      <data key="d9">administrative division,geographical jurisdiction</data>
+      <data key="d10">chunk-8aac7537227c4daf63ed401fb51bb0ae</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771738</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul" target="Gangdong-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangdong-gu is an autonomous district that belongs to Seoul.</data>
+      <data key="d9">administrative hierarchy,territorial belonging</data>
+      <data key="d10">chunk-c86aede000cfd461b40f495155982ca9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771749</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jongno-gu" target="Administrative Code 11110">
+      <data key="d7">1.0</data>
+      <data key="d8">Jongno-gu is identified and classified by the administrative code 11110.</data>
+      <data key="d9">administrative classification,identification system</data>
+      <data key="d10">chunk-73c9d7a70ce525b4e57fa371d9b90f53</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771436</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jongno-gu" target="Seoul Special City">
+      <data key="d7">1.0</data>
+      <data key="d8">Jongno-gu is an autonomous district that belongs to and is governed under Seoul Special City.</data>
+      <data key="d9">administrative division,jurisdictional hierarchy</data>
+      <data key="d10">chunk-73c9d7a70ce525b4e57fa371d9b90f53</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771436</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Jung-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Jung-gu is an autonomous district that belongs to and is governed under Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,jurisdiction</data>
+      <data key="d10">chunk-2afeacd0a2acd216ae68220dfe54f1d5</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771447</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Yongsan-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Yongsan-gu is an autonomous district that belongs to and is administratively governed by Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,regional governance</data>
+      <data key="d10">chunk-ba2fb2fc296c6534e33e59f09c2fd071</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771460</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Seongdong-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seongdong-gu is an autonomous district that belongs to and is administratively governed by Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,jurisdictional belonging</data>
+      <data key="d10">chunk-ff12e0bcde450dc70c733655e1372111</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771472</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Jungnang-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Jungnang-gu is an autonomous district under the jurisdiction of Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,jurisdictional belonging</data>
+      <data key="d10">chunk-88abc9bd51b1b657051999f057afcd49</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771509</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Seongbuk-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seongbuk-gu is an autonomous district belonging to Seoul Special City.</data>
+      <data key="d9">administrative division,jurisdictional hierarchy</data>
+      <data key="d10">chunk-ea1e3f14dd430e90040d8f01e5fc5bb4</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771521</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Gangbuk-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangbuk-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,territorial jurisdiction</data>
+      <data key="d10">chunk-6e0848b1b119121dd5a60b5cf3c301ef</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771532</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Dobong-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Dobong-gu is an autonomous district that belongs to and is governed under Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,territorial jurisdiction</data>
+      <data key="d10">chunk-2ff67ac67cc9eeac45a0205b35dd39f1</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771551</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Nowon-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Nowon-gu is an autonomous district belonging to Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,jurisdictional relationship</data>
+      <data key="d10">chunk-e4634cc4eba25b66d38b04ecc11cd7da</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771571</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Seodaemun-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seodaemun-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative division,jurisdiction</data>
+      <data key="d10">chunk-2b87a139c84f7b979018131d3eaff697</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771595</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Mapo-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Mapo-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,regional governance</data>
+      <data key="d10">chunk-09d75c5313df1318db9ef4ffaa364562</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771606</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Yangcheon-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Yangcheon-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,governance</data>
+      <data key="d10">chunk-3f6f80a23c789323038b051e370b122d</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771618</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Guro-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Guro-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative subdivision,regional governance</data>
+      <data key="d10">chunk-36504f5106c2785a957ce01e0ec2a6a0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771641</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Geumcheon-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Geumcheon-gu is an autonomous district that belongs to Seoul Special City.</data>
+      <data key="d9">administrative jurisdiction,regional governance</data>
+      <data key="d10">chunk-c83b2b38bf556783a8733e54499d62bb</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771653</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Yeongdeungpo-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Yeongdeungpo-gu is an autonomous district that belongs to and is governed under Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,geographic belonging</data>
+      <data key="d10">chunk-618ce06f064b6fccec91a4f5161efba3</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771671</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Dongjak-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Dongjak-gu is an autonomous district that belongs to and is governed by Seoul Special City.</data>
+      <data key="d9">administrative jurisdiction,regional governance</data>
+      <data key="d10">chunk-4604c150a35c9545e35acb2c818250a1</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771685</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Songpa-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Songpa-gu is an autonomous district that belongs to and is governed under Seoul Special City.</data>
+      <data key="d9">administrative hierarchy,jurisdictional relationship</data>
+      <data key="d10">chunk-8aac7537227c4daf63ed401fb51bb0ae</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771738</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seoul Special City" target="Gangdong-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangdong-gu is an autonomous district that belongs to and is governed by Seoul Special City.</data>
+      <data key="d9">administrative jurisdiction,territorial governance</data>
+      <data key="d10">chunk-c86aede000cfd461b40f495155982ca9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771749</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jung-gu" target="Administrative Code 11140">
+      <data key="d7">1.0</data>
+      <data key="d8">Jung-gu is identified and classified by the administrative region code 11140.</data>
+      <data key="d9">administrative classification,identification</data>
+      <data key="d10">chunk-2afeacd0a2acd216ae68220dfe54f1d5</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771448</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jung-gu" target="Busan Metropolitan City">
+      <data key="d7">1.0</data>
+      <data key="d8">Jung-gu is an autonomous district that belongs to Busan Metropolitan City.</data>
+      <data key="d9">administrative hierarchy,regional governance</data>
+      <data key="d10">chunk-961f1fc7dd6c7edd94429e83ce3c3b28</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771761</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jung-gu" target="26110">
+      <data key="d7">1.0</data>
+      <data key="d8">Jung-gu is identified by the administrative region code 26110.</data>
+      <data key="d9">administrative identification,code assignment</data>
+      <data key="d10">chunk-961f1fc7dd6c7edd94429e83ce3c3b28</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771761</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jung-gu" target="Administrative Code 26110">
+      <data key="d7">1.0</data>
+      <data key="d8">Jung-gu is identified by the administrative code 26110.</data>
+      <data key="d9">administrative classification,identification system</data>
+      <data key="d10">chunk-961f1fc7dd6c7edd94429e83ce3c3b28</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771761</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Yongsan-gu" target="Administrative Code 11170">
+      <data key="d7">1.0</data>
+      <data key="d8">Yongsan-gu is officially identified and classified by the Administrative Code 11170.</data>
+      <data key="d9">administrative classification,identification system</data>
+      <data key="d10">chunk-ba2fb2fc296c6534e33e59f09c2fd071</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771461</data>
+      <data key="d13" />
+    </edge>
+    <edge source="성동구" target="Administrative Code 11200">
+      <data key="d7">1.0</data>
+      <data key="d8">성동구 is identified by the administrative code 11200.</data>
+      <data key="d9">administrative identification,regional coding</data>
+      <data key="d10">chunk-ff12e0bcde450dc70c733655e1372111</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771472</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Administrative Code 11200" target="Seongdong-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seongdong-gu is identified by the administrative code 11200 as its official designation within the administrative system.</data>
+      <data key="d9">administrative identification,official coding</data>
+      <data key="d10">chunk-ff12e0bcde450dc70c733655e1372111</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771473</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Gwangjin-gu" target="Administrative Code 11215">
+      <data key="d7">1.0</data>
+      <data key="d8">Gwangjin-gu is officially identified by Administrative Code 11215.</data>
+      <data key="d9">administrative identification,official designation</data>
+      <data key="d10">chunk-48c028f3004b35c16f57482f5741c5d7</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771484</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dongdaemun-gu" target="Administrative Code 11230">
+      <data key="d7">1.0</data>
+      <data key="d8">Dongdaemun-gu is identified by the administrative code 11230.</data>
+      <data key="d9">administrative identification,regional coding</data>
+      <data key="d10">chunk-0b64ffc75148f235760d93f0b7d2e0e5</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771497</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jungnang-gu" target="Administrative Code 11260">
+      <data key="d7">1.0</data>
+      <data key="d8">Jungnang-gu is identified by the administrative code 11260.</data>
+      <data key="d9">administrative classification,identification</data>
+      <data key="d10">chunk-88abc9bd51b1b657051999f057afcd49</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771509</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seongbuk-gu" target="Administrative Code 11290">
+      <data key="d7">1.0</data>
+      <data key="d8">Seongbuk-gu is identified by the administrative code 11290 in the government system.</data>
+      <data key="d9">administrative identification,official designation</data>
+      <data key="d10">chunk-ea1e3f14dd430e90040d8f01e5fc5bb4</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771521</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Gangbuk-gu" target="Administrative Code 11305">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangbuk-gu is identified by the administrative region code 11305.</data>
+      <data key="d9">administrative classification,identification</data>
+      <data key="d10">chunk-6e0848b1b119121dd5a60b5cf3c301ef</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771531</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dobong-gu" target="Administrative Code 11320">
+      <data key="d7">1.0</data>
+      <data key="d8">Dobong-gu is officially identified and classified by Administrative Code 11320.</data>
+      <data key="d9">administrative identification,coding system</data>
+      <data key="d10">chunk-2ff67ac67cc9eeac45a0205b35dd39f1</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771551</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Nowon-gu" target="Administrative Code 11350">
+      <data key="d7">1.0</data>
+      <data key="d8">Nowon-gu is identified by Administrative Code 11350 in the administrative system.</data>
+      <data key="d9">administrative system,identification</data>
+      <data key="d10">chunk-e4634cc4eba25b66d38b04ecc11cd7da</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771571</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Eunpyeong-gu" target="Administrative Code 11380">
+      <data key="d7">1.0</data>
+      <data key="d8">Eunpyeong-gu is identified by the administrative code 11380.</data>
+      <data key="d9">administrative classification,identification</data>
+      <data key="d10">chunk-5891f3364a5bfdd86b9a4c8052cfa3b9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771583</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seodaemun-gu" target="11410">
+      <data key="d7">1.0</data>
+      <data key="d8">Seodaemun-gu is identified by the administrative code 11410.</data>
+      <data key="d9">administrative identification,code assignment</data>
+      <data key="d10">chunk-2b87a139c84f7b979018131d3eaff697</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771595</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seodaemun-gu" target="Administrative District Code 11410">
+      <data key="d7">1.0</data>
+      <data key="d8">Seodaemun-gu is identified by the administrative district code 11410.</data>
+      <data key="d9">administrative identification,code assignment</data>
+      <data key="d10">chunk-2b87a139c84f7b979018131d3eaff697</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771595</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mapo-gu" target="Administrative Code 11440">
+      <data key="d7">1.0</data>
+      <data key="d8">Mapo-gu is officially identified by Administrative Code 11440.</data>
+      <data key="d9">administrative identification,official designation</data>
+      <data key="d10">chunk-09d75c5313df1318db9ef4ffaa364562</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771606</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Yangcheon-gu" target="Administrative Code 11470">
+      <data key="d7">1.0</data>
+      <data key="d8">Yangcheon-gu is identified by the administrative code 11470.</data>
+      <data key="d9">administrative identification,official designation</data>
+      <data key="d10">chunk-3f6f80a23c789323038b051e370b122d</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771618</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Yangcheon-gu" target="11470">
+      <data key="d7">1.0</data>
+      <data key="d8">Yangcheon-gu is identified by the administrative code 11470.</data>
+      <data key="d9">administrative identification,classification</data>
+      <data key="d10">chunk-3f6f80a23c789323038b051e370b122d</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771618</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Gangseo-gu" target="Administrative Code 11500">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangseo-gu is identified by the administrative code 11500.</data>
+      <data key="d9">administrative identification,code assignment</data>
+      <data key="d10">chunk-c0bbc84bdc3d0142ced9bccd29033ddf</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771630</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Guro-gu" target="Administrative Code 11530">
+      <data key="d7">1.0</data>
+      <data key="d8">Guro-gu is identified by the administrative code 11530.</data>
+      <data key="d9">administrative identification,official designation</data>
+      <data key="d10">chunk-36504f5106c2785a957ce01e0ec2a6a0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771641</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geumcheon-gu" target="Administrative Code 11545">
+      <data key="d7">1.0</data>
+      <data key="d8">Geumcheon-gu is assigned the administrative code 11545 for identification purposes.</data>
+      <data key="d9">administrative identification,government coding</data>
+      <data key="d10">chunk-c83b2b38bf556783a8733e54499d62bb</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771653</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Yeongdeungpo-gu" target="Administrative Code 11560">
+      <data key="d7">1.0</data>
+      <data key="d8">Yeongdeungpo-gu is officially identified and classified by the administrative code 11560.</data>
+      <data key="d9">administrative classification,identification</data>
+      <data key="d10">chunk-618ce06f064b6fccec91a4f5161efba3</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771671</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dongjak-gu" target="Administrative Code 11590">
+      <data key="d7">1.0</data>
+      <data key="d8">Dongjak-gu is identified by the administrative code 11590 for governmental and organizational purposes.</data>
+      <data key="d9">administrative classification,identification system</data>
+      <data key="d10">chunk-4604c150a35c9545e35acb2c818250a1</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771685</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Gwanak-gu" target="Administrative Code 11620">
+      <data key="d7">1.0</data>
+      <data key="d8">Gwanak-gu is officially identified by Administrative Code 11620.</data>
+      <data key="d9">administrative identification,official designation</data>
+      <data key="d10">chunk-9df2cb01e9dcae684eda36c3f419e9af</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771695</data>
+      <data key="d13" />
+    </edge>
+    <edge source="서초구" target="11650">
+      <data key="d7">1.0</data>
+      <data key="d8">서초구 is identified by the administrative code 11650.</data>
+      <data key="d9">administrative identification,code assignment</data>
+      <data key="d10">chunk-6d24b1ba5974ca3013ef835560acdfae</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771713</data>
+      <data key="d13" />
+    </edge>
+    <edge source="11650" target="Seocho-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seocho-gu is identified by the administrative code 11650.</data>
+      <data key="d9">administrative identification,data classification</data>
+      <data key="d10">chunk-6d24b1ba5974ca3013ef835560acdfae</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771713</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Songpa-gu" target="Administrative Code 11710">
+      <data key="d7">1.0</data>
+      <data key="d8">Administrative Code 11710 is the official code used to identify Songpa-gu within the administrative system.</data>
+      <data key="d9">administrative identification,regional coding</data>
+      <data key="d10">chunk-8aac7537227c4daf63ed401fb51bb0ae</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771738</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Gangdong-gu" target="Administrative Code 11740">
+      <data key="d7">1.0</data>
+      <data key="d8">Gangdong-gu is officially identified by Administrative Code 11740.</data>
+      <data key="d9">administrative identification,official coding</data>
+      <data key="d10">chunk-c86aede000cfd461b40f495155982ca9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771749</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busan Metropolitan City" target="Seogu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seogu is an autonomous district that belongs to Busan Metropolitan City.</data>
+      <data key="d9">administrative hierarchy,jurisdictional relationship</data>
+      <data key="d10">chunk-78a787ae0cb06803b352769561ab969d</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771774</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busan Metropolitan City" target="Seo-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Seo-gu is an autonomous district under the jurisdiction of Busan Metropolitan City.</data>
+      <data key="d9">administrative division,hierarchical relationship</data>
+      <data key="d10">chunk-78a787ae0cb06803b352769561ab969d</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771774</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busan Metropolitan City" target="Dong-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Dong-gu is an autonomous district that belongs to Busan Metropolitan City.</data>
+      <data key="d9">administrative hierarchy,jurisdiction</data>
+      <data key="d10">chunk-88f798edb4f77e0e46a68196f4986c02</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771785</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busan Metropolitan City" target="Yeongdo-Gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Yeongdo-gu is an autonomous district that belongs to and is governed by Busan Metropolitan City.</data>
+      <data key="d9">administrative hierarchy,jurisdiction</data>
+      <data key="d10">chunk-7948217ad947c2ca90abfc9216b8d5e4</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771797</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busan Metropolitan City" target="Yeongdo-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Yeongdo-gu is an autonomous district under the jurisdiction of Busan Metropolitan City.</data>
+      <data key="d9">administrative jurisdiction,regional governance</data>
+      <data key="d10">chunk-7948217ad947c2ca90abfc9216b8d5e4</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771797</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busan Metropolitan City" target="Busanjin-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Busanjin-gu is an autonomous district that belongs to Busan Metropolitan City.</data>
+      <data key="d9">administrative jurisdiction,regional hierarchy</data>
+      <data key="d10">chunk-7d77972a76bab56fe4658d4da55a7774</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771809</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busan Metropolitan City" target="Dongnae-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Dongnae-gu is an autonomous district that belongs to Busan Metropolitan City.</data>
+      <data key="d9">administrative division,geographic hierarchy</data>
+      <data key="d10">chunk-d27c29ca8001628fd2d891cd4a4140a0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775254</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Seogu" target="26140">
+      <data key="d7">1.0</data>
+      <data key="d8">Seogu is identified by the administrative region code 26140.</data>
+      <data key="d9">administrative identification,code assignment</data>
+      <data key="d10">chunk-78a787ae0cb06803b352769561ab969d</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771774</data>
+      <data key="d13" />
+    </edge>
+    <edge source="26140" target="Seo-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">26140 is the official administrative region code that identifies Seo-gu.</data>
+      <data key="d9">administrative identification,regional coding</data>
+      <data key="d10">chunk-78a787ae0cb06803b352769561ab969d</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771774</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dong-gu" target="Administrative Code 26170">
+      <data key="d7">1.0</data>
+      <data key="d8">Dong-gu is identified by the administrative code 26170.</data>
+      <data key="d9">administrative identification,coding system</data>
+      <data key="d10">chunk-88f798edb4f77e0e46a68196f4986c02</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771785</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Yeongdo-Gu" target="Administrative Code 26200">
+      <data key="d7">1.0</data>
+      <data key="d8">Yeongdo-gu is officially identified by Administrative Code 26200.</data>
+      <data key="d9">administrative identification,code assignment</data>
+      <data key="d10">chunk-7948217ad947c2ca90abfc9216b8d5e4</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771797</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Administrative Code 26200" target="Yeongdo-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Yeongdo-gu is identified by the administrative code 26200.</data>
+      <data key="d9">administrative classification,identification</data>
+      <data key="d10">chunk-7948217ad947c2ca90abfc9216b8d5e4</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771797</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busanjin-gu" target="Administrative Code 26230">
+      <data key="d7">1.0</data>
+      <data key="d8">Busanjin-gu is identified by the administrative code 26230.</data>
+      <data key="d9">administrative identification,governmental classification</data>
+      <data key="d10">chunk-7d77972a76bab56fe4658d4da55a7774</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771809</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Busanjin-gu" target="26230">
+      <data key="d7">1.0</data>
+      <data key="d8">Busanjin-gu is identified by the administrative region code 26230.</data>
+      <data key="d9">administrative identification,regional coding</data>
+      <data key="d10">chunk-7d77972a76bab56fe4658d4da55a7774</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765771809</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dongnae-gu" target="Administrative Code 26260">
+      <data key="d7">1.0</data>
+      <data key="d8">Dongnae-gu is identified by the administrative code 26260.</data>
+      <data key="d9">administrative identification,regional coding</data>
+      <data key="d10">chunk-d27c29ca8001628fd2d891cd4a4140a0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775254</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dongnae-gu" target="26260">
+      <data key="d7">1.0</data>
+      <data key="d8">Dongnae-gu is identified by the administrative code 26260.</data>
+      <data key="d9">administrative identification,code assignment</data>
+      <data key="d10">chunk-d27c29ca8001628fd2d891cd4a4140a0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775255</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sale Price Index" target="South Korea">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sale Price Index measures apartment sale prices across South Korea on a national and regional basis.</data>
+      <data key="d9">geographic scope,market measurement</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sale Price Index" target="January 2024">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sale Price Index was measured and recorded for January 2024 showing current market conditions.</data>
+      <data key="d9">current data,temporal measurement</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sale Price Index" target="June 2021">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sale Price Index uses June 2021 as its baseline period with a value of 100 for comparative analysis.</data>
+      <data key="d9">baseline reference,indexing methodology</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sale Price Index" target="99.97 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sale Price Index recorded a value of 99.97 in January 2024, representing current market conditions.</data>
+      <data key="d9">data representation,market indicator</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sale Price Index" target="한국부동산원 R-ONE">
+      <data key="d7">1.0</data>
+      <data key="d8">한국부동산원 R-ONE provides the data and publishes the National Apartment Sale Price Index.</data>
+      <data key="d9">authoritative source,data provision</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sale Price Index" target="Real Estate Market Statistics">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sale Price Index is a component of Real Estate Market Statistics used for market analysis.</data>
+      <data key="d9">category classification,data type</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="South Korea" target="National Apartment Sales Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sales Price Index measures apartment prices across all regions of South Korea.</data>
+      <data key="d9">data coverage,geographic scope</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="South Korea" target="Apartment Sales Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Sales Price Index covers the entire national territory of South Korea and its regional subdivisions.</data>
+      <data key="d9">geographic coverage,market analysis</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775422</data>
+      <data key="d13" />
+    </edge>
+    <edge source="January 2024" target="Apartment Transaction Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Transaction Price Index recorded a value of 99.97 in January 2024, indicating a 0.0% decline from the base period.</data>
+      <data key="d9">market snapshot,temporal measurement</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="January 2024" target="Apartment Sales Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Sales Price Index was measured and recorded for the time period of January 2024.</data>
+      <data key="d9">measurement period,temporal data point</data>
+      <data key="d10">chunk-a3f23e7d033713a722554a57577cd4cd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775290</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021" target="99.97 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 99.97 index value represents a 0.03% decline compared to the baseline value of 100 set in June 2021.</data>
+      <data key="d9">comparative analysis,percentage change</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021" target="Apartment Sales Price Index">
+      <data key="d7">5.0</data>
+      <data key="d8">The Apartment Sales Price Index uses June 2021 as its baseline period with an index value of 100.&lt;SEP&gt;The Apartment Sales Price Index uses June 2021 as its baseline reference point set at 100.&lt;SEP&gt;The Apartment Sales Price Index uses June 2021 as its baseline period with a value of 100.&lt;SEP&gt;The Apartment Sales Price Index uses June 2021 as its baseline period with an index value of 100.&lt;SEP&gt;The Apartment Sales Price Index uses June 2021 as the baseline reference point with a value of 100.</data>
+      <data key="d9">baseline reference,index calculation,index calibration,index standard,temporal benchmark</data>
+      <data key="d10">chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775452</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021" target="National Apartment Sales Price Index">
+      <data key="d7">3.0</data>
+      <data key="d8">The National Apartment Sales Price Index uses June 2021 as its base period with a value of 100 for comparison.&lt;SEP&gt;The National Apartment Sales Price Index uses June 2021 as its base period with a value of 100.&lt;SEP&gt;June 2021 serves as the base period (100) for calculating the National Apartment Sales Price Index.</data>
+      <data key="d9">base period,baseline reference,index calculation,reference point</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021" target="99.76 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 99.76 index value represents a 0.2% decrease compared to the June 2021 baseline of 100.</data>
+      <data key="d9">comparative analysis,percentage change</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021" target="Apartment Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Price Index uses June 2021 as the baseline period with an index value of 100.</data>
+      <data key="d9">baseline reference,index calculation</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021" target="99.58 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 99.58 index value represents a 0.4% decline compared to the June 2021 baseline of 100.</data>
+      <data key="d9">comparative measurement,percentage change</data>
+      <data key="d10">chunk-1d7f0fdc03368ea6a5088322d896a022</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775371</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021" target="99.50 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 99.50 index value represents a 0.5% decline compared to the June 2021 base period value of 100.</data>
+      <data key="d9">comparative analysis,percentage change</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775422</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Real Estate Market Statistics" target="한국부동산원">
+      <data key="d7">3.0</data>
+      <data key="d8">한국부동산원 publishes and provides Real Estate Market Statistics including apartment price indices.&lt;SEP&gt;한국부동산원 is the official source providing Real Estate Market Statistics.&lt;SEP&gt;한국부동산원 collects and publishes Real Estate Market Statistics for South Korea.</data>
+      <data key="d9">data collection,data provider,data publication,information provider,official source,statistical analysis</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775513</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Real Estate Market Statistics" target="National Apartment Sales Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sales Price Index is a component of broader Real Estate Market Statistics.</data>
+      <data key="d9">category relationship,data classification</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Real Estate Market Statistics" target="Apartment Sales Price Index">
+      <data key="d7">4.0</data>
+      <data key="d8">The Apartment Sales Price Index is a component of Real Estate Market Statistics used for market analysis.&lt;SEP&gt;Real Estate Market Statistics includes apartment sales price index as a key data type.&lt;SEP&gt;The Apartment Sales Price Index is a specific method used within Real Estate Market Statistics to track price changes.&lt;SEP&gt;The Apartment Sales Price Index is a component of broader Real Estate Market Statistics.</data>
+      <data key="d9">category classification,data category,data type,market analysis,statistical method</data>
+      <data key="d10">chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775513</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Korea Real Estate Board" target="R-ONE">
+      <data key="d7">9.0</data>
+      <data key="d8">The Korea Real Estate Board operates and maintains R-ONE, a comprehensive real estate data platform and information system. R-ONE functions as a data distribution platform specifically designed for real estate statistics and market data. Through this system, the Korea Real Estate Board collects and disseminates real estate market data, serving as a centralized hub for real estate information management. The platform represents the Korea Real Estate Board's primary technological infrastructure for managing, organizing, and distributing statistical information related to the real estate sector.&lt;SEP&gt;Korea Real Estate Board operates the R-ONE data system.</data>
+      <data key="d9">data management,data platform,data provider,data provision,data system ownership,information management,information system,platform operation,system operation</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-f52ad34fcfff2c6894ff4918dca7427f&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775513</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Korea Real Estate Board" target="Incheon Jung-gu">
+      <data key="d7">1.0</data>
+      <data key="d8">Korea Real Estate Board collects and analyzes apartment sales price data from Incheon Jung-gu.</data>
+      <data key="d9">data collection,regional monitoring</data>
+      <data key="d10">chunk-a3f23e7d033713a722554a57577cd4cd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775290</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Korea Real Estate Board" target="R-ONE System">
+      <data key="d7">2.0</data>
+      <data key="d8">Korea Real Estate Board operates and manages the R-ONE system for real estate data collection.&lt;SEP&gt;Korea Real Estate Board operates the R-ONE system for collecting and distributing real estate market data.</data>
+      <data key="d9">data management,organizational ownership,system operation</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775396</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Korea Real Estate Board" target="Apartment Sales Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">Korea Real Estate Board is responsible for calculating and publishing the Apartment Sales Price Index.</data>
+      <data key="d9">data publication,statistical authority</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775422</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Korea Real Estate Board" target="National Apartment Sales Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sales Price Index data is collected and published by Korea Real Estate Board.</data>
+      <data key="d9">data source,statistical reporting</data>
+      <data key="d10">chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="R-ONE" target="Apartment Transaction Price Index">
+      <data key="d7">2.0</data>
+      <data key="d8">R-ONE serves as the source platform providing the Apartment Transaction Price Index data.&lt;SEP&gt;R-ONE serves as the data source providing apartment transaction price index statistics.</data>
+      <data key="d9">data source,information provision,statistical reporting</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427&lt;SEP&gt;chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="R-ONE" target="Apartment Sales Price Index">
+      <data key="d7">6.0</data>
+      <data key="d8">R-ONE provides the statistical data for the Apartment Sales Price Index across regions.&lt;SEP&gt;R-ONE provides the data for the Apartment Sales Price Index measurements.&lt;SEP&gt;The Apartment Sales Price Index data is sourced from the R-ONE system.&lt;SEP&gt;R-ONE serves as the data source and platform for publishing the Apartment Sales Price Index.&lt;SEP&gt;R-ONE serves as the data source for apartment sales price index information.&lt;SEP&gt;R-ONE provides the data used to calculate and report the Apartment Sales Price Index.</data>
+      <data key="d9">data provision,data source,information provider,information provision,statistical reporting,statistical source</data>
+      <data key="d10">chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775513</data>
+      <data key="d13" />
+    </edge>
+    <edge source="R-ONE" target="한국부동산원">
+      <data key="d7">5.0</data>
+      <data key="d8">한국부동산원 operates and maintains the R-ONE data system for real estate information.&lt;SEP&gt;한국부동산원 operates R-ONE as a data platform for real estate information.&lt;SEP&gt;한국부동산원 operates the R-ONE data platform for real estate information distribution.&lt;SEP&gt;R-ONE is a data system operated by 한국부동산원 for real estate information distribution.&lt;SEP&gt;한국부동산원 operates R-ONE as a platform for providing real estate data.</data>
+      <data key="d9">data platform,data platform operation,information system,organizational system,platform ownership,system operation</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775512</data>
+      <data key="d13" />
+    </edge>
+    <edge source="R-ONE" target="Apartment Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">R-ONE provides and publishes the Apartment Price Index statistics.</data>
+      <data key="d9">data provision,statistical publication</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="R-ONE" target="National Apartment Sales Price Index">
+      <data key="d7">3.0</data>
+      <data key="d8">R-ONE is the data source system that provides the National Apartment Sales Price Index information.&lt;SEP&gt;R-ONE serves as the platform through which National Apartment Sales Price Index data is distributed.&lt;SEP&gt;The National Apartment Sales Price Index is accessible through the R-ONE platform.</data>
+      <data key="d9">data accessibility,data distribution,data source,information access,information distribution,information system</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166&lt;SEP&gt;chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Transaction Price Index" target="Nationwide">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Transaction Price Index measures apartment sales prices across the Nationwide region.</data>
+      <data key="d9">geographic coverage,market measurement</data>
+      <data key="d10">chunk-6b07d5022b1be1f67e51d71084766427</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775266</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Transaction Price Index" target="Incheon Jung-gu">
+      <data key="d7">2.0</data>
+      <data key="d8">Incheon Jung-gu is the geographic area where the Apartment Transaction Price Index is measured and reported.&lt;SEP&gt;The Apartment Transaction Price Index provides specific measurements for the Incheon Jung-gu district.</data>
+      <data key="d9">geographic scope,market measurement,regional data,regional statistics</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Transaction Price Index" target="98.56 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Transaction Price Index recorded a specific value of 98.56 for the measured period.</data>
+      <data key="d9">market indicator,statistical measurement</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Transaction Price Index" target="R-ONE System">
+      <data key="d7">1.0</data>
+      <data key="d8">The R-ONE system serves as the source for apartment transaction price index data.</data>
+      <data key="d9">data source,information provision</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Transaction Price Index" target="June 2021 Baseline">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Transaction Price Index uses June 2021 as its baseline with a standardized value of 100.</data>
+      <data key="d9">measurement standard,reference point</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Transaction Price Index" target="February 2024">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Transaction Price Index was measured and reported for February 2024.</data>
+      <data key="d9">data collection period,temporal measurement</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Nationwide" target="Apartment Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Price Index covers the nationwide region for measuring apartment prices.</data>
+      <data key="d9">geographical coverage,statistical scope</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Nationwide" target="Apartment Sales Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Sales Price Index covers apartment sales prices across the entire nation.</data>
+      <data key="d9">data coverage,geographical scope</data>
+      <data key="d10">chunk-1d7f0fdc03368ea6a5088322d896a022</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775370</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Incheon Jung-gu" target="Apartment Sales Price Index">
+      <data key="d7">6.0</data>
+      <data key="d8">Incheon Jung-gu is the geographical area for which the Apartment Sales Price Index is measured and reported.&lt;SEP&gt;The Apartment Sales Price Index was measured for the Incheon Jung-gu region.&lt;SEP&gt;Incheon Jung-gu is the specific geographic location for which the Apartment Sales Price Index is being measured and reported.&lt;SEP&gt;The Apartment Sales Price Index was measured specifically for the Incheon Jung-gu district.&lt;SEP&gt;The Apartment Sales Price Index is measured and tracked for the Incheon Jung-gu region.&lt;SEP&gt;The Apartment Sales Price Index measures and tracks property price changes in Incheon Jung-gu.</data>
+      <data key="d9">geographic data point,geographic measurement,geographical measurement,market measurement,market statistics,market tracking,real estate statistics,regional data,regional measurement</data>
+      <data key="d10">chunk-a3f23e7d033713a722554a57577cd4cd&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf&lt;SEP&gt;chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775512</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Incheon Jung-gu" target="98.69 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">Incheon Jung-gu recorded an index value of 98.69, reflecting a 1.3% decline from the baseline.</data>
+      <data key="d9">price trend,regional performance</data>
+      <data key="d10">chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775397</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="99.06 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 99.06 index value represents the specific measurement of the Apartment Sales Price Index for Incheon Jung-gu in January 2024.</data>
+      <data key="d9">market indicator,statistical measurement</data>
+      <data key="d10">chunk-a3f23e7d033713a722554a57577cd4cd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775290</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="March 2024">
+      <data key="d7">2.0</data>
+      <data key="d8">The Apartment Sales Price Index data is measured and reported for the reference time point of March 2024.&lt;SEP&gt;The Apartment Sales Price Index was measured and recorded at the reference time point of March 2024.</data>
+      <data key="d9">data collection,data reference,temporal measurement</data>
+      <data key="d10">chunk-1d7f0fdc03368ea6a5088322d896a022&lt;SEP&gt;chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775396</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="99.58 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Sales Price Index registered a value of 99.58 in the measurement period.</data>
+      <data key="d9">measurement result,numerical representation</data>
+      <data key="d10">chunk-1d7f0fdc03368ea6a5088322d896a022</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775370</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="98.69 Index Value">
+      <data key="d7">2.0</data>
+      <data key="d8">The Apartment Sales Price Index for the specified location and time period is represented by the value 98.69.&lt;SEP&gt;The 98.69 index value represents the current measurement of the Apartment Sales Price Index.</data>
+      <data key="d9">market indicator,quantitative data,statistical measurement</data>
+      <data key="d10">chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775396</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="R-ONE System">
+      <data key="d7">1.0</data>
+      <data key="d8">R-ONE System serves as the authoritative data source for the Apartment Sales Price Index statistics.</data>
+      <data key="d9">data source,information provider</data>
+      <data key="d10">chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775396</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="Korea Real Estate Board R-ONE">
+      <data key="d7">1.0</data>
+      <data key="d8">Korea Real Estate Board R-ONE provides the data for the Apartment Sales Price Index.</data>
+      <data key="d9">data provision,official statistics</data>
+      <data key="d10">chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775397</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="April 2024">
+      <data key="d7">2.0</data>
+      <data key="d8">The Apartment Sales Price Index was measured and reported for the time period of April 2024.&lt;SEP&gt;The Apartment Sales Price Index was measured at 98.53 for April 2024, indicating a 1.5% decline from the baseline.</data>
+      <data key="d9">current status,statistical reporting,temporal measurement</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-dae8799df4566fc6ebf105ca520762cf</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775452</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="June 2021 Baseline">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Sales Price Index uses June 2021 as its baseline period with a value of 100.</data>
+      <data key="d9">baseline reference,measurement standard</data>
+      <data key="d10">chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775513</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="May 2024">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Sales Price Index was measured and recorded for May 2024.</data>
+      <data key="d9">data collection,temporal measurement</data>
+      <data key="d10">chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775513</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Apartment Sales Price Index" target="99.10 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 99.10 index value represents the current measurement of the Apartment Sales Price Index.</data>
+      <data key="d9">price indicator,statistical measurement</data>
+      <data key="d10">chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775513</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="February 2024">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sales Price Index was measured and recorded for February 2024.</data>
+      <data key="d9">data point,temporal measurement</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="99.76 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sales Price Index recorded a value of 99.76 in February 2024.</data>
+      <data key="d9">data measurement,statistical value</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="전국">
+      <data key="d7">2.0</data>
+      <data key="d8">The National Apartment Sales Price Index covers the entire region of 전국 (nationwide South Korea).&lt;SEP&gt;The National Apartment Sales Price Index measures apartment prices across the entire nationwide region of South Korea.</data>
+      <data key="d9">data scope,geographic coverage,geographic scope,measurement coverage</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="April 2024">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sales Price Index was measured at the reference time point of April 2024.</data>
+      <data key="d9">data point,temporal measurement</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775422</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="99.50 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sales Price Index is quantified by the value 99.50 in April 2024.</data>
+      <data key="d9">quantitative representation,statistical measurement</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775422</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="한국부동산원">
+      <data key="d7">2.0</data>
+      <data key="d8">한국부동산원 is the authoritative source providing the National Apartment Sales Price Index data.&lt;SEP&gt;한국부동산원 is the authoritative source that compiles and publishes the National Apartment Sales Price Index.</data>
+      <data key="d9">data provider,data source,source authority,statistical authority</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9&lt;SEP&gt;chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="Apartment Sales Price Statistics">
+      <data key="d7">1.0</data>
+      <data key="d8">The National Apartment Sales Price Index is a specific implementation of Apartment Sales Price Statistics methodology.</data>
+      <data key="d9">methodological implementation,statistical measure</data>
+      <data key="d10">chunk-3579a904ac8769eac8790b06dec47ed9</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775422</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="May 2024">
+      <data key="d7">1.0</data>
+      <data key="d8">The index data was collected and reported for May 2024 as the reference time point.</data>
+      <data key="d9">data collection,temporal reference</data>
+      <data key="d10">chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="National Apartment Sales Price Index" target="0.5% Decline">
+      <data key="d7">1.0</data>
+      <data key="d8">The index shows a 0.5% decline from the base period, indicating a decrease in apartment sales prices.</data>
+      <data key="d9">market trend,price change</data>
+      <data key="d10">chunk-7ef4ca6930002e77af53eddb07e7d8d0</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="February 2024" target="Apartment Price Index">
+      <data key="d7">1.0</data>
+      <data key="d8">The Apartment Price Index recorded a value of 99.76 in February 2024, indicating a 0.2% decline from the baseline.</data>
+      <data key="d9">measurement period,statistical reporting</data>
+      <data key="d10">chunk-bf4c10e112d36d0addd98561faf05166</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775317</data>
+      <data key="d13" />
+    </edge>
+    <edge source="February 2024" target="98.56 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The index value of 98.56 was recorded during the reference period of February 2024.</data>
+      <data key="d9">data point,temporal measurement</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="98.56 Index Value" target="June 2021 Baseline">
+      <data key="d7">1.0</data>
+      <data key="d8">The index value of 98.56 is measured against the June 2021 baseline of 100.</data>
+      <data key="d9">baseline reference,comparative measurement</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="98.56 Index Value" target="1.4% Decline">
+      <data key="d7">1.0</data>
+      <data key="d8">The index value of 98.56 represents a 1.4% decline from the baseline value.</data>
+      <data key="d9">market trend,statistical interpretation</data>
+      <data key="d10">chunk-f52ad34fcfff2c6894ff4918dca7427f</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775345</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021 Baseline" target="98.69 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 98.69 index value is calculated relative to the June 2021 baseline of 100, showing a 1.3% decline.</data>
+      <data key="d9">baseline reference,comparative analysis</data>
+      <data key="d10">chunk-01dfefa312d316c4620eb1af2c8a5277</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775396</data>
+      <data key="d13" />
+    </edge>
+    <edge source="June 2021 Baseline" target="99.10 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 99.10 index value represents a 0.9% decline compared to the June 2021 baseline of 100.</data>
+      <data key="d9">comparative measurement,price change</data>
+      <data key="d10">chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775513</data>
+      <data key="d13" />
+    </edge>
+    <edge source="99.58 Index Value" target="0.4% Decline">
+      <data key="d7">1.0</data>
+      <data key="d8">The index value of 99.58 represents a 0.4% decline from the baseline.</data>
+      <data key="d9">market trend,statistical interpretation</data>
+      <data key="d10">chunk-1d7f0fdc03368ea6a5088322d896a022</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775370</data>
+      <data key="d13" />
+    </edge>
+    <edge source="May 2024" target="99.10 Index Value">
+      <data key="d7">1.0</data>
+      <data key="d8">The 99.10 index value corresponds to the measurement taken in May 2024.</data>
+      <data key="d9">temporal data,time-specific measurement</data>
+      <data key="d10">chunk-6dcdca701c5dee03fe6fbc0023b8cefd</data>
+      <data key="d11">unknown_source</data>
+      <data key="d12">1765775512</data>
       <data key="d13" />
     </edge>
   </graph>

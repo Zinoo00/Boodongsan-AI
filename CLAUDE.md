@@ -97,6 +97,10 @@ STORAGE_BACKEND=postgresql  # "postgresql" (기본값) 또는 "local"
 # PostgreSQL Database (프로덕션 - STORAGE_BACKEND=postgresql인 경우 필수)
 DATABASE_URL=postgresql+asyncpg://username:password@host:port/database
 
+# PostgreSQL SSL Mode (AWS RDS 연결 시 필수!)
+# Options: disable, allow, prefer, require, verify-ca, verify-full
+POSTGRES_SSL_MODE=require  # AWS RDS는 SSL 필수
+
 # LightRAG Configuration
 LIGHTRAG_WORKING_DIR=./lightrag_storage
 LIGHTRAG_WORKSPACE=BODA
@@ -242,6 +246,22 @@ uv run alembic current
 
 # 마이그레이션 재실행
 uv run alembic upgrade head
+```
+
+### AWS RDS SSL 연결 오류
+
+**오류 메시지**: `no pg_hba.conf entry for host "x.x.x.x", user "postgres", database "dbname", no encryption`
+
+**원인**: AWS RDS는 기본적으로 SSL 연결을 요구함
+
+**해결책**:
+```bash
+# .env 파일에 추가
+POSTGRES_SSL_MODE=require
+
+# 또는 환경 변수로 직접 설정 후 실행
+export POSTGRES_SSL_MODE=require
+uv run uvicorn api.main:app --host 0.0.0.0
 ```
 
 ### Local Storage 초기화
