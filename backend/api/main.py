@@ -15,8 +15,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from api.routers import admin, chat, citydata, health, policies, properties, users
+from core.cache import cleanup_cache, initialize_cache
 from core.config import get_environment_config, settings
-from core.database import cleanup_database, initialize_database
 from services.ai_service import AIService
 from services.data_service import DataService
 from services.lightrag_service import LightRAGService
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await initialize_database()
+    await initialize_cache()
 
     # Initialize AI service
     ai_service = AIService()
@@ -93,7 +93,7 @@ async def lifespan(app: FastAPI):
         await ai_service.close()
         await lightrag_service.finalize()
         await city_data_service.close()
-        await cleanup_database()
+        await cleanup_cache()
 
 
 app = FastAPI(

@@ -1,5 +1,17 @@
 """
 PostgreSQL database models for RAG storage.
+
+NOTE: 이 모델들은 현재 LightRAG의 네이티브 스토리지와 별개로 존재합니다.
+
+현재 상태:
+- LightRAG는 자체 PostgreSQL 스토리지 클래스 사용 (PGKVStorage, PGVectorStorage 등)
+- 이 모델들은 Alembic 마이그레이션을 통해 테이블이 생성되지만 쿼리에 직접 사용되지 않음
+- 향후 사용자 정의 데이터 저장이나 확장 기능에 활용 가능
+
+사용 중인 스토리지:
+- 대화 이력: UserService (JSON 파일 기반)
+- 부동산 데이터: LightRAG (PostgreSQL + pgvector)
+- 캐시: Redis (core/cache.py)
 """
 
 from __future__ import annotations

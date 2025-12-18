@@ -1,17 +1,41 @@
 """
 In-memory data service for properties and policies.
+
+NOTE: 이 서비스는 인메모리 스텁입니다.
+- 데이터는 서버 재시작 시 사라짐
+- 실제 부동산/정책 데이터는 LightRAG를 통해 관리됨
+- properties.py, policies.py 라우터는 현재 비활성 상태
+
+향후 계획:
+- LightRAG 기반 검색으로 통합 예정
+- 또는 PostgreSQL 기반으로 마이그레이션 예정
 """
 
 from __future__ import annotations
 
+import logging
 import uuid
 from typing import Any
 
+logger = logging.getLogger(__name__)
+
 
 class DataService:
+    """
+    In-memory stub for properties and policies.
+
+    WARNING: 이 서비스는 현재 비활성 상태입니다.
+    실제 데이터는 LightRAG를 통해 관리됩니다.
+    """
+
     def __init__(self) -> None:
         self._properties: dict[str, dict[str, Any]] = {}
         self._policies: dict[str, dict[str, Any]] = {}
+        logger.warning(
+            "DataService initialized (in-memory stub). "
+            "Data will not persist across restarts. "
+            "Use LightRAG for actual data."
+        )
 
     async def create_property(self, property_data: dict[str, Any]) -> dict[str, Any]:
         property_id = property_data.get("id") or str(uuid.uuid4())

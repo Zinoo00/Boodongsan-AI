@@ -11,8 +11,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from api.dependencies import get_ai_service
+from core.cache import cache_health_check
 from core.config import settings
-from core.database import database_health_check
 from services.ai_service import AIService
 
 router = APIRouter()
@@ -38,12 +38,12 @@ def _get_model_info(provider: str) -> dict[str, str]:
 
 @router.get("/", response_model=HealthResponse)
 async def health_check(ai_service: AIService = Depends(get_ai_service)) -> HealthResponse:
-    redis_status = await database_health_check()
+    redis_status = await cache_health_check()
     await ai_service.initialize()
 
     model_info = _get_model_info(ai_service.provider)
     services = {
-        "database": redis_status["redis"],
+        "cache": redis_status["redis"],
         "ai_service": {
             "status": ai_service.is_ready(),
             **model_info,
@@ -59,9 +59,10 @@ async def health_check(ai_service: AIService = Depends(get_ai_service)) -> Healt
     )
 
 
-@router.get("/database", response_model=dict[str, Any])
-async def database_health() -> dict[str, Any]:
-    return await database_health_check()
+@router.get("/cache", response_model=dict[str, Any])
+async def cache_health() -> dict[str, Any]:
+    """Check Redis cache health."""
+    return await cache_health_check()
 
 
 @router.get("/ai", response_model=dict[str, Any])

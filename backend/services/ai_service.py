@@ -230,9 +230,20 @@ class AIService:
 
     async def generate_rag_response(self, context: dict[str, Any]) -> dict[str, Any]:
         system_prompt = self._system_prompt()
-        messages = [
-            {"role": "user", "content": self._user_prompt(context)},
-        ]
+
+        # 네이티브 멀티턴: messages 배열에 대화 이력 포함
+        messages: list[dict[str, str]] = []
+
+        # 이전 대화 이력 추가
+        conversation_history = context.get("conversation_history") or []
+        for msg in conversation_history[-6:]:  # 최근 6개 메시지
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            if role in ("user", "assistant") and content:
+                messages.append({"role": role, "content": content[:2000]})
+
+        # 현재 질문 추가
+        messages.append({"role": "user", "content": self._user_prompt(context)})
 
         if self._provider == "anthropic":
             text = await self._invoke_anthropic(
@@ -268,19 +279,8 @@ class AIService:
         )
 
     def _user_prompt(self, context: dict[str, Any]) -> str:
-        parts: list[str] = []
-
-        # 이전 대화 이력 추가 (멀티턴 지원)
-        conversation_history = context.get("conversation_history") or []
-        if conversation_history:
-            parts.append("이전 대화:")
-            for msg in conversation_history[-6:]:  # 최근 6개 메시지만
-                role = "사용자" if msg.get("role") == "user" else "AI"
-                content = msg.get("content", "")[:500]  # 각 메시지 500자 제한
-                parts.append(f"[{role}] {content}")
-            parts.append("")  # 빈 줄
-
-        parts.append(f"사용자 질문: {context.get('user_query', '').strip()}")
+        # 대화 이력은 messages 배열로 네이티브 전달됨 (generate_rag_response에서 처리)
+        parts: list[str] = [f"사용자 질문: {context.get('user_query', '').strip()}"]
 
         profile = context.get("user_profile") or {}
         if profile:

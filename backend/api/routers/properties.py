@@ -1,5 +1,9 @@
 """
 Property router backed by DataService.
+
+NOTE: 이 라우터는 현재 비활성 상태입니다.
+DataService가 인메모리 스텁이므로 항상 빈 결과를 반환합니다.
+실제 부동산 데이터 검색은 /chat 엔드포인트를 통해 LightRAG로 수행됩니다.
 """
 
 from __future__ import annotations

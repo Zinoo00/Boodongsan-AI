@@ -1,5 +1,7 @@
 """
-Very small Redis helper used during development.
+Redis cache helper.
+
+Redis 캐시 관리 및 in-memory fallback 제공.
 """
 
 from __future__ import annotations
@@ -18,8 +20,8 @@ from core.config import settings
 logger = logging.getLogger(__name__)
 
 
-class AsyncMemoryRedis:
-    """Very small in-memory substitute for Redis used when a real instance is unavailable."""
+class AsyncMemoryCache:
+    """In-memory substitute for Redis used when a real instance is unavailable."""
 
     def __init__(self) -> None:
         self._store: dict[str, Any] = {}
@@ -52,7 +54,7 @@ class AsyncMemoryRedis:
         pass
 
 
-class DatabaseManager:
+class RedisManager:
     """Manage a single Redis connection."""
 
     def __init__(self) -> None:
@@ -73,7 +75,7 @@ class DatabaseManager:
             logger.info("Connected to Redis at %s", settings.REDIS_URL)
         except (RedisConnectionError, OSError) as exc:
             logger.warning("Redis connection failed (%s). Falling back to in-memory cache.", exc)
-            self._redis = AsyncMemoryRedis()
+            self._redis = AsyncMemoryCache()
 
     async def get_redis(self):
         if not self._redis:
@@ -87,9 +89,9 @@ class DatabaseManager:
 
 
 class CacheManager:
-    """Minimal JSON helpers on top of Redis."""
+    """JSON helpers on top of Redis."""
 
-    def __init__(self, manager: DatabaseManager):
+    def __init__(self, manager: RedisManager):
         self.manager = manager
         self.default_ttl = settings.CACHE_TTL
 
@@ -114,30 +116,42 @@ class CacheManager:
         return await self.set(key, json.dumps(value, ensure_ascii=False), ttl)
 
 
-db_manager = DatabaseManager()
-cache_manager = CacheManager(db_manager)
+redis_manager = RedisManager()
+cache_manager = CacheManager(redis_manager)
 
 
 async def get_redis_client():
-    return await db_manager.get_redis()
+    return await redis_manager.get_redis()
 
 
 async def get_cache_manager():
     return cache_manager
 
 
-async def initialize_database():
-    await db_manager.initialize()
+async def initialize_cache():
+    """Initialize Redis/cache connection."""
+    await redis_manager.initialize()
 
 
-async def cleanup_database():
-    await db_manager.close()
+async def cleanup_cache():
+    """Close Redis/cache connection."""
+    await redis_manager.close()
 
 
-async def database_health_check() -> dict[str, Any]:
-    client = await db_manager.get_redis()
+async def cache_health_check() -> dict[str, Any]:
+    """Check Redis/cache health."""
+    client = await redis_manager.get_redis()
     alive = bool(await client.ping())
     return {
         "redis": {"status": alive, "url": settings.REDIS_URL},
         "timestamp": datetime.utcnow().isoformat(),
     }
+
+
+# Backward compatibility aliases (deprecated - will be removed in future)
+db_manager = redis_manager
+DatabaseManager = RedisManager
+AsyncMemoryRedis = AsyncMemoryCache
+initialize_database = initialize_cache
+cleanup_database = cleanup_cache
+database_health_check = cache_health_check
