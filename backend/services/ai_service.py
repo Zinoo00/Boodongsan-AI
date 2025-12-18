@@ -268,7 +268,19 @@ class AIService:
         )
 
     def _user_prompt(self, context: dict[str, Any]) -> str:
-        parts: list[str] = [f"사용자 질문: {context.get('user_query', '').strip()}"]
+        parts: list[str] = []
+
+        # 이전 대화 이력 추가 (멀티턴 지원)
+        conversation_history = context.get("conversation_history") or []
+        if conversation_history:
+            parts.append("이전 대화:")
+            for msg in conversation_history[-6:]:  # 최근 6개 메시지만
+                role = "사용자" if msg.get("role") == "user" else "AI"
+                content = msg.get("content", "")[:500]  # 각 메시지 500자 제한
+                parts.append(f"[{role}] {content}")
+            parts.append("")  # 빈 줄
+
+        parts.append(f"사용자 질문: {context.get('user_query', '').strip()}")
 
         profile = context.get("user_profile") or {}
         if profile:

@@ -37,7 +37,7 @@ class Settings(BaseSettings):
 
     # RAG
     MAX_SEARCH_RESULTS: int = 10
-    RESPONSE_MAX_TOKENS: int = 1000
+    RESPONSE_MAX_TOKENS: int = 10000  # 충분한 응답 길이 (약 6000 단어)
 
     # AI
     AWS_ACCESS_KEY_ID: str = ""

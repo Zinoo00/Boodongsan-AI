@@ -50,7 +50,7 @@ def _build_llm_model_func(ai_service: AIService | None) -> Callable[..., Awaitab
             response = await ai_service.generate_text(
                 prompt=prompt,
                 system_prompt=system_prompt,
-                max_tokens=kwargs.get("max_tokens", 2000),
+                max_tokens=kwargs.get("max_tokens", 10000),
             )
         except Exception as exc:
             logger.error(f"LLM function failed: {exc}")

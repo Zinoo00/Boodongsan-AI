@@ -80,6 +80,21 @@ class RAGService:
         profile = await self.user_service.get_primary_profile(user_id)
         profile_dict = self._profile_to_dict(profile)
 
+        # 이전 대화 이력 가져오기 (멀티턴 지원)
+        conversation_history = session_context.get("conversation_history", [])
+        if not conversation_history and conversation_id:
+            try:
+                history_records = await self.user_service.get_conversation_history(
+                    user_id, conversation_id, limit=10
+                )
+                conversation_history = [
+                    {"role": r.role, "content": r.content}
+                    for r in history_records
+                    if hasattr(r, "role") and hasattr(r, "content")
+                ]
+            except Exception:
+                conversation_history = []
+
         return {
             "user_query": user_query,
             "user_id": user_id,
@@ -89,7 +104,7 @@ class RAGService:
             "properties": session_context.get("properties", []),
             "policies": session_context.get("policies", []),
             "market_context": session_context.get("market_context", {}),
-            "conversation_history": session_context.get("conversation_history", []),
+            "conversation_history": conversation_history,
         }
 
     async def _query_lightrag(self, query: str) -> dict[str, Any] | None:
