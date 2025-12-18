@@ -37,7 +37,7 @@ class FrontendSettings(BaseSettings):
         description="FastAPI 백엔드 URL",
     )
     API_V1_STR: str = Field(default="/api/v1", description="API 버전 prefix")
-    API_TIMEOUT: int = Field(default=300, ge=5, le=3000, description="API 타임아웃 (초)")
+    API_TIMEOUT: int = Field(default=900, ge=5, le=3600, description="API 타임아웃 (초)")  # 15분
 
     # Chat Settings
     MAX_MESSAGE_LENGTH: int = Field(default=2000, ge=1, le=10000, description="최대 메시지 길이")

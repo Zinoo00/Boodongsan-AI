@@ -95,12 +95,21 @@ class AIService:
         """Initialize AWS Bedrock client."""
         try:
             import boto3
+            from botocore.config import Config
+
+            # 타임아웃 무제한 설정 (복잡한 RAG 쿼리용)
+            bedrock_config = Config(
+                read_timeout=900,  # 15분
+                connect_timeout=60,
+                retries={"max_attempts": 3},
+            )
 
             self._bedrock_client = boto3.client(
                 service_name="bedrock-runtime",
                 region_name=settings.AWS_REGION,
                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                config=bedrock_config,
             )
             logger.info(f"AWS Bedrock client initialized (region: {settings.AWS_REGION})")
         except ImportError:
