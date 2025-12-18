@@ -4,10 +4,13 @@ Straightforward Retrieval-Augmented Generation service using LightRAG.
 
 from __future__ import annotations
 
+import logging
 import time
 from typing import TYPE_CHECKING, Any
 
 from core.config import settings
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from services.ai_service import AIService
@@ -87,12 +90,21 @@ class RAGService:
                 history_records = await self.user_service.get_conversation_history(
                     user_id, conversation_id, limit=10
                 )
+                # 딕셔너리 리스트에서 대화 이력 추출 (키 접근)
                 conversation_history = [
-                    {"role": r.role, "content": r.content}
+                    {"role": r.get("role"), "content": r.get("content")}
                     for r in history_records
-                    if hasattr(r, "role") and hasattr(r, "content")
+                    if r.get("role") and r.get("content")
                 ]
-            except Exception:
+                logger.debug(
+                    "대화 이력 로드 성공: user=%s, conv=%s, count=%d",
+                    user_id, conversation_id, len(conversation_history)
+                )
+            except Exception as e:
+                logger.warning(
+                    "대화 이력 로드 실패: user=%s, conv=%s, error=%s",
+                    user_id, conversation_id, str(e)
+                )
                 conversation_history = []
 
         return {

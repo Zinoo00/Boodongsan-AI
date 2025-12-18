@@ -97,13 +97,14 @@ class UserService:
         conversation_id: str,
         limit: int = 10,
     ) -> list[dict[str, Any]]:
-        """대화 이력 조회"""
+        """대화 이력 조회 (시간순 - 오래된 것 먼저)"""
         async with self._lock:
             store = await self._load_store()
             user_convs = store.get("conversations", {}).get(user_id, {})
             convo = user_convs.get(conversation_id, {"messages": []})
             messages = list(convo.get("messages", []))
-            return list(reversed(messages[-limit:]))
+            # 최근 N개 메시지를 시간순으로 반환 (Claude API 요구사항)
+            return messages[-limit:]
 
     async def save_conversation_message(
         self,
